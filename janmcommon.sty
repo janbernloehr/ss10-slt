@@ -1,0 +1,368 @@
+% Dieser Style definiert alles Notwendige um mathematische Texte
+% zu setzten.
+%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{janmcommon}[2009/09/22 v. 1.0 A common document style]
+
+\PackageWarningNoLine{janmcommon}{Loading.}
+
+%
+% =============================================================================
+% 					Pakete für Script Dokumente
+% =============================================================================
+\newcommand*\@janmfont{%
+  1%
+}
+% Sprache, Sonderzeichen, UTF-8 Encoding
+%\DeclareOption{nolucida}{ \@nolucidatrue
+%TODO: 10pt falls kein lucida
+% }
+\KOMA@ifkey{boldvectors}{@boldVectors}
+\DeclareOption{pdftitle}{ \PassOptionsToPackage{{\CurrentOption}}{hyperref} }
+\KOMA@DeclareDeprecatedOption[janmcommon]{nolucida}{font=cm} 
+
+\newcommand*{\Font}[1]{}
+\KOMA@key{font}[true]{%
+    \KOMA@set@ncmdkey{font}{@tempa}{%
+      {cm}{0},{off}{0},{no}{0},%
+      {lucida}{1},{true}{1},{on}{1},{yes}{1},%
+      {times}{2}%
+    }{#1}%
+    \edef\@janmfont{\number\@tempa}
+}
+
+\KOMAProcessOptions\relax
+
+%
+\RequirePackage{ifthen}
+%
+\RequirePackage[ngerman]{babel}
+\RequirePackage[utf8x]{inputenc}
+%
+% Moderne T1 fonts (empfohlen für Lucida) 
+\RequirePackage[T1]{fontenc}
+%
+\ifcase\number\@janmfont% 0
+	\PackageWarningNoLine{janmcommon}{Loading Computer Modern.}
+	\RequirePackage{amsmath,amssymb,array,latexsym,stmaryrd}%
+\or% 1
+	\PackageWarningNoLine{janmcommon}{Loading Lucida.}
+	\RequirePackage{amsmath,mathtools}
+	\RequirePackage[romanfamily=bright-osf,math-style=iso,stdmathdigits=true,scale=.79]{lucimatx}
+	\or% 2
+	\PackageWarningNoLine{janmcommon}{Loading Times with Math Time Pro 2}
+	\usepackage{textcomp}
+	\renewcommand{\rmdefault}{ptm}
+	\usepackage[scaled=0.92]{helvet}
+	\usepackage[lite]{mtpro2}
+	\RequirePackage{amsmath,amssymb,array,latexsym,stmaryrd}
+\fi
+
+%
+% Nummerierung von Aufzählungen (i), (a), 1.) usw.
+\RequirePackage{enumitem}
+%
+% pstricks für Zeichnungen
+\RequirePackage{pstricks-add}
+\RequirePackage{pst-pdf}
+\RequirePackage{float}
+
+% Ausgabe der Urhzeit
+\RequirePackage{scrtime}
+
+% PDF Optionen
+\RequirePackage[
+% Hyperlink-Optionen
+hyperfootnotes=true, % Fußnoten verlinken
+hyperindex=true, % Seitenzahlen als Link
+%backref=true, % Rücklinks von bibitem,
+% erfordert Leerzeile nach jedem bibitem
+breaklinks=true, % Zeilenumbruch bei Links
+% Farben
+colorlinks=true, % true = farbige Links, false = Rahmen
+linkcolor=linkred, % Farbe für Links auf gleicher Seite
+%pagecolor=gray, % Farbe für Links auf anderen Seiten
+citecolor=gray, % Farbe für Links auf Zitatstellen
+filecolor=magenta,
+urlcolor=linkred, % Farbe für Links auf URLs
+anchorcolor=blue, % Farbe für Anker (?)
+menucolor=red, % Farbe für Acrobatmenüeinträge
+% Fehlermeldungen reduzieren
+plainpages=false,
+% PDF-Metainformationen
+unicode=true, % Mit Unicode kodierte Texte
+baseurl={http://www.janmolnar.de/uni},
+pdfauthor={Jan-Cornelius Molnar},
+pdfproducer={pdflatex},
+% Adobe Reader: Anzeigeoptionen
+bookmarks=true, % Acrobat-Lesezeichen einfügen
+bookmarksnumbered=true, % Kapitelnummern für Lesezeichen
+bookmarksopen=true, % Acrobat-Lesezeichen links geöffnet
+bookmarksopenlevel=2, % Geöffnete Hierarchiestufe
+%bookmarkstype=Richter_LaTeX_Tipps.toc,
+% Lesezeichentyp. Fehlen aber.
+pdfview=FitH, % Zoom beim Link-Traversieren
+% FitH=Seitenbreite anpassen
+% weitere: Fit, FitH, FitV, FitR, FitBH
+pdfstartview=FitH, % Zoom beim Öffnen
+pdfstartpage={1}, % Seite, die angezeigt wird
+pdfpagelayout=OneColumn % Anzeigemodus, hier 1 Seite fortlaufend
+% SinglePage, OneColumn,
+% TwoColumnLeft, TwoColumnRight
+%pdfpagemode=None, % Optionen: UseOutlines = Bookmarks links
+% UseThumbs, FullScreen
+]{hyperref}
+
+% Farben 
+\RequirePackage{color}
+
+% Abbildungsüberschriten
+\RequirePackage{caption}
+
+
+% =============================================================================
+% 					Seitenstil
+% =============================================================================
+
+\DeclareCaptionFont{gray-bold}{\small\bfseries\color{gray}}
+\DeclareCaptionFont{gray-light}{\color{gray}\footnotesize}
+
+\DeclareCaptionLabelFormat{number-only}{#2}
+\DeclareCaptionFormat{llap}{\llap{#1#2}\quad#3\par}
+
+\captionsetup{format=llap,labelformat=number-only,labelsep=quad,singlelinecheck=no,labelfont=gray-light,textfont=gray-bold}
+
+% Seitenstil
+\pagestyle{plain} 
+
+% Option H für figures
+\restylefloat{figure}
+
+% =============================================================================
+% 					Häufig verwendete Farben
+% =============================================================================
+
+\definecolor{darkblue}{rgb}{0.09,0.20,0.43}
+\definecolor{darkgreen}{rgb}{0,0.5,0}
+\definecolor{lightgray}{rgb}{0.9,0.9,0.9}
+\definecolor{proofgray}{rgb}{0.3,0.3,0.3}
+\definecolor{framecolor}{rgb}{0,0,0}
+\definecolor{gdarkgray}{rgb}{0.39,0.39,0.40}
+\definecolor{glightgray}{rgb}{0.93,0.93,0.93}
+
+\definecolor{purple}{rgb}{0.55,.16,0.44}
+\definecolor{yellow}{rgb}{0.78,.51,0.13}
+\definecolor{htmlyellow}{rgb}{1,1,0}
+\definecolor{linkred}{rgb}{0.545,0.275,0.29}
+
+% Hervorhebung in Definitionen etc.
+\renewcommand{\emph}[1]{{\color{purple}#1}}
+
+% =============================================================================
+% 					PSTricks Standard
+% =============================================================================
+
+\psset{linecolor=gdarkgray}
+\psset{tickcolor=gdarkgray}
+\psset{fillcolor=glightgray}
+
+% =============================================================================
+% 					Listen
+% =============================================================================
+
+% itemize 
+\newcommand{\labelitem}{\footnotesize\ensuremath{\blacksquare}}
+
+% Standard Aufzählung (a)
+\renewcommand{\labelenumi}{{\normalfont(\alph{enumi})}}
+% Standard Liste
+\renewcommand{\labelitemi}{{\footnotesize\ensuremath{\blacksquare}}}
+
+
+% =============================================================================
+% 					Mathematische Ergänzungen
+% =============================================================================
+
+% funktionierendes \atop
+\renewcommand{\atop}[2]{\genfrac{}{}{0pt}{}{#1}{#2}}
+
+% Mehr Platz um Quantoren
+\let\existsorig\exists 
+\renewcommand{\exists}{\ \existsorig\ } 
+\let\forallorig\forall 
+\renewcommand{\forall}{\ \forallorig\ } 
+
+% Standard Abbildungen
+\DeclareMathOperator\id{id}%						Identität
+\newcommand{\Id}{\mathbf{I}}
+\DeclareMathOperator\sgn{sgn}%				Signumsfunktion
+\DeclareMathOperator\sign{sign}%				Signum
+\DeclareMathOperator\rad{rad}%					Rad
+\DeclareMathOperator\arcsinh{arcsinh}%		areasinh
+\DeclareMathOperator\arccosh{arccosh}%	areacosh
+
+% Abbildung ops
+\DeclareMathOperator\im{im}%					im = Bild
+
+% Mengen
+\newcommand{\card}{\#}
+
+\newcommand{\setd}[1]%					  			Menge
+	{\left\{ #1 \right\}}
+\newcommand{\setdef}[2]%				  			Menge mit Eigenschaft
+	{\left\{ #1\,:\,#2\right\}}
+
+% Analysis
+\newcommand{\abs}[1]%					  			Absolutbetrag
+	{\left|#1\right|}
+\newcommand{\norm}[1]%					  		Norm
+	{\left\|#1\right\|}
+
+\newcommand{\esssup}{\mathop{\mathrm{ess sup}}}%	Wesentliches Supremum
+\newcommand{\supp}{\operatorname{supp}}	%			Träger
+
+\newcommand{\unito}{\twoheadrightarrow}%			Gleichmäßige Konvergenz
+\newcommand{\wto}{\rightharpoonup}%					Schwache Konvergenz
+\newcommand{\opento}{\hookrightarrow}	%				Von einer offenen Teilmenge nach *
+\newcommand{\Dto}{\overset{D}{\rightarrow}}%		Von einer offenen Teilmenge nach *
+\newcommand{\loc}{\text{loc}}
+
+% Lineare Algebra
+\newcommand{\lin}[1]%								Linearer Aufspann
+	{\left\langle#1\right\rangle}
+\newcommand{\nrm}[1]%								Kommutator
+	{\left[#1\right]}
+
+% Funktionentheorie
+\renewcommand{\Re}{\operatorname{Re}}	%	Realteil
+\renewcommand{\Im}{\operatorname{Im}}	%	Imaginärteil
+\DeclareMathOperator\Res{Res}%					Residuum
+
+% WT
+\newcommand{\E}{\textbf{E}}
+\newcommand{\V}{\textbf{V}}
+
+% Körpersymobole
+\renewcommand{\C}{\mathbb{C}}%				Komplexe Zahlen
+\newcommand{\N}{\mathbb{N}}%					Natürlcihe Zahlen
+\newcommand{\R}{\mathbb{R}}	%					Reelle Zahlen
+\newcommand{\RA}{\overline{\mathbb{R}}}%	Abschluss von R
+\newcommand{\Z}{\mathbb{Z}}	%					Ganze Zahlen
+\newcommand{\Q}{\mathbb{Q}}%					Rationale Zahlen
+\newcommand{\F}{\mathbb{F}}%					Endlicher Körper
+\renewcommand{\S}{\mathbb{S}}%				Spähre
+
+% Caligraphie, Blackboard Zeichen
+\renewcommand{\AA}{\mathcal{A}}
+\newcommand{\BB}{\mathcal{B}}
+\newcommand{\CC}{\mathcal{C}}
+\newcommand{\DD}{\mathcal{D}}
+\newcommand{\EE}{\mathcal{E}}
+\newcommand{\FF}{\mathcal{F}}
+\newcommand{\GG}{\mathcal{G}}
+\newcommand{\HH}{\mathcal{H}}
+\newcommand{\II}{\mathcal{I}}
+\newcommand{\JJ}{\mathcal{J}}
+\newcommand{\KK}{\mathcal{K}}
+\newcommand{\LL}{\mathcal{L}}
+\newcommand{\MM}{\mathcal{M}}
+\newcommand{\NN}{\mathcal{N}}
+\newcommand{\OO}{\mathcal{O}}
+\newcommand{\PP}{\mathcal{P}}
+\newcommand{\QQ}{\mathcal{Q}}
+\newcommand{\RR}{\mathcal{R}}
+\renewcommand{\SS}{\mathcal{S}}
+\newcommand{\TT}{\mathcal{T}}
+\newcommand{\UU}{\mathcal{U}}
+\newcommand{\VV}{\mathcal{V}}
+\newcommand{\WW}{\mathcal{W}}
+\newcommand{\XX}{\mathcal{X}}
+\newcommand{\YY}{\mathcal{Y}}
+\newcommand{\ZZ}{\mathcal{Z}}
+
+% Griechische Buchstaben
+\newcommand{\ph}{\varphi}
+\renewcommand{\th}{\vartheta}
+\newcommand{\ep}{\varepsilon}
+
+\newcommand{\talpha}{\tilde{\alpha}}
+\newcommand{\tomega}{\tilde{\omega}}
+\newcommand{\tsigma}{\tilde{\sigma}}
+\newcommand{\ttau}{\tilde{\tau}}
+\newcommand{\tbeta}{\tilde{\beta}}
+\newcommand{\tgamma}{\tilde{\gamma}}
+\newcommand{\tph}{\tilde{\ph}}
+\newcommand{\tphi}{\tilde{\phi}}
+\newcommand{\tpsi}{\tilde{\psi}}
+
+\newcommand{\halpha}{\hat{\alpha}}
+\newcommand{\hbeta}{\hat{\beta}}
+
+\newcommand{\dipper}{\ensuremath{\ \lightning}}
+
+% Differentialformen
+\newcommand{\dist}{\mathrm{dist}}
+\newcommand{\diffd}{\mathrm{d}}
+\newcommand{\D}{\mathrm{D}}
+\newcommand{\ddt}{\frac{\diffd}{\dt}}
+
+\newcommand{\dph}{\,\diffd \ph\,}
+\newcommand{\dth}{\,\diffd \th\,}
+
+\newcommand{\domega}{\,\diffd \omega\,}
+\newcommand{\dsigma}{\,\diffd \sigma\,}
+\newcommand{\dtau}{\,\diffd \tau\,}
+\newcommand{\dOmega}{\,\diffd \Omega\,}
+\newcommand{\dzeta}{\,\diffd \zeta\,}
+\newcommand{\dxi}{\,\diffd \xi\,}
+
+\newcommand{\dmu}{\,\diffd \mu}
+\newcommand{\dnu}{\,\diffd \nu}
+\newcommand{\dlambda}{\,\diffd \lambda}
+\newcommand{\dlamb}[1]{\,\diffd \lambda^{#1}}
+\newcommand{\dmumu}{\,\diffd (\mu\otimes\mu')}
+\newcommand{\drho}{\,\diffd \rho\,}
+
+\newcommand{\db}{\,\diffd b}
+
+\newcommand{\df}{\,\diffd f}
+\newcommand{\dF}{\,\diffd F}
+
+\newcommand{\dH}{\,\diffd H}
+
+\newcommand{\dk}{\,\diffd k\,}
+\newcommand{\dn}{\,\diffd n\,}
+
+\newcommand{\ddp}{\,\diffd p\,}
+\newcommand{\dP}{\,\diffd P}
+
+\newcommand{\ddq}{\,\diffd q}
+\newcommand{\ddotq}{\,\diffd \dot{q}}
+
+\newcommand{\dr}{\,\diffd r\,}
+\newcommand{\ds}{\,\diffd s\,}
+\newcommand{\dt}{\,\diffd t\,}
+
+\newcommand{\du}{\,\diffd u\,}
+\newcommand{\dv}{\,\diffd v\,}
+\newcommand{\dw}{\,\diffd w\,}
+
+\newcommand{\dx}{\,\diffd x}
+\newcommand{\dy}{\,\diffd y\,}
+\newcommand{\dz}{\,\diffd z\,}
+
+
+\newcommand{\dA}{\,\diffd A\,}
+\newcommand{\dB}{\,\diffd B\,}
+\newcommand{\dE}{\,\diffd E\,}
+\newcommand{\dN}{\,\diffd N\,}
+
+\newcommand{\dQ}{\,\diffd Q\,}
+\newcommand{\dV}{\,\diffd V\,}
+\newcommand{\dW}{\,\diffd W\,}
+
+\newcommand{\tot}{\text{\tiny tot}}
+
+\newcommand{\const}{\mathrm{const}}
+
+\PackageWarningNoLine{janmcommon}{Completed}

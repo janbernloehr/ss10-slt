@@ -1,0 +1,307 @@
+\chapter{Empirische Risikominimierung (ERM)}
+\index{ERM}
+
+\begin{bem*}[Motivation.]
+Sei $D$ das empirische Wahrscheinlichkeitsmaß,
+\begin{align*}
+\RR_{L,D}(f) \defl \frac{1}{n}\sum_{i=1}^n L(x_i,y_i,f(x_i))
+\overset{n\to\infty}{\longrightarrow} \RR_{L,P}(f).
+\end{align*}
+Ziel des Lernens: Finde $f$ mit $\RR_{L,P}(f)$ klein.\\
+Heuristik von ERM: Minimiere Schätzung $\RR_{L,D}(\cdot)$ von
+$\RR_{L,P}(\cdot)$.\maphere
+\end{bem*}
+
+\section{ERM über endliche Funktionenmengen}
+
+\begin{defn}
+\label{defn:4.1.1}
+Sei $L$ eine Verlustfunktion, $\varnothing\neq \FF\subset \LL_0(X)$. Dann heißt
+eine Lernmethode $\LL$ \emph{ERM} über $\FF$, wenn
+\begin{align*}
+\RR_{L,D}(f_D) = \inf_{f\in\FF} \RR_{L,D}(f),\qquad \forall n\ge 1,\; D\in
+(X\times Y)^n \text{ und } f_D\in\FF.\fishhere
+\end{align*}
+\end{defn}
+
+\begin{bem*}[Bemerkungen.]
+\begin{bemenum}
+\item Im Allgemeinen gibt es keine ERM.
+\item Im Allgemeinen ist ERM nicht eindeutig.
+\item Für $\FF=\LL_0(X)$ oder $\FF=\LL_\infty(X)$ erhält man im Allgemeinen
+overfitted ERM.
+\item Für "`kleine"' $\FF$ erhält man im Allgemeinen underfitted ERM.
+\end{bemenum}
+\end{bem*}
+
+Im Folgenden sei $\FF$ endlich.
+
+\begin{prop}[Orakelungleichung I]
+\index{Orakelungleichung!ERM}
+\label{prop:4.1.2}
+Sei $L$ eine Verlustfunktion und $\FF\subset\LL_0(X)$ nicht leer und endlich.
+Ferner sei $B>0$ mit
+\begin{align*}
+L(x,y,f(x)) \le B,\qquad \forall (x,y)\in X\times Y,\quad f\in\FF.
+\end{align*}
+Für den Wert des Orakels
+\begin{align*}
+\RR_{L,P,\FF}^* \defl \inf_{f\in\FF} \RR_{L,P}(f)
+\end{align*}
+und ERM gilt für $n\ge 1$ und $\tau > 0$,
+\begin{align*}
+&P^n\left(\setdef{D\in (X\times Y)^n}{\RR_{L,P}(f_D) \le \RR_{L,P,\FF}^* +
+B\sqrt{\frac{2\tau + 2\log(2\abs{\FF})}{n}} } \right)\\ 
+&\qquad\ge 1-e^{-\tau}.\fishhere
+\end{align*}
+\end{prop}
+\begin{proof}
+Für $\delta > 0$ existiert ein $f_\delta \in\FF$ mit $\RR_{L,P}(f_\delta)\le
+\RR_{L,P,\FF}^* + \delta$. Damit ist
+\begin{align*}
+\RR_{L,P}(f_D) - \RR_{L,P,\FF}^*
+&\le \RR_{L,P}(f_D)-\RR_{L,D}(f_D) + \RR_{L,D}(f_D)
+- \RR_{L,P}(f_\delta)+ \delta\\
+&\le \abs{\RR_{L,P}(f_D)-\RR_{L,D}(f_D)} + 
+\abs{\RR_{L,P}(f_\delta)-\RR_{L,D}(f_\delta)} + \delta\\
+&\le 2 \sup_{f\in\FF} \abs{\RR_{L,P}(f)-\RR_{L,D}(f)} + \delta.
+\end{align*}
+Für "`$\delta\to 0$"' folgt
+\begin{align*}
+\RR_{L,P}(f_D) - \RR_{L,P,\FF}^* \le
+2 \sup_{f\in\FF} \abs{\RR_{L,P}(f)-\RR_{L,D}(f)}
+\end{align*}
+Damit folgt
+\begin{align*}
+&P^n\left(\setdef{D}{\RR_{L,P}(f_D)- \RR_{L,P,\FF}^* \ge
+B\sqrt{\frac{2\tau}{n}}} \right)\\
+\le\;\; 
+&P^n\left(\setdef{D}{\sup_{f\in\FF}\abs{\RR_{L,P}(f)- \RR_{L,D}} \ge
+B\sqrt{\frac{\tau}{2n}}}\right)\\
+\overset{\atop{\text{union}}{\text{bound}}}{\le}
+&\sum_{f\in\FF}
+P^n\left(\setdef{D}{\abs{\RR_{L,P}(f)- \RR_{L,D}} \ge
+B\sqrt{\frac{\tau}{2n}}}\right).
+\end{align*}
+Setzen wir $\E_P\xi_1 =\RR_{L,P}(f)$ und $\xi_i = L(x_i,y_i,f(x_i))$, so ist
+$\RR_{L,D}(f) = \frac{1}{n}\sum_{i=1}^n \xi_i$ und mit der 2-seitigen
+Hoeffding Ungleichung folgt
+\begin{align*}
+\ldots \le 
+\sum_{f\in\FF} 2e^{-\tau} = 2\abs{\FF}e^{-\tau} = e^{\log(2\abs{\FF})-\tau}.
+\end{align*}
+Mit $-t' = \log(2\abs{\FF})-\tau$ folgt die Behauptung.\qedhere
+\end{proof}
+
+Idee: Falls $\abs{\FF} = \infty$ finde $\FF_\ep \subset\FF$ endlich, das $\FF$
+gut "`approximiert"'.
+
+\section{ERM über unendlichen Funktionenmengen}
+\label{sec:4.2}
+
+\begin{defn}
+\label{defn:4.2.1}
+Sei $(T,d)$ ein metrischer Raum (MR) und $\ep > 0$.
+\begin{defnenum}
+\item $S\subset T$ heißt \emph{$\ep$-Netz}\index{$\ep$-Netz} falls
+\begin{align*}
+\forall t\in T \exists s\in S : d(t,s) \le \ep.
+\end{align*}
+\item Die \emph{Überdeckungszahl}\index{Überdeckungszahl} (covering number) ist
+definiert als
+\begin{align*}
+\NN(T,d,\ep) \defl \inf\setdef{n\ge 1}{\exists s_1,\ldots,s_n\in T : T\subset
+\bigcup_{i=1}^n B_d(s_i,\ep)}.
+\end{align*}
+D.h. $S=\setd{s_1,\ldots,s_n}$ ist $\ep$-Netz. Damit entspricht $\NN(T,d,\ep)$
+der Größe des kleinsten $\ep$-Netzes von $T$.
+\item Sei $T\subset E$, $E$ normierter Raum. Dann ist
+\begin{align*}
+\NN(T,\norm{\cdot}_E,\ep) \defl \NN(T,d_E,\ep),\qquad d_E(x,x') =
+\norm{x-x'}_E.\fishhere
+\end{align*}
+\end{defnenum}
+\end{defn}
+
+\begin{bem*}[Interpretation.]
+Ist $T$ kompakt, dann ist $\NN(T,d,\ep) < \infty$ für jedes $\ep > 0$. Genauer
+ist $T$ genau dann präkompakt, wenn $\NN(T,d,\ep) < \infty$ für jedes $\ep > 0$.
+
+Da für $\ep < \ep'$ gilt $\NN(T,d,\ep')<\NN(T,d,\ep)$, stellt das
+Wachstumsverhalten von $\NN(T,d,\ep)$ für $\ep \downarrow 0$ ein
+quantitatives Maß für die Kompaktheit dar.
+
+$\NN(T,d,\ep)\to \infty$ für $\ep \to 0$ genau dann, wenn $T$ unendlich.\maphere
+\end{bem*}
+
+\begin{defn}
+\label{defn:4.2.2}
+Sei $(T,d)$ ein metrischer Raum und $n\ge 1$.
+\begin{defnenum}
+\item Die $n$-te (b-a-dische) \emph{Entropiezahl}\index{Entropiezahl} von $T$
+ist
+\begin{align*}
+e_n(T,d) = \inf\setdef{\ep >0}{\exists s_1,\ldots,s_{2^{n-1}}\in T :
+T\subset\bigcup_{i=1}^{2^{n-1}} B_d(s_i,\ep)}.
+\end{align*}
+\item $e_n(T,\norm{\cdot}_E)$ für $T\subset (E,\norm{\cdot}_E)$ ist wie üblich
+definiert.
+\item Sei $S: E\to F$ ein stetige linearer Operator zwischen den normierten
+Räumen $E$ und $F$ und es sei $B_E \defl \setdef{x\in E}{\norm{x}_E \le 1}$, dann
+schreibe
+\begin{align*}
+e_n(S) = e_n(S: E\to F) \defl e_n(SB_E,\norm{\cdot}_F).\fishhere
+\end{align*}
+\end{defnenum}
+\end{defn}
+
+\begin{bem*}[Bemerkungen (ohne Beweis).]
+\begin{bemenum}
+\item $e_1(S) = \norm{S}$.
+\item $e_{n+1}(S)\le e_n(S)$ für $n\ge 1$.
+\item $\lim\limits_{n\to\infty} e_n(S) = 0$ genau dann, wenn $S$ kompakt.
+\item $e_{n+k-1}(S+T) \le e_{n}(S) + e_k(T)$.
+\item $e_{n+k-1}(S\circ T) \le e_n(S)e_k(T)$.
+\item Sei $d=\rank S = \dim SE$. Dann ist $d<\infty$ genau dann, wenn
+\begin{align*}
+\exists c_1,c_2 : c_1 2^{-\frac{n-1}{d}} \le e_n(S) \le c_22^{-\frac{n-1}{d}}.
+\end{align*}
+\item Sei $X\subset \R^d$ offen und beschränkt und
+\begin{align*}
+C_b^m(X) \defl \setdef{f \in C^m(X\to \R)}{\max_{\abs{\alpha}\le m}
+\norm{\partial^\alpha f}_\infty < \infty}
+\end{align*}
+versehen mit der Norm
+\begin{align*}
+\norm{f}_{C_b^m(X)} = \max_{\abs{\alpha}\le m} \norm{\partial^\alpha f}_\infty.
+\end{align*}
+Dann ist $e_n(\id: C_b^m(X)\to C_b(X)) \le C_{m,d}(X)n^{-\frac{m}{d}}$ und die
+Abschätzung ist scharf, d.h. es gibt ein $\tilde{C}_{m,d}(X)$ mit $e_n(\ldots)
+\ge \tilde{C}_{m,d}(x)n^{-\frac{m}{d}}$. Weiterhin ist
+\begin{align*}
+C_{m,d}(r\cdot X) = r^m C_{m,d}(X),\qquad r\ge 1.\maphere
+\end{align*}
+\end{bemenum}
+\end{bem*}
+
+\begin{lem}
+\label{prop:4.2.3}
+Sei $(T,d)$ MR und $a,q >0$ mit
+\begin{align*}
+e_n(T,d) \le an^{-\frac{1}{q}},\qquad n\ge 1.
+\end{align*}
+Dann gilt
+\begin{align*}
+\log(\NN(T,d,\ep)) \le \log(4)\left(\frac{a}{\ep}\right)^q,\qquad \ep >
+0.\fishhere
+\end{align*}
+\end{lem}
+\begin{proof}
+Für $\ep > a$ ist $\NN(T,d,\ep)=1$, d.h. $\log(\NN(T,d,\ep)) = 0$ und es ist
+nichts zu beweisen. Sei $\delta > 0$ und $\ep \in (0,a]$, dann existiert ein
+$n\ge 1$ mit
+\begin{align*}
+a(1+\delta)(n+1)^{-\frac{1}{q}} \le \ep \le a(1+\delta)n^{-\frac{1}{q}}.\tag{*}
+\end{align*}
+Da $e_n(T,d) < a(1+\delta)n^{-\frac{1}{q}}$, gibt es ein
+$a(1+\delta)n^{-\frac{1}{q}}$-Netz der Größe $2^{n-1}$, d.h.
+\begin{align*}
+\NN(T,d,a(1+\delta)n^{-\frac{1}{q}}) \le 2^{n-1}.
+\end{align*}
+Nun ist
+\begin{align*}
+a(1+\delta)n^{-\frac{1}{q}} &=
+a(1+\delta)(n+1)^{-\frac{1}{q}}\underbrace{\left(\frac{n+1}{n}\right)^{\frac{1}{q}}}_{\le
+2}
+\le 2^{\frac{1}{q}}a(1+\delta)(n+1)^{-\frac{1}{q}}\\
+&\overset{(*)}{\le} 2^{\frac{1}{q}}\ep.
+\end{align*}
+Und ferner folgt mit der rechten Seite von (*),
+\begin{align*}
+n \le \left(\frac{a(1+\delta)}{\ep}\right)^q.
+\end{align*}
+Somit ist
+\begin{align*}
+\log(\NN(T,d,2^{1/q}\ep))&\le 
+\log(\NN(T,d,a(1+\delta)n^{-1/q}))
+\le \log(2^{n-1})\\
+& \le n \log 2
+\le (\log2)\left(\frac{a(1+\delta)}{\ep}\right)^q 
+\end{align*}
+Für $\delta \to 0$ und $2^{1/q}\ep = \tilde{\ep}$ folgt die Behauptung.\qedhere
+\end{proof}
+
+\begin{prop}[Orakelungleichung II]
+\index{Orakelungleichung!ERM (2)}
+\label{prop:4.2.4}
+Sei $L:X\times Y\times\R\to [0,\infty)$ eine lokal lipschitz-stetige
+Verlustfunktion und $P$ ein W-Maß auf $(X\times Y)$. Ferner sei
+\begin{align*}
+\FF\subset\LL_\infty(X) = \setdef{f: X\to\R}{f\text{ messbar und beschränkt}}
+\end{align*}
+für die $B>0$ und $M>0$ existieren, so dass
+\begin{align*}
+&\norm{f}_\infty  < M, && \text{für alle }f\in\FF,\\
+&L(x,y,f(x)) \le B, && \text{für alle }(x,y)\in (X\times Y),\; f\in\FF.
+\end{align*}
+Dann gilt für ERM über $f$,
+\begin{align*}
+&P^n\left( \setdef{D}{\RR_{L,P}(f_D) < \RR_{L,P,\FF}^* +
+B\sqrt{\frac{2\tau+2\log\left(2\NN(\FF,\norm{\cdot}_\infty,\ep)\right)
+}{n}}+4\ep\abs{L}_{M,1} } \right)\\
+&\ge 1-e^{-\tau},\qquad \text{für alle }n\ge1, \ep > 0\text{ und }\tau >
+0.\fishhere
+\end{align*}
+\end{prop}
+
+Beachte, dass falls $\log(\NN(\FF,\norm{\cdot}_\infty,\ep)) \le \mu(\ep)$ für
+$\ep > 0$, der Ausdruck nach $\ep$ optimiert werden kann. Somit erhält man eine
+Abschätzung in $n\ge 1$ und $\tau > 0$.
+
+\begin{proof}
+Fixiere $\ep > 0$ und ein minimales $\ep$-Netz $\FF_\ep$ von $\FF$ bezüglich
+$\norm{\cdot}_\infty$, d.h.
+\begin{align*}
+\NN(\FF,\norm{\cdot}_\infty,\ep) = \abs{\FF_\ep}
+\end{align*}
+und
+\begin{align*}
+\forall f\in\FF \exists g\in \FF_\ep \text{ mit } \norm{f-g}_\infty \le \ep.
+\end{align*}
+Somit ist für solches $f,g$
+\begin{align*}
+&\abs{\RR_{L,P}(f)-\RR_{L,D}(f)}\\
+\le &\abs{\RR_{L,P}(f)-\RR_{L,P}(g)}
++ \abs{\RR_{L,P}(g)-\RR_{L,D}(g)}
++ \abs{\RR_{L,D}(g)-\RR_{L,D}(f)}\\
+\overset{\ref{defn:2.1.9}}{\le} &2 \ep \abs{L}_{M,1} + 
+\abs{\RR_{L,P}(g)-\RR_{L,D}(g)}.
+\end{align*}
+D.h.
+\begin{align*}
+\sup_{f\in\FF} \abs{\RR_{L,P}(f)-\RR_{L,D}(f)}
+\le 2\ep \abs{L}_{M,1} + 
+\sup_{g\in\FF_\ep}\abs{\RR_{L,P}(g)-\RR_{L,D}(g)}.
+\end{align*}
+Der Beweis von \ref{prop:4.1.2} zeigte außerdem, dass
+\begin{align*}
+\RR_{L,P}(f_D)-\RR_{L,P,\FF}^*
+&\le 2 \sup_{f\in\FF} \abs{\RR_{L,P}(f)-\RR_{L,D}(f)}\\
+&\le 4\ep \abs{L}_{M,1} + 2
+\sup_{g\in\FF_\ep} \abs{\RR_{L,P}(g)-\RR_{L,D}(g)}. 
+\end{align*}
+Anwendung der Hoeffding Ungleichung und es union bounds liefert, 
+\begin{align*}
+&P^n\left(\setdef{D}{\RR_{L,P}(f_D)-\RR_{L,P,F}^*\ge B\sqrt{\frac{2\tau}{n}}+
+4\ep \abs{L}_{M,1}} \right)\\
+\le &P^n\left( \setdef{D}{\sup_{g\in\FF_\ep} \abs{\RR_{L,P}(g) -
+\RR_{L,D}(g)}\ge B\sqrt{\frac{\tau}{2n}}} \right)\\
+\le &2\NN\left(\FF,\norm{\cdot}_\infty,\ep \right)e^{-\tau}
+= \exp\left(\log(2 \NN(\FF,\norm{\cdot}_\infty, \ep))-\tau \right).
+\end{align*}
+Die Behauptung folgt nun mit einer Variablentransformation
+\begin{align*}
+-\tau' = \log(2
+\NN(\FF,\norm{\cdot}_\infty, \ep))-\tau.\qedhere
+\end{align*}
+\end{proof}

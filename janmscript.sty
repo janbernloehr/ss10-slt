@@ -1,0 +1,85 @@
+% Dieser Style definiert Erweiterungen für janmcommon.sty, die das Setzen von
+% Skripten erleichtern.
+
+% =============================================================================
+% 					Pakete für Script Dokumente
+% =============================================================================
+
+% Theoreme wie Satz, Lemma, Definition, Beispiel
+\usepackage[thmmarks,amsmath,amsthm]{ntheorem}
+
+% Überschriften 1. ..., 1-A ... usw.
+\usepackage{titlesec}
+
+% =============================================================================
+% 					Symbole wie q.e.d., fish, etc.
+% =============================================================================
+
+\newcommand{\fishhere}%
+	{\quad\ensuremath{\color{darkblue}\rtimes}}
+
+\newcommand{\bsphere}%
+	{\quad\ensuremath{\color{yellow}\blacksquare}}
+
+\newcommand{\maphere}%
+	{\quad\ensuremath{\multimap}}
+
+\newcommand{\qedhere}%
+	{\quad\text{<<}}
+
+% =============================================================================
+% 					Styles für Theoreme wie Definition, Satz, Beweis etc.
+% =============================================================================
+
+% Fonts definieren
+\newcommand{\blueheaderfont}%
+	{\normalfont\normalsize\bfseries\color{darkblue}}
+\newcommand{\yellowheaderfont}%
+	{\normalfont\normalsize\bfseries\scshape\small\color{yellow}}
+\newcommand{\itheaderfont}%
+	{\normalfont\itshape}
+\newcommand{\marginfont}%
+	{\normalfont\small\color{gray}}
+\newcommand{\prooffont}%
+	{\normalfont\normalsize}
+\newcommand{\prooftextfont}%
+	{\normalfont\normalsize\itshape}
+
+% Styles definieren
+\newtheoremstyle{graymarginwithblueheader}%
+	{\item[\llap{\marginfont{##2}}\hskip\labelsep \blueheaderfont{##1}]}%
+	{\item[\llap{\marginfont{##2}}\hskip\labelsep \blueheaderfont{##3}]}%
+
+\newtheoremstyle{graymarginwithyellowheader}%
+	{\item[\llap{\marginfont{##2}}\hskip\labelsep \yellowheaderfont{##1}]}%
+	{\item[\llap{\marginfont{##2}}\hskip\labelsep \yellowheaderfont{##3}]}%
+
+\newtheoremstyle{graymarginwithitblackheader}%
+	{\item[\llap{\marginfont{##2}}\hskip\labelsep \itheaderfont{##1}]}%
+	{\item[\llap{\marginfont{##2}}\hskip\labelsep \itheaderfont{##3}]}%
+
+\newtheoremstyle{graymarginwithblueheadern}%
+	{\item[\hskip\labelsep \blueheaderfont{##1}]}%
+	{\item[\hskip\labelsep \blueheaderfont{##3}]}%
+
+\newtheoremstyle{graymarginwithyellowheadern}%
+	{\item[\hskip\labelsep \yellowheaderfont{##1}]}%
+	{\item[\hskip\labelsep \yellowheaderfont{##3}]}%
+
+\newtheoremstyle{graymarginwithitblackheadern}%
+	{\item[\hskip\labelsep \itheaderfont{##1}]}%
+	{\item[\hskip\labelsep \itheaderfont{##3}]}%
+
+\newtheoremstyle{yellowheader}%
+	{\item[\hskip\labelsep \yellowheaderfont{##1 ##2}]}%
+	{\item[\hskip\labelsep \yellowheaderfont{##3 ##2}]}%
+
+\newtheoremstyle{nonumberproof}
+ 	{\item[\hskip\labelsep \prooffont{##1}]}%
+ 	{\item[\hskip\labelsep \prooffont{##1} \prooftextfont{##3}]}
+
+% qed Umgebung resetten
+\theorembodyfont{\normalfont}
+\theoremstyle{nonumberproof}
+\theoremsymbol{}
+\renewtheorem{proof}{>>}

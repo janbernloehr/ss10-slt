@@ -1,0 +1,1466 @@
+\chapter{Grundkonzepte der statistischen Lerntheorie}
+\newcommand{\class}{\mathrm{class}}
+\newcommand{\diam}{\mathrm{diam}}
+
+\section{Grundannahmen}
+
+Folgende Notationen werden durchgehend verwendet.
+\begin{itemize}
+  \item $(X,\AA)$ sei ein metrischer Raum.
+  \item $Y\subset\R$ sei abgeschlossen mit $Y=\setd{-1,1}$, $Y=[-M,M]$ oder
+  $Y=\R$. $Y$ sei stets mit der Borel-$\sigma$-Algebra versehen.
+  \item $P$ sei ein W-Maß auf $X\times Y$.
+  \item $D=((x_1,y_1),\ldots,(x_n,y_n))\in(X\times Y)^n$.
+  \item $\LL_0(X)\defl\setdef{f:X\to \R}{f\text{ messbar}}$.
+\end{itemize}
+
+Wir benötigen folgenden Satz zu regulären bedingten Wahrscheinlichkeiten.
+\begin{prop*}
+Es existiert eine Abbildung
+\begin{align*}
+P(\cdot\mid\cdot) : \BB\times X\to [0,1]
+\end{align*}
+mit folgenden Eigenschaften.
+\begin{propenum}
+\item $P(\cdot\mid x): \BB \to [0,1]$ ist ein W-Maß auf $\BB$ für alle $x\in X$.
+\item $x\mapsto P(B\mid x)$ ist messbar für alle $B\in\BB$.
+\item Für alle messbaren $A\in\AA$ und $B\in\BB$ gilt
+\begin{align*}
+P(A\times B) = \int_A P(B\mid x)\dP_X(x)\tag{*}
+\end{align*}
+wobei $P_X$ ein W-Maß auf $(X,\AA)$ ist, das durch $P_X(A) \defl P(A\times Y)$ für
+$A\in\AA$ definiert ist.
+\item $P(\cdot\mid\cdot)$ ist $P_X$-f.s. eindeutig.\fishhere
+\end{propenum}
+\end{prop*}
+
+\begin{bem*}[Interpretation.]
+Falls $P=P_Y\otimes P_X$, so ist $P(B\mid x) = P_Y(B)$ und daher
+\begin{align*}
+\text{(*)} = P(A\times B) = P_Y(B)P_X(A).
+\end{align*}
+$P(\cdot\mid\cdot)$ ermöglicht es, $P$ im Sinne von (*) aufzuspalten
+(``desintegrate'').\maphere
+\end{bem*}
+
+Als Folgerung erhalten wir eine Verallgemeinerung des Satzes von Fubini von
+Produktmaßen auf solche $P$.
+
+\begin{cor*}
+Sei $f: X\times Y\to \R$ $P$-integrierbar, so gilt
+\begin{align*}
+\E_P f\defl \int_{X\times Y} f\dP = \int_X \int_Y f(x,y)
+P(\dy\mid x)\dP_X(x).\fishhere
+\end{align*}
+\end{cor*}
+
+\begin{bem*}
+Für allgemeine messbare Räume ($Y,\AA'$) ist dies \textit{nicht} möglich.
+(Wesentlich ist hier, dass $Y\subset \R$ abgeschlossen).\maphere
+\end{bem*}
+
+\noindent
+Weitere Grundannahmen sind.
+\begin{itemize}
+  \item $P$ ist uns völlig unbekannt. Wir wissen lediglich, dass $P$ existiert.
+  \item Die Trainingsdaten $D$ sind Beobachtungen einer Folge $Z=(Z_i)_{i=1}^n$
+  mit $Z_i=(X_i,Y_i)$ von Zufallsvariablen, die $X\times Y$-wertig und
+  unabhängig sind und alle die Verteilung $P$ haben.
+
+\noindent
+\textit{Interpretation}.\\
+$X_i\sim P_X$, dies gibt eine Beobachtung $x_i\in X$.\\
+$Y_i\sim P(\cdot\mid x_i)$, dies gibt eine Beobachtung $y_i\in Y$.
+
+\noindent
+\textit{Datengenerierungsalgorithmus}.\\
+\begin{itemize}
+  \item $i=1$.
+  \item ``Würfle'' $x$ gemäß der Verteilung $P_X$ und unabhängig von
+  $(x_1,y_1)$, \ldots, $(x_{i-1},y_{i-1})$.
+  \item ``Würfle'' $y$ gemäß der Verteilung $P(\cdot\mid x_i)$.
+  \item Wiederhole bis $i=n$.
+\end{itemize}
+\item Alle zukünftigen Daten $(x,y)$ sind Beobachtungen von einer
+Zufallsvariable $\tilde{Z} = (\tilde{X},\tilde{Y})$, die $X\times Y$-wertig
+ist, Verteilung $P$ hat und unabhängig von der Folge $(Z_i)_{i=1}^n$ ist.
+\item Für eine große Anzahl zukünftiger Beobachtungen, betrachte die Folge
+$(Z_i)_{i=n+1}^\infty$ von $(X\times Y)$-wertigen Zufallsvariablen, die
+untereinander und von $Z_1,\ldots,Z_n$ unabhängig sind und Verteilung $P$ haben.
+\end{itemize}
+
+\begin{defn}
+\label{defn:1.1.1}
+Eine \emph{Lernmethode} oder auch \emph{Lernverfahren} ist eine Folge
+$(L_n)_{n\ge 1}$ von Abbildungen
+\index{Lernmethode}
+\index{Lernverfahren}
+\begin{align*}
+L_n : (X\times Y)^n\to \LL_0(X),\qquad D\mapsto f_D.\fishhere
+\end{align*}
+\end{defn}
+
+\begin{bsp*}
+\begin{bspenum}
+\item Histogrammregel.
+\item Nearest Neighbor.
+\item Moving windows, kernel rules.\bsphere
+\end{bspenum}
+\end{bsp*}
+
+\begin{bem}
+Wir werden später benötigen, dass die Abbildungen
+\begin{align*}
+(X\times Y)^n\times X \to \R,\qquad (D,x) \mapsto f_D(x)
+\end{align*}
+messbar sind.\maphere
+\end{bem}
+
+\section{Verlustfunktionen und Risiken}
+\index{Verlustfunktion}\index{Risiko}
+\label{sec:1.2}
+
+Ziel dieses Abschnitts ist es, genauer zu beschreiben, was $f_D(x) \approx y$
+bedeutet.
+
+\begin{defn}
+\label{defn:1.2.1}
+Eine messbare Abbildung
+\begin{align*}
+L: X\times Y\times\R\to [0,\infty)
+\end{align*}
+heißt \emph{Verlustfunktion}\index{Verlustfunktion}. Selbiges gilt für
+Funktionen
+\begin{align*}
+L: X\times \R\to [0,\infty),\quad \text{oder}\quad L:Y\times \R\to
+[0,\infty).\fishhere
+\end{align*}
+\end{defn}
+
+\begin{bem*}[Interpretation.]
+$L(x,y,f(x))\in [0,\infty)$ beschreibt den ``Verlust'' bei der Entscheidung
+$f_D(x)$, falls $(x,y)$ beobachtet wird. Generell sind kleine Verluste besser
+als große!\maphere
+\end{bem*}
+
+\begin{defn}
+\label{defn:1.2.2}
+Sei $L$ eine Verlustfunktion. Dann ist das \emph{Risiko} einer messbaren
+Funktion $f: X\to\R$ durch\index{Risiko}
+\begin{align*}
+\RR_{L,P}(f) &= \int_{X\times Y} L(x,y,f(y))\dP(x,y)\\
+&= \int_X \int_Y L(x,y,f(x))P(\dy\mid x)\dP_X(x)
+\end{align*}
+definiert.\fishhere
+\end{defn}
+\begin{bem*}[Interpretation.]
+Ist $Z=(Z_i)_{i=1}^n$ eine Folge von $X\times Y$-wertigen, unabhängigen und
+$P$-verteilten Zufallsvariablen und $\RR_{L,P}(f) < \infty$, so besagt das
+starke Gesetz der großen Zahlen, dass
+\begin{align*}
+\RR_{L,P}(f) = \lim\limits_{m\to\infty} \frac{1}{m-n-1}\sum_{i=n+1}^\infty
+L(x_i,y_i,f(x_i))\Pfs
+\end{align*}
+$\RR_{L,P}(f)$ beschreibt daher den mittleren zukünftigen Verlust.\maphere
+\end{bem*}
+
+Wir wollen jetzt genauer spezifizieren, was wir unter ``kleinen'' Risiken
+zu verstehen ist.
+\begin{defn}
+\label{defn:1.2.3}
+Sei $L$ eine Verlustfunktion, dann heißt das kleinstmögliche Risiko
+\begin{align*}
+\RR_{L,P}^* \defl \inf\setdef{\RR_{L,P}(f)}{f:X\to\R\text{ messbar}}
+\end{align*}
+\emph{Bayes-Risiko}.\index{Bayes!Risiko}
+Eine messbare Funktion $f_{L,P}^* : X \to \R$ für die gilt
+\begin{align*}
+\RR_{L,P}(f_{L,P}^*) = \RR_{L,P}^*
+\end{align*}
+heißt
+\emph{Bayes-Entscheidungsfunktion}.\index{Bayes!Entscheidungsfunktion}\fishhere
+\end{defn}
+
+$f_{L,P}^*$ ist im Allgemeinen nicht $\Pfs$ eindeutig.
+
+Unser informelles Lernziel besteht nun darin, ein Lernverfahren $\LL$ zu
+finden, für das das \emph{Überschussrisiko}\index{Überschussrisiko}
+\begin{align*}
+\RR_{L,P}(f_D) - \RR_{L,P}^*,\qquad f_D\in\LL
+\end{align*}
+mit hoher Wahrscheinlichkeit klein ist. In Abschnitt \ref{chap:1.3} werden wir
+präzisieren was wir unter ``hoher Wahrscheinlichkeit'' und ``klein''
+verstehen.
+
+\begin{bsp*}[Bsp Klassifikation]
+
+Hier ist unser Ausgaberaum $Y=\setd{-1,1}$ und unser
+Ziel, $y$ ``richtig vorauszusagen''. Mithilfe der vorangegangen Definitionen
+lässt sich dies nun mathematisch formulieren.
+
+Wir definieren eine Verlustfunktion wie folgt
+\begin{align*}
+&L_\class : Y\times \R\to[0,\infty),\quad (y,t)\mapsto
+\Id_{(-\infty,0]}(y\sign t),\\
+&L_\class(y,t) =
+\begin{cases}
+0, & y = -1,\; t<0,\\
+1, & y = -1,\; t\ge0,\\
+1, & y = 1,\; t<0,\\
+0, & y = 1,\; t\ge0.
+\end{cases} 
+\end{align*}
+$L_\class$ bestraft somit Vorhersagen, für die $y\neq \sign t$. Wir können nun
+das Risiko angeben,
+\begin{align*}
+\RR_{L_\class,P}(f) &=
+\int_{X\times Y} \Id_{(-\infty,0]}(y\sign f(x)) \dP(x,y)\\
+&= P\setdef{(x,y)}{y\neq \sign f(x)}\\
+&= \int_X\int_Y L_\class(y,f(x))P(\dy\mid x)\dP_X(x).
+\end{align*}
+Setzen wir nun $\eta(x) = P(y=1\mid x)$ so können wir das Integral schreiben als
+\begin{align*}
+\int_X\int_Y \eta(x)\Id_{(-\infty,0)}(f(x)) +
+(1-\eta(x))\Id_{[0,\infty)}(f(x))\dP_X(x).
+\end{align*}
+Damit der Integrand minimal wird muss gelten,
+\begin{align*}
+&\eta(x) > \frac{1}{2}\Rightarrow f(x)\ge 0,\\
+&\eta(x) <\frac{1}{2}\Rightarrow f(x)< 0.
+\end{align*}
+Daher minimiert $f$ das Risiko genau dann, wenn
+\begin{align*}
+&f(x)\ge 0, && \text{auf } [\eta> \frac{1}{2}],\\ 
+&f(x)< 0, && \text{auf } [\eta< \frac{1}{2}].
+\end{align*}
+In diesem Fall ist $f=f_{L_\class,P}^*$ und folglich
+\begin{align*}
+\RR_{L,P}^* = \int_X \min\setd{\eta,1-\eta}\dP_X.
+\end{align*}
+Wir wollen noch zeigen, dass
+\begin{align*}
+\RR_{L,P}(f) - \RR_{L,P}^* =
+\int_X \abs{2\eta-1}\Id_{(-\infty,0]}((2\eta-1)\sign f(x))\dP_X.
+\end{align*}
+\begin{proof}[Beweisskizze.]
+Dazu betrachtet man einfach die 6 möglichen Kombinationen von
+\begin{align*}
+&\eta(x) > \frac{1}{2} & \eta(x) < \frac{1}{2} && \eta(x) = \frac{1}{2}\\
+& f(x) \ge 0 & f(x) < 0. 
+\end{align*}
+z.B. $\eta(x) > \frac{1}{2}$ und $f(x)\ge 0$, so ist
+\begin{align*}
+\abs{2\eta(x)-1}\Id_{(-\infty,0]}(\underbrace{(2\eta-1)\sign f(x)}_{>0})= 0
+\end{align*}
+und
+\begin{align*}
+\eta(x)\underbrace{\Id_{(-\infty,0)}(f(x))}_{=0} +
+(1-\eta(x))\underbrace{\Id_{[0,\infty)}(f(x))}_{=1}
+- \underbrace{\min\setd{\eta(x),1-\eta(x)}}_{1-\eta(x)} = 0.
+\end{align*}
+oder $\eta(x)>\frac{1}{2}$ und $f(x) < 0$, so ist
+\begin{align*}
+\abs{2\eta(x)-1}\Id_{(-\infty,0]}(\underbrace{(2\eta-1)\sign f(x)}_{<0}) =
+2\eta(x)-1
+\end{align*}
+und
+\begin{align*}
+&\eta(x)\underbrace{\Id_{(-\infty,0)}(f(x))}_{=1} +
+(1-\eta(x))\underbrace{\Id_{[0,\infty)}(f(x))}_{=0}
+- \underbrace{\min\setd{\eta(x),1-\eta(x)}}_{1-\eta(x)} \\ &\quad = 2\eta(x)-1.
+\end{align*}
+Die übrigen Fälle folgen analog.\qedhere
+\end{proof}
+
+In unserer Definition von $L_\class$ haben wir alle Fehler gleich gewichtet.
+Oft nimmt man eine unterschiedliche Gewichtung vor (Übungsaufgabe).\bsphere
+\end{bsp*}
+
+\begin{bsp*}[Regression mit kleinsten Fehlerquadraten]
+\newcommand{\LS}{\mathrm{LS}}
+Sei $Y\subset\R$ ein Intervall oder ganz $\R$. Unser Ziel ist es $f$ zu finden
+mit $f(x)\approx y$. Dies wollen wir nun mathematisch fassen.
+
+Dazu definieren wir folgende Verlustfunktion
+\begin{align*}
+L_\LS : Y\times \R\to [0,\infty),\qquad (y,t)\mapsto (y-t)^2.
+\end{align*}
+LS steht hier für least squares. Das Risiko ist dann gegeben durch
+\begin{align*}
+\RR_{L,P}(f) &= \int_X\int_Y (y-f(x))^2 P(\dy\mid x)\dP_X(x)\\
+&= \int_X \int_Y y^2-2yf(x) + f^2(x) P(\dy\mid x)\dP_X(x)\\
+&= \int_X \int_Y y^2P(\dy\mid x) - 2 f(x)\int_Y yP(\dy\mid x)\\
+&\qquad\qquad+ f^2(x)\dP_X(x).
+\end{align*}
+Setzen wir $t=f(x)$ und $h(t) = -2t \int_Y y P(\dy\mid x) + t^2$, so erhalten
+wir ein Minimum durch
+\begin{align*}
+0 = h'(t) = -2\int_Y yP(\dy\mid x) + 2t \Rightarrow t = \int_Y yP(\dy\mid x).
+\end{align*}
+Somit ist $f: X\to\R$ eine Bayes-Entscheidungsfunktion, wenn
+\begin{align*}
+f(x) = \int_Y yP(\dy\mid x) \defr \E_P(Y\mid x) \Pfs
+\end{align*}
+$f$ ist in diesem Fall tatsächlich eindeutig.
+
+Das alles funktioniert jedoch nur, wenn $\RR_{L,S}^* < \infty$, denn sonst ist
+jede Funktion eine Bayes-Entscheidungsfunktion.
+
+Setzen wir nun in $\RR_{L,S}(\cdot)$ ein, erhalten wir
+\begin{align*}
+\RR_{L,S}(f^*_{L,S}) &=
+\int_X \int_Y y^2P(\dy\mid x) - 2(\E_P(Y\mid x))^2 + (\E_P(Y\mid x))^2\dP_X(x)\\
+&= 
+\int_X \int_Y y^2P(\dy\mid x) - (\E_P(Y\mid x))^2\dP_X(x)\\
+&= \text{mittlere Varianz der Label }y.
+\end{align*}
+Somit ist das Überschussrisiko
+\begin{align*}
+\RR_{L,P}(f) - \RR_{L,P}^* &=
+\int_X\int_Y y^2 - 2f(x)y + f^2 - y^2 \\ &\qquad\qquad - (\E_P(Y\mid x))^2
+P(\dy\mid x) \dP_X(x)\\
+&= \int_X (f(x)-f^*_{L,P}(x))^2\dP_X(x) = \norm{f-f_{L,S}^*}_{L^2(P_X)}^2.
+\end{align*}
+Minimierung des Risikos ist also äquivalent zur $L^2$-Approximation von
+$f^*_{L,S}$.\bsphere
+\end{bsp*}
+
+Bis jetzt waren alle konkreten Verlustfunktionen von $x$ unabhängig.
+
+\begin{defn}
+\label{defn:1.2.4}
+Eine messbare Funktion $L:Y\times\R\to [0,\infty)$ heißt \emph{strikt überwachte
+Verlustfunktion}\index{Verlustfunktion!strikt überwachte}.\fishhere
+\end{defn}
+
+\begin{defn}
+\label{defn:1.2.5}
+Eine messbare Funktion $L:X\times\R\to [0,\infty)$ heißt \emph{unüberwachte
+Verlustfunktion}\index{Verlustfunktion!unüberwachte}.\fishhere
+\end{defn}
+
+Es liegt die Vermutung nahe, dass unüberwachte Verlustfunktionen nutzlos für
+überwachtes Lernen ist. Dem ist aber nicht so, wie folgendes Beispiel zeigen
+wird.
+
+\begin{bsp*}[Bsp Medianregression]
+$Y\subset\R$ ist hier typischerweise ein Intervall oder $\R$.
+
+Für $x\in X$ ist der \emph{bedingte Median}\index{bedingter Median} (Median von
+der bedingten Erwartung in $x$ $P(\cdot\mid x)$) gegeben durch
+\begin{align*}
+F_{1/2}^* \defl \setdef{t^*\in\R}{\frac{1}{2}\le P((-\infty,t^*]\mid x)\text{ und
+}\frac{1}{2}\le P([t^*,\infty)\mid x)}.
+\end{align*}
+Im Allgemeinen ist dieser nicht eindeutig, wir nehmen nun aber an, dass dem so
+ist.
+
+Das Ziel ist es nun $f^*$ bei bekanntem
+$D=((x_1,y_1),\ldots,(x_n,y_n))$ abzuschätzen. Wie genau das gemacht wird
+behandeln wir später, jetzt soll es nur darum gehen, die Verluste zu bewerten.
+
+Betrachte die Verlustfunktion
+\begin{align*}
+L: X\times\R \to [0,\infty),\qquad (x,t)\mapsto \abs{f^*(x)-t}.
+\end{align*}
+Das Risiko ist dann
+\begin{align*}
+&\RR_{L,P}(f) \defl \int_X \abs{f^*(x)-f(x)}\dP_X(x),\\
+&\RR^*_{L,P} = \RR_{L,P}(f^*) = 0.
+\end{align*}
+Somit ist das Überschussrisiko
+\begin{align*}
+\RR_{L,P}(f) - \RR_{L,P}^* = \norm{f^*-f}_{L^1(P_X)}.
+\end{align*}
+Die Verlustfunktion ist also tatsächlich unabhängig von den Daten, obwohl wir
+überwachte Labels haben.
+
+Problematisch hierbei ist, dass $L$ auf dem bedingten Median beruht, den wir
+nicht kennen und so $L$ überhaupt nicht berechnen können. Man muss also einen
+anderen Ansatz wählen.
+
+Dies ist auch ein gutes Beispiel dafür, dass ein Unterschied darin besteht,
+eine Verlustfunktion zu finden, die das Lernziel gut beschreibt, und eine, die 
+in der Praxis gut verwendbar ist.\bsphere
+\end{bsp*}
+
+\section{Universelle Konsistenz}
+\label{chap:1.3}
+
+Ziel dieses Abschnittes ist es die Formulierung
+\begin{align*}
+\RR_{L,P}(f)-\RR_{L,P}^*
+\end{align*}
+ist mit hoher Wahrscheinlichkeit klein, mathematisch zu präzisieren.
+
+\begin{defn}
+\label{defn:1.3.1}
+Sei $L:X\times Y\times \R\to [0,\infty)$ eine Verlustfunktion. Eine Lernmethode
+$\LL$ heißt \emph{$P$-konsistent}\index{$P$-konsistent} bezüglich $L$, falls für
+alle $\ep > 0$ gilt
+\begin{align*}
+\lim\limits_{n\to\infty} P^n\setdef{D\in (X\times Y)^n}{\RR_{L,P}(f_D) -
+\RR_{L,P}^* < \ep} = 1.
+\end{align*}
+$\LL$ heißt \emph{universell konsistent}\index{universell konsistent} bezüglich
+$L$, falls $\LL$ $P$-konsistent bezüglich $L$ für W-Maße $P$ auf $X\times Y$ für die
+$\RR_{L,P}^* < \infty$.\fishhere
+\end{defn}
+
+Die universelle Konsistenz ist einerseits eine schwache Forderung, da sie eine
+rein asymptotische Aussage macht. Sie ist andererseits aber auch eine sehr
+starke Forderung wie das folgende Beispiel zeigen wird.
+
+\begin{bsp*}
+Wir betrachten Klassifikation auf $X=[0,1]$. Seien dazu
+\begin{align*}
+&X_1 = C\subset[0,1],\qquad \text{``Cantor Menge''},\\
+&X_{-1} = (\Q\cap[0,1])\setminus C
+\end{align*}
+Nun existiert ein W-Maß $\mu$ auf $X_1$ (z.B. das Hausdorffmaß) und ein W-Maß
+$\nu$ auf $X_{-1}$ (z.B. Zählmaß+Dichte), so dass für
+ $P_X\defl\frac{1}{2}(\mu+\nu)$ gilt
+\begin{align*}
+P(Y=1\mid x) =
+\begin{cases}
+0.51, & x\in X_1,\\
+0.49 & x\in X_{-1}.\bsphere
+\end{cases}
+\end{align*}
+\end{bsp*}
+
+\subsection{Plug-in-rules für Klassifikation}
+
+Wir wollen nun für ein spezielles Verfahren nachweisen, dass es universell
+konsistent ist.
+
+Sei $Y=\setd{-1,1}$ und $\eta(x) = P(Y=1\mid x)$ die Wahrscheinlichkeit dafür,
+dass $x$ ein positives Label besitzt. Gegeben sei eine Lernmethode $\LL$, die
+die Entscheidungsfunktion $f_D$ konstruiert und $f_D\approx \eta$.
+
+Wir haben bereits gezeigt, dass für die
+Bayes-Klassifikationsentscheidungsfunktion gilt
+\begin{align*}
+f_{L_\class,P}^*(x) =
+\begin{cases}
+1, & \eta(x)> \frac{1}{2},\\
+-1, & \eta(x) < \frac{1}{2}.
+\end{cases}
+\end{align*}
+
+\begin{defn}
+\label{defn:1.3.2}
+Das zu $\LL$ gehörige \emph{plug-in-Verfahren} ist durch
+\begin{align*}
+\hat{f}_D(x) \defl
+\begin{cases}
+1, & f_D(x) > \frac{1}{2},\\
+-1, & f_D(x) < \frac{1}{2},
+\end{cases}
+\end{align*}
+gegeben.\fishhere
+\end{defn}
+
+Wie gut das Verfahren arbeitet, beschreibt das folgende
+\begin{lem}
+\label{prop:1.3.3}
+Sei $P$ ein W-Maß auf $X\times Y$, $Y=\setd{-1,1}$, $\eta(x) = P(Y=1\mid x)$
+und $x\in X$. Für $h:X\to\R$ gilt dann
+\begin{align*}
+\RR_{L_\class}(2h-1) - \RR_{L_\class,P}^*
+\le 2 \int_X \abs{\eta-h}\dP_X.\fishhere
+\end{align*}
+\end{lem}
+
+\textit{Interpretation}. Ist $h$ eine ``gute'' Schätzung von $\eta$, dann ist
+$2h-1$ (bzw. $\sign (2h-1)$) eine ``gute'' Klassifikationsentscheidungsfunktion.
+
+\begin{proof}[Beweis des Lemmas.]
+Sei $f\defl 2h-1$. Wir haben bereits gezeigt, dass
+\begin{align*}
+\RR_{L_\class}(f) - \RR_{L_\class,P}^*
+= \int_X \underbrace{\abs{2\eta-1}\Id_{(-\infty,0]}((2\eta-1)\sign
+f)}_{\text{(1)}}\dP_X.
+\end{align*}
+
+Falls $(2\eta-1)\sign f > 0$, so ist der Integrand Null und daher
+\begin{align*}
+(1) \le 2\abs{\eta-h}.
+\end{align*}
+
+Falls $(2\eta-1)\sign f < 0$, so wertet die Indikatorfunktion zu 1 aus. Ist nun
+$\eta > \frac{1}{2}$, so ist $f < 0$ und somit $-f-1 > -1$, also
+\begin{align*}
+\abs{2\eta-1} &= 2\eta -1 \le 2\eta-1-f = 2\eta -1 -(2h-1) = 2(\eta - h)\\
+&\le 2\abs{\eta -h}.
+\end{align*}
+Ist dagegen $\eta < \frac{1}{2}$, so ist $f\ge 0$ und somit $f+1 \ge 1$, also
+\begin{align*}
+\abs{2\eta-1} &= 1-2\eta \le f+1-2\eta = 2\abs{\eta-h}.
+\end{align*}
+Ist $\eta=\frac{1}{2}$, so ist (1)$=0$.\qedhere
+\end{proof}
+
+Betrachten wir die Histogrammregel mit $Y=\setd{-1,1}$, $X=\R^d$ und
+\begin{align*}
+D=((x_1,y_1),\ldots,(x_n,y_n))\in (X\times Y)^n.
+\end{align*}
+Sei nun $\AA=(A_i)_{i\ge 1}$ mit $A_i$ messbar eine Partition von $X$, d.h.
+\begin{align*}
+X= \bigcup_{i\ge 1} A_i,\qquad A_i\cap A_j = \varnothing,\quad i\neq j. 
+\end{align*}
+Für jedes $x\in X$ existiert ein eindeutiger Index $j\ge 1$, so dass $x\in
+A_j$. Setzen wir
+\begin{align*}
+N_D(x) \defl \sum_{i=1}^n \Id_{A_i(x)}(x_i) = 
+\card\setd{\text{Samples }(x_i,y_i)\text{ für die }x_i\in A(x)}, 
+\end{align*}
+so erhalten wir
+\begin{align*}
+\hat{n}_D(x)
+=
+\begin{cases}
+\frac{1}{N_D(x)}\sum_{\setdef{i}{y_i=1}} \Id_{A(x)}(x_i), & N_D(x)\neq 0,\\
+0, & \text{sonst}.
+\end{cases}
+\end{align*}
+Damit können wir nun eine plug-in-Regel definieren.
+\begin{align*}
+f_D^\AA(x) \defl
+\begin{cases}
+-1, & \hat{n}_D(x) < \frac{1}{2},\\
+1 & \hat{n}_D(x) \ge \frac{1}{2}.  
+\end{cases}
+\end{align*}
+Für $A\subset\R^d$ ist der \emph{Durchmesser} definiert als
+\begin{align*}
+\diam A \defl \sup_{x,x'\in A} \norm{x-x'}.
+\end{align*}
+Für $n\ge 1$ betrachten wir nun eine weitere Partition $\AA_n = (A_{n,j})_{j\ge
+1}$. Das Lernverfahren $\LL$ sei nun durch
+\begin{align*}
+(X\times Y)\ni D \mapsto f_D^{\AA_n} \defr f_D\tag{*}
+\end{align*}
+gegeben.
+
+\begin{prop}
+\label{prop:1.3.4}
+Sei $P$ ein W-Maß auf $X\times Y$, $Y=\setd{-1,1}$ und $X=\R^d$. Ferner gelten
+\begin{propenum}
+\item $\lim\limits_{n\to\infty} \sup_j \diam A_{n,j} = 0$.
+\item $\lim\limits_{n\to\infty} P^n\otimes P_X(\setdef{(D,x)}{N_D(x)\le l}) =
+0\fs$ für $l\ge 1$.
+\end{propenum}
+Dann ist die Lernmethode (*) $P$-konsistent bezüglich $L_\class$.\fishhere
+\end{prop}
+\begin{proof}
+Nach Lemma \ref{prop:1.3.3} gilt für $h=\hat{\eta}_D$ und
+$f_D=\sign(2\hat{\eta}_D-1)$,
+\begin{align*}
+\RR_{L_\class}(f_D) - \RR_{L_\class,P}^*
+\le 2\int_X \abs{\eta-\hat\eta_D}\dP_X.
+\end{align*}
+Definiere nun $\bar{\eta}:X\to[0,1]$,
+\begin{align*}
+\bar{\eta}(x) =
+\begin{cases}
+\frac{1}{P_X(A(x))}\int_{A(x)} \eta \dP_X, & P_X(A(x)) > 0,\\
+0, & \text{sonst},
+\end{cases}
+\end{align*}
+als ``mittleres $\eta$ auf $A(x)$''. $\bar{\eta}$ ist somit auf jedem $A(x)$
+konstant.
+Dann gilt
+\begin{align*}
+\int \abs{\eta-\hat{\eta}_D}\dP_X \le
+\underbrace{\int\abs{\eta-\bar{\eta}}\dP_X}_{(1)}
++ \underbrace{\int \abs{\bar{\eta}-\hat{\eta}_D}\dP_X}_{(2)}.
+\end{align*}
+
+Wir betrachten zunächst den von $D$ abhängigen Term (2),
+\begin{align*}
+&\int_{X\times Y} \int_X \abs{\bar{\eta}(x)-\hat{\eta}_D(x)}\dP_X(x)\dP^n(D)\\
+&\quad =
+ \int_X\int_{X\times Y} \abs{\bar{\eta}(x)-\hat{\eta}_D(x)}\dP^n(D)\dP_X(x)\\
+&\quad=
+ \int_X\sum_{k=0}^n \int_{\setdef{D}{N_D(x)=k}}
+ \abs{\bar{\eta}(x)-\hat{\eta}_D(x)}\dP^n(D)\dP_X(x)
+\end{align*}
+Sei $N_D(x)=k$, dann existieren eindeutige $x_{i_1},\ldots,x_{i_k}\in A(x)$.
+Die zugehörigen $y_{i_1},\ldots,y_{i_k}$ sind unabhängige Zufallsvariablen,
+wovon jede einzelne mit der Wahrscheinlichkeit $\bar{\eta}(x)$  positiv ist.
+
+Somit ist $\sum_{\setdef{j}{Y_{i_j}=1}} y_{i_j}$ binomialverteilt, genauer
+$B(k,\bar{\eta}(x))$-verteilt und
+\begin{align*}
+\sum_{\setdef{i}{y_i=1}}\Id_{A(x)}(x_i) = N_D(x)\hat{\eta}_D(x) =
+k\cdot\hat{\eta}_D(x).
+\end{align*}
+
+Sei $\xi: \Omega\to\R$ eine $B(k,\bar{\eta}(x))$-verteilte Zufallsvariable. Dann
+gilt $\xi/k \sim \hat{\eta}_D(x)$ für $k\ge 1$ und folglich
+\begin{align*}
+&\frac{1}{P^n(\setdef{D}{N_D(x)=k})}\int_{\setdef{D}{N_D(x)=k}}
+\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!
+\abs{\bar{\eta}(x)-\hat{\eta}_D(x)}\dP^n(D)\\
+&\qquad=
+\E \abs{\bar{\eta}(x)-\frac{1}{k}\xi}\\
+&\qquad\le
+\frac{1}{k}\left(\E\left((k\bar{\eta}(x)-\xi)^2 \right)\right)^{1/2}\\
+&\qquad= \frac{1}{k}\left(\E(\E\xi - \xi)^2 \right)^{1/2},
+\end{align*}
+nach Hölders Ungleichung. Die Varianz einer $B(k,\bar{\eta}(x))$-verteilten
+Zufallsvariablen ist $k\bar{\eta}(x)(1-\bar{\eta}(x))\le k/4$ und damit erhalten
+wir für obigen Ausdruck die Abschätzung
+\begin{align*}
+\frac{1}{k}\left(\E(\E\xi - \xi)^2 \right)^{1/2} = 
+ \frac{1}{k}\left(k\bar{\eta}(x)(1-\bar{\eta}(x))\right)^{1/2}
+\le \frac{1}{2\sqrt{k}}.
+\end{align*}
+
+Für $k=0$ gilt auf $\setdef{D}{N_D(x)=k}$ nach Definition $\hat{\eta}\equiv0$
+sowie $\abs{\bar{\eta}(x)}\le 1$. Deshalb ist
+\begin{align*}
+\int_{\setdef{D}{N_D(x)=k}}
+\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!\!
+\abs{\bar{\eta}(x)-\hat{\eta}_D(x)}\dP^n(x) \le P^n(\setdef{D}{N_D(x)=k}).
+\end{align*} 
+Damit folgt
+\begin{align*}
+&\int_{(X\times Y)^n} \int_X
+\abs{\bar{\eta}(x)-\hat{\eta}_D(x)}\dP_X(x)\dP^n(D)\\
+&\quad\le
+\int_X \sum_{k=1}^n \frac{1}{2\sqrt{k}} P^n(\setdef{D}{N_D(x)=k})
++ P^n(\setdef{D}{N_D(x)=0})\dP_X(x)\\
+&\quad\le
+\int_X \sum_{k=1}^n \int_{\setdef{D}{N_D(x)=k}}
+\frac{1}{2\sqrt{k}} \dP^n(D) + P^n(\setdef{D}{N_D(x)=0})\dP_X(x)\\
+&\quad\le
+\frac{1}{2}\int_X \int_{\setdef{D}{N_D(x)>0}}
+\frac{\dP^n(D)}{\sqrt{N_D(x)}}\dP_X(x)  +
+P^n\otimes P(\setdef{(D,x)}{N_D(x)=0})\tag{**}
+\end{align*}
+Für $l\ge 1$ gilt dann
+\begin{align*}
+&\int_X  \int_{\setdef{D}{N_D(x)>0}}
+\frac{\dP^n(D)}{\sqrt{N_D(x)}}\dP_X(x)\\
+&\quad \le
+\int_X  \int_{\setdef{D}{0<N_D(x)\le l}}
+\underbrace{\frac{\dP^n(D)}{\sqrt{N_D(x)}}}_{\le1}\dP_X(x)
++
+\int_X  \int_{\setdef{D}{l<N_D(x)}}
+\underbrace{\frac{\dP^n(D)}{\sqrt{N_D(x)}}}_{\le \sqrt{l}^{-1}}\dP_X(x)\\
+&\quad \le
+P^n\otimes P(\setdef{(D,x)}{N_D(x)\le l}) + \frac{1}{\sqrt{l}}.\tag{***}
+\end{align*}
+Insgesamt gilt also
+\begin{align*}
+\text{(**)} \le \frac{3}{2}P^n\otimes P(\setdef{(D,x)}{N_D(x)\le l}) +
+\frac{1}{2\sqrt{l}}.
+\end{align*}
+Sei nun $\ep >0$ und $l> \ep^{-2}$, so ist $\frac{1}{\sqrt{l}} < \ep$ und nach
+Voraussetzung (ii) gilt für hinreichend große $n$,
+\begin{align*}
+P^n\otimes P(\setdef{(D,x)}{N_D(x)\le l}) \le \ep
+\end{align*}
+und somit (***)$\le \frac{5}{2}\ep$.\qedhere
+\end{proof}
+
+\begin{prop}
+\label{prop:1.3.5}
+Sei $\mu$ ein endliches Borelmaß auf $\R^d$ und
+\begin{align*}
+f: \R^d\to \R,\qquad \mu\text{-integrierbar}.
+\end{align*}
+Dann gibt es für jedes $\ep > 0$ eine gleichmäßig stetige Abbildung $h:\R^d\to
+\R$, die $\mu$-integrierbar ist und für die gilt
+\begin{align*}
+\int \abs{f-h}\dmu \le \ep.\fishhere
+\end{align*}
+\end{prop}
+\begin{proof}
+Der Beweis findet sich in \cite{bauerI}, oder ergibt sich direkt, wenn das
+Lebesgue-Integral nach der Methode von Daniel Stone eingeführt wird.\qedhere
+\end{proof}
+
+$P_X$ ist als W-Maß insbesondere endlich und
+$\eta=P(Y=1\mid\cdot)\in[0,1]$ ist beschränkt und damit $P_X$-integrierbar. Für
+$\ep  > 0$ gibt es nun eine gleichmäßig stetige Abbildung $\eta_\ep :
+\R^d\to\R$, die ebenfalls $P_X$-integrierbar ist und
+\begin{align*}
+\int\abs{\eta-\eta_\ep}\dP_X < \ep 
+\end{align*}
+erfüllt. Setzen wir also
+\begin{align*}
+\bar{\eta}_\ep(x) \defl
+\begin{cases}
+\frac{1}{P_X(A(x))}\int_{A(x)}\eta_\ep\dP_X,& P_X(A(x)) > 0,\\
+0, & \text{sonst},
+\end{cases}
+\end{align*}
+so gilt
+\begin{align*}
+\int \abs{\eta-\bar{\eta}}\dP_X
+\le
+\underbrace{\int \abs{\eta-\eta_\ep}\dP_X}_{\text{(I)}}
++\underbrace{\int \abs{\eta_\ep-\bar{\eta}_\ep}\dP_X}_{\text{(II)}}
++\underbrace{\int \abs{\bar{\eta}_\ep-\bar{\eta}}\dP_X}_{\text{(III)}}
+\end{align*}
+
+(I) ist nach Konstruktion $<\ep$. Analog folgt
+\begin{align*}
+\text{(III)} &= \int \abs{\bar{\eta}_\ep-\bar{\eta}}\dP_X\\
+&\overset{\frac{0}{0}\defl0}{=} \int_X \frac{1}{P_X(A(x))} \int_{A(x)}
+\abs{\eta_\ep(x')-\eta(x')} \dP_X(x')\dP_X(x)\\
+&=
+\int_X\int_X \frac{1}{P_X(A(x))} \Id_{A(x)}(x) \abs{\eta_\ep(x')-\eta(x')}
+\dP_X(x)\dP_X(x')\\
+&= \int_X \abs{\eta_\ep(x')-\eta(x')} \dP_X(x') \le \ep.
+\end{align*}
+
+Da $\eta_\ep$ gleichmäßig stetig, gibt es ein $\delta > 0$, so dass
+\begin{align*}
+\norm{x-x'}< \delta \Rightarrow \abs{\eta_\ep(x)-\eta_\ep(x')} < \ep
+\end{align*}
+und nach Voraussetzung (i) des Satzes gilt für große Zahlen $n$,
+\begin{align*}
+\sup_{j\ge 1} \diam A_{n,j} \le \delta.
+\end{align*}
+Außerdem erhalten wir
+\begin{align*}
+\text{(II)} &= 
+\int_X \abs{\eta_\ep - \bar{\eta}_\ep}\dP_X\\
+&=
+\int_X \abs{\eta_\ep(x) - \frac{1}{P_X(A(x))}\int_{A(x)}
+\eta_\ep(x')\dP_X(x')}\dP_X(x)\\
+&\le
+\int_X \frac{1}{P_X(A(x))}\int_{A(x)} \underbrace{\abs{\eta_\ep(x) -
+\eta_\ep(x')}}_{<\ep}\dP_X(x')\dP_X(x)\le \ep. 
+\end{align*}
+Insgesamt haben wir somit gezeigt,
+\begin{align*}
+\forall \ep > 0 \exists N_0 \in\N \forall n\ge N : 
+\int \abs{\eta-\bar{\eta}} \dP_X < \ep.
+\end{align*}
+Damit haben wir gezeigt, dass
+\begin{align*}
+\E_{D\sim P^n} \int \abs{\eta-\hat{\eta}_D} \dP_X \to 0,\qquad n\to \infty.
+\end{align*}
+Jetzt müssen wir uns noch davon überzeugen, dass dies auch für die universelle
+Konsistenz genügt.
+
+Schreibe $h_D \defl \RR_{L_\class,P}(f_D) - \RR_{L_\class,P}^* \ge 0$, so gilt
+nach Lemma \ref{prop:1.3.3} und dem soeben gezeigten, dass
+\begin{align*}
+\E_{D\sim P^n} h_D \to 0,\qquad n\to\infty. 
+\end{align*}
+Ferner gilt
+\begin{align*}
+\E_{D\sim P^n} h_D = \E_{D\sim P^n} \abs{h_D} =
+\int_{[h_D< \ep]} \abs{h_D}\dP^n(D)
++
+\underbrace{\int_{[h_D\ge \ep]} \abs{h_D}\dP^n(D)}_{\ge \ep
+P^n(\setdef{D}{\abs{h_D} \ge \ep})}.
+\end{align*}
+Das heißt
+\begin{align*}
+\lim\limits_{n\to\infty}
+P^n\left(\setdef{D}{\RR_{L_\class,P}(f_D) - \RR_{L_\class,P}^* \ge \ep}\right) =
+0,
+\end{align*}
+da $\E_{D\sim P^n} h_D \to 0$.
+
+Wir wollen jetzt zeigen, dass es Lernmethoden gibt, die universell konsistent
+sind.
+
+\begin{prop}[Universelle Konsistenz der Histogrammregel]
+\index{Histogrammregel!universelle Konsistenz}
+\label{prop:1.3.6}
+Sei $\AA_n \defl (A_{n,j})_{j\ge1}$ eine Partition von $\R^d$, so dass jedes
+$A_{n,j}$ ein Hyperwürfel der Kantenlänge $h_n$ ist, d.h. wir haben zu
+$x_{n,j}\in\R^d$,
+\begin{align*}
+A_{n,j} = x_{n,j} + [0,h_n]^d.
+\end{align*}
+Es gelten
+\begin{propenum}
+\item $\lim\limits_{n\to\infty} h_n  = 0$,
+\item $\lim\limits_{n\to\infty} n\cdot h_n  = \infty$.
+\end{propenum}
+Dann ist die zugehörige Histogrammregel universell konsistent.\fishhere
+\end{prop}
+\begin{proof}
+Wir weisen die Voraussetzungen von Satz \ref{prop:1.3.4} nach.\\
+``1)'': $\lim\limits_{n\to\infty} \sup_{j\ge 1} \diam A_{n,j} = 0$ ist
+erfüllt.\\
+``2)'': Dazu führen wir $S>0$ ein. Dann gibt es höchstens $c_1+c_2
+h_n^{-d}$ Hyperwürfel $A_{n,j}$ mit $A_{n,j}\cap B_S(0)\neq \varnothing$ und somit
+\begin{align*}
+&P^n\otimes P_X\left(\setdef{(D,x)}{N_D(x)\le l} \right)
+\le P^n\otimes P_X\left(\setdef{(D,x)}{x\notin B_S(0)} \right)\\
+&\le
+\sum_{j:A_{n,j}\cap B_S(0)\neq \varnothing} P^n\otimes P_X
+\left(\setdef{(D,x)}{N_D(x)\le l}\cap (X\times Y)^n\times A_{n,j}\right)
+\end{align*}
+Dann ist $P^n\otimes P_X\left(\setdef{(D,x)}{x\notin B_S(0)} \right) =
+P_X(\R^d\setminus B_S(0))$ also
+\begin{align*}
+&\sum_{j:A_{n,j}\cap B_S(0)\neq \varnothing} P^n\otimes P_X
+\left(\setdef{(D,x)}{N_D(x)\le l,\; x\in A_{n,j}}\right)\\
+&\le 
+\sum_{\atop{j:A_{n,j}\cap B_S(0)\neq \varnothing}{P_X(A_{n,j})\le \frac{2l}{n}}}
+P^n\otimes P_X \left(\setdef{(D,x)}{N_D(x)\le l,\; x\in
+A_{n,j}}\right)\tag{1}\\ &+
+\sum_{\atop{j:A_{n,j}\cap B_S(0)\neq \varnothing}{P_X(A_{n,j})> \frac{2l}{n}}}
+\left(\setdef{(D,x)}{N_D(x)\le l,\; x\in A_{n,j}}\right)\tag{2}
+\end{align*}
+ Zu (1): $\setdef{(D,x)}{N_D(x)\le l,\; x\in A_{n,j}}\subset (X\times
+ Y)^n\times A_{n,j}$ und daher
+ \begin{align*}
+ &P^n\otimes P_X\left(\setdef{(D,x)}{N_D(x)\le l,\; x\in A_{n,j}}\right)
+ \le P^n\otimes P_X((X\times Y)^n\times A_{n,j})\\
+ &= P_X(A_{n,j})
+ \end{align*}
+Folglich ist
+\begin{align*}
+\text{(1)} \le
+\sum_{\atop{j:A_{n,j}\cap B_S(0)\neq \varnothing}{P_X(A_{n,j})\le \frac{2l}{n}}}
+P_X(A_{n,j})
+\le
+\frac{2l}{n}
+(c_1+c_2h_n^{-d}) \to 0,
+\end{align*}
+nach Voraussetzung 2).
+
+Zu (2): Setze $\mu_{D_X} \defl n^{-1} \sum_{i=1}^n \delta_{\setd{x_i}}$, wobei
+\begin{align*}
+\delta_{\setd{x_i}}(A) = 
+\begin{cases}
+1, & x_i\in A,\\
+0, & \text{sonst}.
+\end{cases}
+\end{align*}
+$\mu_{D_X}$ heißt \emph{empirisches Maß}
+\index{empirisches Maß}
+bezüglich des Datensatzes
+$D_X=(x_1,\ldots,x_n)$.
+
+Für $x\in A_{n,j}$ gilt
+\begin{align*}
+N_D(x) = \sum_{i=1}^n \Id_{A(x)}(x_i) = n\cdot\mu_{D_X}(A(x)).
+\end{align*}
+Daher folgt
+\begin{align*}
+&P^n\otimes P_X\left(\setdef{(D,x)}{N_D(x)\le l,\; x\in A_{n,j}} \right)\\
+&\quad \le P_X(A_{n,j})P^n\left(\setdef{D}{n\cdot \mu_{D_X}(A_{n,j})\le l}
+\right)
+\end{align*}
+Es folgt wegen $P_X(A_{n,j}) > \frac{2l}{n}$
+\begin{align*}
+&P^n\left(\setdef{D}{\mu_{D_X}(A_{n,j})\le \frac{l}{n}} \right)\\
+&\quad =
+P^n\left(\setdef{D}{\mu_{D_X}(A_{n,j}) - P_X(A_{n,j})\le \frac{l}{n}-
+P_X(A_{n,j})} \right)\\
+&\quad \le
+P^n\left(\setdef{D}{\mu_{D_X}(A_{n,j}) - P_X(A_{n,j})\le -\frac{1}{2}
+P_X(A_{n,j})} \right).
+\end{align*}
+Zur Fortsetzung des Beweises benötigen wir folgendes Lemma.\qedhere
+\end{proof}
+
+\begin{lem}
+\label{lem:1.3.7}
+Sei $(\Omega,\AA,P)$ ein W-Raum und $h:\Omega\to\R$ messbar mit
+$\int h^2 \dP < \infty$. Dann gilt für alle $n\ge 1$ und $t > 0$,
+\begin{align*}
+P^n\left(\setdef{\omega\in\Omega}{\frac{1}{n}\sum_{i=1}^n h(\omega_i) - \E_P h
+\ge t } \right) \le
+\frac{\E_P h^2}{t^2\cdot n}.\fishhere
+\end{align*}
+\end{lem}
+\begin{proof}
+Die Tschebyscheff-Ungleichung besagt für quadratintegrierbares $f$,
+\begin{align*}
+P\left[\abs{f}\ge t\right] \le \frac{\E_P f^2}{t^2}.
+\end{align*}
+Wenden wir dies auf $f=\frac{1}{n}\sum_{i=1}^n h\circ\pi_i - \E_P h$, wobei
+\begin{align*}
+\pi_i : \Omega^n\to \Omega
+\end{align*}
+die $i$-te Projektion.
+\begin{align*}
+&P^n\left(\setdef{\omega\in\Omega^n}{\frac{1}{n}\sum_{i=1}^n h(\omega_i) - \E_P
+h \ge t } \right)\\ &\quad \le
+\frac{\E_{P^n}\left(\frac{1}{n} \sum_{i=1}^n h\circ\pi_i - \E_P
+h\right)^2}{t^2}
+\end{align*}
+und mit $\eta_i \defl h\circ\pi_i - \E_P h$ gilt
+\begin{align*}
+&\E_{P^n}\left(\frac{1}{n}\sum_{i=1}^n (h\circ\pi_i -\E_P h) \right)^2
+= \frac{1}{n^2} \E_{P^n} \left(\sum_{i=1}^n \eta_i\right)^2\\
+&\qquad= \frac{1}{n^2}
+\sum_{i=1}^n \E_{P^n} h^2\circ \pi_i + \frac{1}{n^2}\sum_{i\neq j} 
+\underbrace{\E_{P^n} \eta_i\eta_j}_{=0}\\
+&\qquad=
+ \frac{1}{n^2}
+\sum_{i=1}^n \E_{P^n} h^2\circ \pi_i
+=
+ \frac{1}{n^2}
+\sum_{i=1}^n \E_{P} h^2 = \frac{1}{n} \E_{P} h^2.\qedhere
+\end{align*}
+\end{proof}
+
+\begin{proof}[Fortsetzung des Beweises von Satz \ref{prop:1.3.6}.]
+Setze nun in Lemma \ref{prop:1.3.5}, $h=\Id_{A_{n,j}}$ und
+$t=\frac{1}{2}P_X(A_{n,j})$, so gilt
+\begin{align*}
+&P^n\left(\setdef{D}{\mu_{D_X}}(A_{n,j}) -P(A_{n,j}) \le
+-\frac{1}{2}P_X(A_{n,j}) \right)
+\le \frac{\E_P \Id^2_{A_{n,j}}}{4P_X^2(A_{n,j})n}\\
+&\qquad= \frac{1}{4n\cdot P_X(A_{n,j})}.
+\end{align*}
+Somit gilt schließlich
+\begin{align*}
+\text{(2)} &= \sum_{\atop{j:A_{n,j}\cap B_S(0)\neq \varnothing}{P_X(A_{n,j})>
+\frac{2l}{n}}} \left(\setdef{(D,x)}{N_D(x)\le l,\; x\in A_{n,j}}\right)\\
+&\le
+\sum_{\atop{j:A_{n,j}\cap B_S(0)\neq \varnothing}{P_X(A_{n,j})> \frac{2l}{n}}}
+\frac{1}{4n}
+\le \frac{c_1+c_2h_n^{-d}}{4n} \overset{n\to\infty}{\longrightarrow} 0.
+\end{align*}
+
+Zum Abschluss des Beweises, müssen wir noch $S$ passend wählen. Sei also $\ep >
+0$, dann existiert ein $\delta > 0$, so dass $P_X(\R^d\setminus B_S(0)) \le
+\ep$ und für hinreichend große $n$ gilt ferner
+\begin{align*}
+&\frac{2l}{n}\left(c_1 + c_2h_n^{-d}\right) \le \ep,\\
+&\left(c_1 + c_2h_n^{-d}\right)\frac{1}{4n} \le \ep,
+\end{align*}
+und letztlich
+\begin{align*}
+P^n\otimes P_X\left(\setdef{(D,x)}{N_D(x)\le \ep} \right)\le 3\ep.\qedhere
+\end{align*}
+\end{proof}
+
+\begin{bem*}[Schlussbemerkungen]
+\begin{bemenum}
+\item Es gibt universell konsistente Klassifizierungsmethoden. Stone hat 1977
+gezeigt, dass das Nearest-Neighbour-Verfahren universell konsistent ist, falls
+$K_n\to \infty$ und $\frac{K_n}{n}\to 0$.
+\item Gibt es ein $S>0$, so dass $P_X(\R^d\setminus B_S(0)) = 0$, dann ist die
+Konvergenz von
+\begin{align*}
+P^n\otimes P_X\left(\setdef{(D,x)}{N_D(x)\le l} \right)\tag{*}
+\end{align*}
+für $n\to\infty$ von $P$ unabhängig. Der wesentliche Grund dafür ist, dass
+Lemma \ref{prop:1.3.7} von $P$ unabhängig ist.
+\item Die Konvergenzgeschwindigkeit von
+\begin{align*}
+\int_{(X\times Y)^n}\int_X \abs{\bar{\eta}-\hat{\eta}_D}\dP_X\dP^n
+\overset{n\to\infty}{\to} 0
+\end{align*}
+hängt lediglich von (*) ab und ist daher von $P$ unabhängig.
+\item In Satz \ref{prop:1.3.4} benötigen wir eine gleichmäßig stetige
+Approximation von $\eta$ und $\bar{\eta}$ und können daher keine Aussage zur
+Konvergenzrate von
+\begin{align*}
+\RR_{L_\class,P}(f_D) - \RR_{L_\class,P}^*
+\le \int \abs{\eta-\bar{\eta}}\dP_X \to 0
+\end{align*}
+machen.
+\item Ist $\eta$ lipschitz stetig mit Konstante $\le 1$, so können wir eine
+Konvergenzrate von
+\begin{align*}
+\RR_{L_\class,P}(f_D) - \RR_{L_\class,P}^*
+\le \int \abs{\eta-\bar{\eta}}\dP_X \to 0
+\end{align*}
+berechnen.
+Diese ist unabhängig von $P$, in dem Sinn, dass man nur die $P$
+betrachtet für die $\eta$ lipschitz ist.\maphere 
+\end{bemenum}
+\end{bem*}
+
+\section{Lernraten}
+\index{Lernraten}
+
+Ziel dieses Abschnitts ist es, die Konvergenzraten von
+\begin{align*}
+\RR_{L_\class,P}(f_D) - \RR_{L_\class,P}^*\to 0
+\end{align*}
+zu untersuchen.
+
+\begin{defn}
+\label{defn:1.4.1}
+Sei $L:X\times Y\times \R\to[0,\infty)$ eine Verlustfunktion, $P$ ein W-Maß auf
+$X\times Y$, $\LL$ eine Lernmethode und $(a_n)$ eine Folge echt positiver
+Zahlen mit $a_n\downarrow 0$.
+
+Wir sagen, dass $\LL$ \emph{im Mittel mit Rate $(a_n)$ lernt},
+\index{Lernrate!im Mittel}
+falls es ein $c>0$ gibt, so dass
+\begin{align*}
+\E_{D\sim P^n} \left(\RR_{L,P}(f_D)-\RR_{L,P}^*\right)
+\le ca_n,\qquad n\ge 1.
+\end{align*}
+Ferner sagen wir, dass $\LL$ \emph{in Verteilung mit Rate $(a_n)$ lernt},
+\index{Lernrate!in Verteilung}
+falls es eine Familie $(c_\tau)_\tau\subset [1,\infty)$ und $\tau\in [0,1]$
+gibt, so dass gilt
+\begin{align*}
+P^n\left(\setdef{D}{\RR_{L,P}(f_D) - \RR_{L,P}^* \le c_\tau a_n} \right) \ge
+1-\tau,\qquad n\ge 1,\; \tau\in[0,1].\fishhere
+\end{align*}
+\end{defn}
+
+Bevor wir klären, ob es überhaupt Lernraten gibt, die für alle $P$ gelten,
+wollen wir erstmal beide Begriffe vergleichen.
+
+\begin{bem*}[Bemerkungen.]
+\begin{bemenum}
+\item Ist $\LL$ konsistent, so kann man zeigen, dass $\LL$ im Mittel mit einer
+von $P$ abhängigen Rate im Mittel lernt.
+\item Im Beweis von Satz \ref{prop:1.3.6} haben wir benutzt,
+\begin{align*}
+\E_{D\sim P^n}\left(\RR_{L,P}(f_D) - \RR_{L,P}^* \right)
+\ge \ep P^n\left(\setdef{D}{\RR_{L,P}(f_D)- \RR_{L,P}^* > \ep}\right)
+\end{align*}
+Ist nun $\E_{D\sim P^n}\left(\RR_{L,P}(f_D) - \RR_{L,P}^*\right) \le c a_n$,
+dann ist
+\begin{align*}
+P^n\left(\setdef{D}{\RR_{L,P}(f_D)- \RR_{L,P}^* > \ep}\right)
+\ge \frac{c a_n}{\ep}.
+\end{align*}
+D.h. für $\tau=\frac{c a_n}{\ep} \Leftrightarrow \ep = \frac{c}{\tau}a_n$ und
+$c_\tau \defl c\tau^{-1}$ ist
+\begin{align*}
+P^n\left(\setdef{D}{\RR_{L,P}(f_D)- \RR_{L,P}^* \le c_\tau a_n}\right)
+\le 1-\tau.
+\end{align*}
+Lernraten im Mittel implizieren somit Lernraten in Verteilung.
+\item Später werden wir häufig Lernraten in Verteilung beweisen, die
+dann aufgrund der Struktur der $c_\tau$ auch im Mittel gelten.\maphere
+\end{bemenum}
+\end{bem*}
+
+\begin{prop*}[Offene Frage]
+Gibt es Verfahren $\LL$, die mit Rate $(a_n)$ für alle $P$ lernen?\fishhere
+\end{prop*}
+
+Wir werden im Folgenden sehen, dass dies ``normalerweise'' nicht so ist.
+
+\begin{defn}
+\label{defn:1.4.2}
+Sei $(X,\AA,\mu)$ ein endlicher Maßraum. Ein $A\in\AA$ heißt
+\emph{Atom}\index{Atom}, wenn
+\begin{align*}
+\forall B\subset A,\quad B\in\AA
+\text{ gilt entweder }\mu(B)=0\text{ oder }\mu(A\setminus B) = 0.
+\end{align*}
+$(X,\AA,\mu)$ heißt \emph{atomfrei}, falls kein $A\in\AA$ ein Atom ist.\fishhere
+\end{defn}
+
+\begin{bsp*}
+\begin{bspenum}
+\item Versehen wir die natürlichen Zahlen versehen mit dem Zählmaß $\nu$ mit
+$\nu(\setd{n})=1$, so ist jede einelementige Menge $\setd{n}$ ein Atom.
+\item Das Intervall $[0,1]$ versehen mit dem Lebesgue-Maß ist atomfrei.\bsphere 
+\end{bspenum}
+\end{bsp*}
+
+\begin{prop}[Satz von Lyapunov]
+\index{Satz!von Lyapunov}
+\label{prop:1.4.3}
+Ist $(X,\AA,\mu)$ ein endlicher atomfreier Maßraum, so ist
+\begin{align*}
+\setdef{\mu(A)}{A\in\AA} = [0,\mu(X)].\fishhere
+\end{align*}
+\end{prop}
+\begin{proof}
+Ein Beweis findet sich in \cite{Werner07}.\qedhere
+\end{proof}
+
+\begin{prop}[No-free-lunch Theorem (Devroye 1982)]
+\label{prop:1.4.4}
+\index{No-free-lunch Theorem}
+Sei $(a_n)\subset [0,1/32]$ eine fallende Nullfolge, $(X,\AA,\mu)$ ein
+atomfreier W-Raum und $Y\defl\setd{-1,1}$. Dann gibt es zu jeder Lernmethode $\LL$
+ein W-Maß $P$ auf $X\times Y$ mit
+\begin{propenum}
+\item $P_X = \mu$.
+\item $\RR_{L_\class,P}^* = 0$.
+\item $\E_{D\sim P^n} \RR_{L_\class,P}(f_D) - \RR_{L_\class,P}^* \ge a_n$ für
+$n\ge 1$.\fishhere
+\end{propenum}
+\end{prop}
+
+\begin{bem*}[Bemerkungen.]
+\begin{bemenum}
+\item Das NFL-Theorem besagt, dass es im Allgemeinen keine universellen
+mittleren Raten gibt. Dies gilt auch für Raten in Verteilung.
+\item Das NFL-Theorem gilt für \textit{praktisch jede} Verlustfunktion.
+\item Für $X=\N$ gilt das NFL-Theorem, falls $\mu=P_X$ nicht vorher festgelegt
+wird.
+\item Für \textit{endliche} $X$ ist das NFL-Theorem falsch.\maphere
+\end{bemenum}
+\end{bem*}
+
+\begin{lem}
+\label{prop:1.4.5}
+Sei $(a_n) \subset (0,1/16]$ mit $a_n\downarrow 0$, dann existiert eine Folge
+$(p_n)\subset (0,1)$ mit $p_1\ge p_2 \ge \ldots$ und $\sum_{n=1}^\infty p_n =
+1$ und
+\begin{align*}
+\sum_{i=n+1}^\infty p_i \ge \max\setd{8a_n,32n p_{n+1}}.\fishhere
+\end{align*}
+\end{lem}
+\begin{proof}
+Da $p_n\ge p_{n+1}$ gezeigt wird, genügt es zu zeigen, dass
+\begin{align*}
+\sum_{i=n+1}^\infty p_i \ge \max\setd{8a_n,32n p_{n}}.\fishhere
+\end{align*}
+Für $l\le m$ definiere
+\begin{align*}
+H(m,l) \defl \sum_{i=l}^{m-1} \frac{1}{i}.
+\end{align*}
+Sei nun $n_1\defl 1$, so gilt
+\begin{align*}
+8a_{n_1} = 8a_1 \le 8\frac{1}{16}\le 2^{-1}. 
+\end{align*}
+Ferner gibt es ein $n_2>n_1$ mit $H(n_2,n_1) \ge 32$, da $\sum_{i\ge 1} i^{-1}
+= \infty$. Außerdem ist $H(\cdot,n_1)$ wachsend und $(a_n)$ fallend nach
+Voraussetzung, also können wir $8a_{n_2}\le 2^{-2}$ für $n_2$ hinreichend groß
+garantieren. Sukzessive finden wir $n_k$ für $k\ge 3$, so dass
+\begin{align*}
+n_k > n_{k-1},\qquad H(n_k,n_{k-1}) \ge H(n_{k-1},n_{k-2}),\qquad
+8a_{n_k} \le 2^{-k}.
+\end{align*}
+Definiere nun
+\begin{align*}
+c_k \defl \frac{32}{2^k H(n_{k+1},n_k)},\qquad k\ge 1,
+\end{align*}
+so ist $c_k$ fallend und
+\begin{align*}
+\frac{1}{32}\sum_{k\ge 1} c_k H(n_{k+1},n_k) = \sum_{k\ge 1}\frac{1}{2^k} = 1.
+\end{align*}
+Für $n\in [n_k,n_{k+1})$ definiere $p_n \defl \frac{c_k}{32 n}$, dann fällt $p_n$
+monoton und
+\begin{align*}
+\sum_{n\ge 1} p_n = \sum_{k\ge 1} \sum_{i=n_k}^{n_{k+1}-1} \frac{c_k}{32 i} = 
+\sum_{k\ge 1} \frac{c_k}{32}
+\underbrace{\sum_{i=n_k}^{n_{k+1}-1} \frac{1}{i}}_{H(n_{k+1},n_k)} = 1.
+\end{align*}
+Ferner gilt für $n\in[n_k,n_{k+1})$
+\begin{align*}
+\sum_{i\ge n+1} p_i &\ge \sum_{i\ge n_{k+1}} p_i
+= \sum_{i\ge k+1}\sum_{j=n_i}^{n_{i+1}-1} \frac{c_i}{32 j}
+= \sum_{i\ge k+1} \frac{c_i}{32} H(n_{i+1},n_i)\\
+&= \sum_{i\ge k+1} 2^{-i} = 2^{-k}.
+\end{align*}
+Da außerdem $H(n_{k+1},n_k) \ge H(n_2,n_1) \ge 32$ folgt
+\begin{align*}
+\frac{1}{2^k} \ge \frac{32}{2^k H(n_{k+1},n_k)} = c_k = 32 np_n.
+\end{align*}
+Zudem ist
+\begin{align*}
+\frac{1}{2^k} \ge 8a_{n_k} \ge 8a_n.\qedhere
+\end{align*}
+\end{proof}
+
+\begin{proof}[Beweis des No-free-lunch Theorems.]
+Ohne Einschränkung sei $f_D \in \setd{-1,1}$, ansonsten betrachte $\sign f_D$.
+Fixiere eine Folge $(p_i)\downarrow$ gemäß dem vorangegangen Lemma und zerlege
+$X$ in Partitionen $(A_j)_{j\ge 1}$ mit $\mu(A_j)=p_j$ (Anwendung des Satzes
+von Lyapunov).
+Sei nun $\overline{\nu}$ ein W-Maß auf $\setd{0,1}$ mit
+$\overline{\nu}(\setd{0}) = 1/2$, so ist
+\begin{align*}
+\nu \defl \bigotimes_{i=1}^\infty \overline{\nu},
+\end{align*}
+ein W-Maß auf $\Omega\defl \setd{0,1}^\infty$. Für $\omega = (\omega_j)\in\Omega$
+schreibe
+\begin{align*}
+\eta_\omega(x) \defl \sum_{j=1}^\infty \omega_j \Id_{A_j}(x),\quad \in\setd{0,1}.
+\end{align*}
+Nun sei $P_\omega$ das W-Maß auf $X\times Y$, das durch
+\begin{align*}
+&P_X = \mu,\\
+&P(Y=1\mid x) = \eta_\omega(x),\quad \Pfs
+\end{align*}
+charakterisiert wird, so gilt
+\begin{align*}
+\RR_{L,P_\omega}^* = \int_X
+\underbrace{\min\setd{\eta_\omega,1-\eta_\omega}}_{=0} \dP_X = 0.
+\end{align*}
+Wir zeigen nun, dass
+\begin{align*}
+\int_\Omega \inf_{n\ge 1} \frac{1}{a_n} \int_{(X\times Y)^n}
+\RR_{L,P_\omega}(f_D) \dP_\omega^n(D) \dnu(\omega) \ge \frac{1}{2}\tag{*},
+\end{align*}
+denn dann existiert ein $\omega$, so dass auch
+\begin{align*}
+\inf_{n\ge 1} \frac{1}{a_n} \int_{(X\times Y)^n}
+\RR_{L,P_\omega}(f_D) \dP_\omega^n(D) \ge \frac{1}{2},
+\end{align*}
+und für die Folge $(2a_n)_{n\ge 1}$ folgt die Behauptung.
+
+Idee: Im besten Fall genügt ein Punkt, um alle Informationen auf dem
+zugehörigen $A_j$ zu liefern, denn $\eta_\omega$ ist dort konstant. Haben wir
+beispielsweise 4 Datenpunkte mit je einem in $A_1,\ldots,A_4$, dann können wir
+auf diesen ``richtig'' entscheiden, jedoch haben wir keine Möglichkeit über
+$A_4$ hinaus noch ``richtig'' zu entscheiden, denn egal wie entschieden wird,
+existieren immer $\omega$, für die die Entscheidung schlecht ist. Wir können
+dann also nur noch raten\ldots
+%TODO: Bild zur Erklärung.
+
+Der folgende Beweis ist jedoch sehr technisch und daher ist es schwer, die
+anschauliche Idee dort wieder zu finden.
+
+Sei $D=(X\times Y)^\infty$ und schreibe $D_n \defl ((x_1,y_1),\ldots,(x_n,y_n))$,
+so gilt
+\begin{align*}
+(*) &= \int_\Omega \inf_{n\ge 1} \frac{1}{a_n} \int_{(X\times Y)^n}
+\RR_{L,P_\omega}(f_D) \dP_\omega^n(D) \dnu(\omega)\\
+&\ge
+\int_\Omega \int_{(X\times Y)^n} \inf_{n\ge 1} \frac{1}{a_n} 
+\RR_{L,P_\omega}(f_D) \dP_\omega^n(D) \dnu(\omega).
+\end{align*}
+Ist $\RR_{L,P_\omega}(f_{D}) \ge a_n$, so ist auch
+$\frac{1}{a_n}\RR_{L,P_\omega}(f_D)\ge 1$ und daher
+\begin{align*}
+\ldots \ge
+\int_\Omega \int_{(X\times Y)^n} \Id_{\bigcap_{n=1}^\infty
+\setd{\RR_{L,P_\omega}(f_D) \ge a_n}}
+\dP_\omega^n(D) \dnu(\omega).
+\end{align*}
+Setzen wir $B_n\defl\setd{\RR_{L,P_\omega}(f_D) \ge a_n}$, so ist $\bigcap_{n\ge
+1} B_n = X\setminus \left(\bigcup_{n\ge 1} X\setminus B_n\right)$ und für das
+Maß $Q=P_\omega^\infty$ gilt folglich
+\begin{align*}
+Q\left(\bigcap_{n\ge 1} B_n\right) &= 1-Q\left(\bigcup_{n\ge 1} X\setminus
+B_n\right) \ge 1-\sum_{n\ge 1} Q(X\setminus B_n)\\
+&\ge 
+1- \underbrace{\sum_{n\ge 1} \int_\Omega \int_{(X\times Y)^\infty}
+\Id_{\setd{\RR_{L,P}(f_D)\le a_n}} \dP_\omega^n(D)\dnu(\omega)}_{\text{(**)}}.
+\end{align*}
+Im Folgenden wollen wir (**) nach oben abschätzen. Für $n\ge 1$ definiere
+\begin{align*}
+\overline{f}_{D_n} \defl
+\begin{cases}
+1, & \mu\left(\setd{f_D=1} \cap A_j \right) \ge \mu\left(\setd{f_D = -1}\cap A_j
+\right),\\
+0, & \text{sonst},
+\end{cases}
+\end{align*}
+und schreibe ferner
+\begin{align*}
+E_{\omega,j}(f_{D_n}) \defl
+A_j \cap \setd{f_D \neq 2\eta_\omega -1}
+\end{align*}
+für die Menge der Fehlentscheidungen von $f_{D_n}$ auf $A_j$ für das Maß
+$P_\omega$. Auf $A_j$ ist $\eta_\omega(x)\equiv \omega_j$ und daher gilt
+\begin{align*}
+\overline{f}_{D_n}(j) \neq 2\omega -1 \Rightarrow
+\mu(E_{\omega,j}(f_{D_n})) \ge \frac{p_j}{2}.
+\end{align*}
+Um dies einzusehen sei z.B. $\omega_j = 1$, dann ist
+$\overline{f}_{D_n}(j)=-1$ und daher nach Definition von $\overline{f}_{D_n}$
+\begin{align*}
+\mu\left(\setd{f_{D_n}=1}\cap A_j\right) = \mu\left(\setd{f_{D_n} = -1}\cap
+A_j\right)
+\end{align*}
+also
+\begin{align*}
+p_j &= \mu(A_j) = \mu\left(\setd{f_{D_n}=1}\cap A_j \right)
++ \mu\left(\setd{f_{D_n}=-1}\cap A_j \right)\\
+&\le 2\mu\left(\underbrace{\setd{f_{D_n}=-1} \cap
+A_j}_{E_{\omega,j}(f_{D_n})}\right)
+\end{align*}
+Damit folgt
+$
+\Id_{\setd{\mu(E_{\omega,j}(f_{D_n})) \ge \frac{p_j}{2}}} \ge
+\Id_{\setd{\overline{f}_{D_n} \neq 2\omega_j -1}}
+$
+und wegen
+\begin{align*}
+\mu\left(E_{\omega,j}(f_{D_n}) \right) \ge
+\frac{p_j}{2}\Id_{\setd{\mu(E_{\omega,j}(f_{D_n}))\ge \frac{p_j}{2}}}
+\end{align*}
+ist
+\begin{align*}
+\RR_{L,P_\omega}(f_{D}) &= \RR_{L,P_\omega}(f_D) -
+\underbrace{\RR_{L,P_\omega}^*}_{=0}\\
+&= \int_X \abs{2\eta_\omega -1}\Id_{(-\infty,0]} \left((2\eta_\omega - 1)\sign
+f_{D_n} \right)\dmu\\
+&=\mu\left(\setd{f_{D_n} \neq (2\eta_\omega -1)}\right)
+= \sum_{j=1}^\infty \mu\left(E_{\omega,j}(f_{D_n}) \right)\\
+&\ge \frac{1}{2}
+\sum_{j=1}^\infty p_j \Id_{\setd{f_{D_n} \neq 2\omega_j -1}}
+\ge
+\frac{1}{2} \sum_{\atop{j : j\le n}{x_i\neq A_j}} p_j
+\Id_{\setd{\overline{f}_{D_n}(j) \neq 2\omega_j -1}}
+\end{align*}
+Daraus folgt
+\begin{align*}
+&\int_\Omega\int_{(X\times Y)^\infty}
+\Id_{\setd{\RR_{L,P_\omega}(f_{D_n})\le a_n}} \dP_\omega^\infty(D)
+\dnu(\omega)\\ &\le
+\int_\Omega \int_{(X\times Y)^\infty}
+\Id_{\setd{\sum_{\atop{j: j\le n}{x_i\in A_j}} p_j
+\Id_{\setd{\overline{f}_{D_n} \neq 2\omega_j-1}}\le 2a_n}}\dP_\omega^\infty(D)
+\dnu(\omega).
+\end{align*}
+Für alles Weitere fixieren wir $\JJ\defl\setdef{j}{j\le n,\; x_i\in A_j}$.
+
+Zu jedem $x\in X$ existiert genau ein $j_x\ge 1$ mit $x\in A_j$, wir schreiben
+dafür $j(x) \defl j_x$. Nach Konstruktion sind die $x_i$ von $\omega$ unabhängig
+und es gilt
+\begin{align*}
+y_i = 2\omega_j(x_i)-1.
+\end{align*}
+Die Labels $y_i$ lassen sich somit explizit berechnen
+und daher hängt $\overline{f}_D$ nur von $D_X = (x_1,\ldots,x_n)$ und
+$\omega_{D_X}=(\omega_j(x_1),\ldots,\omega_j(x_n))$ ab. Wir schreiben daher
+$\overline{f}_{D_X,\omega}$ für $\overline{f}_D$ und erhalten,
+\begin{align*}
+&\int_\Omega \int_{(X\times Y)^\infty} \Id_{\setd{\sum_{j\in\JJ} p_j
+\Id_{\setd{\overline{f}_D(j)\neq 2\omega_j-1}}\le
+2a_n}}\dP_\omega^n(D)\dnu(\omega)\\ &=
+\int_{X^n}\int_\Omega \Id_{\setd{\sum_{j\in\JJ} p_j
+\Id_{\setd{\overline{f}_{D_X,\omega}(j)\neq 2\omega_j -1}}\le
+2a_n}}\dnu(\omega)\dmu^n(D_X).
+\end{align*}
+
+Sei weiterhin $\Omega_{D_X}$ das Kreuzprodukt, das durch die Koordinaten
+$j(x_1),\ldots,j(x_n)$ beschrieben wird, und $\Omega_{\not
+D_X}$ stehe für die ``übrigen'' Koordinaten. So ist $\Omega =
+\Omega_{D_X}\times \Omega_{\not D_X}$, in selber Weise definieren wir
+$\nu_{D_X}$ und $\nu_{\not D_X}$. $\overline{f}_{D_X,\omega}$ ändert sich nur
+in den Koordinaten von $\omega$, die zu $\Omega_{D_X}$ gehören, also ist
+\begin{align*}
+&\int_\Omega \Id_{\setd{\sum_{j\in\JJ} p_j
+\Id_{\setd{\overline{f}_{D_X,\omega}(j)\neq 2\omega_j -1}}\le
+2a_n}}\dnu(\omega)\\
+&=\int_{\Omega_{D_X}} \int_{\Omega_{\not D_X}} \Id_{\setd{\sum_{j\in\JJ} p_j
+\Id_{\setd{\overline{f}_{D_X,\omega}(j)\neq 2\omega_j -1}}\le
+2a_n}}\dnu_{\not D_X}(\omega_{\not D_X})\dnu_{D_X}(\omega_{D_X}).
+\end{align*}
+Außer dem ist $\overline{f}_{D_X,\omega}(j)\equiv 1$ oder $-1$ für alle
+$\omega_{\not D_X}$ bei festem $D_X$ und $\omega_{D_X}$, wobei $w_j=0$ oder $1$
+jeweils mit Wahrscheinlichkeit $\frac{1}{2}$, also
+\begin{align*}
+\ldots &=
+\int_{\Omega_{D_X}} \int_{\Omega_{\not D_X}} \Id_{\setd{\sum_{j\in\JJ} p_j
+\underbrace{\Id_{\setd{\omega_j=1}}}_{=\omega_j}\le
+2a_n}}\dnu_{\not D_X}(\omega_{\not D_X})\dnu_{D_X}(\omega_{D_X})\\
+&\ge
+\int_{\Omega} \Id_{\setd{\sum_{j=n+1}^\infty p_j
+\omega_j \le 2a_n}}\dnu(\omega).\tag{**}
+\end{align*}
+Da $p_i$ monoton fällt und (**) unabhängig von $D_X$, ist
+\begin{align*}
+\text{(**)} &=\nu\left(\setdef{\omega}{-\sum_{j=n+1}^\infty p_j\omega_j > -2a_n}
+\right) \\ &= \nu\left(\setdef{\omega}{\exp\left(2sa_n-s\sum_{j=n+1}^\infty
+p_j\omega_j\right) > 1} \right) 
+\end{align*}
+für ein $s>0$, das wir später wählen. Anwendung der Markov-Ungleichung ergibt,
+\begin{align*}
+\ldots &\le \E_{\omega\sim \nu} \exp\left(2sa_n-s\sum_{j=n+1}^\infty
+p_j\omega_j\right)
+= \exp(2sa_n)\prod_{j=n+1}^\infty \E_{\omega\sim \nu} \exp (-sp_j \omega_j)\\
+&= \exp(2sa_n)\prod_{j=n+1}^\infty \left(\frac{1}{2}+\frac{1}{2}\exp(-sp_j)
+\right)
+\end{align*}
+Verwenden wir nun, dass $e^{-t} \le 1 - t + \frac{t^2}{2}$ für $t\ge 0$, so ist
+\begin{align*}
+\ldots \le
+\exp(2sa_n)\prod_{j=n+1}^\infty
+\frac{1}{2}\left(2 - sp_j + \frac{s^2p_j^2}{2}\right) 
+\end{align*}
+und, da $1-t \le e^{-t}$ ist
+\begin{align*}
+\ldots &\le
+\exp(2sa_n)\prod_{j=n+1}^\infty
+\left(\exp\left(\frac{-sp_j}{2} + \frac{s^2p_j^2}{4}\right)\right)\\
+&=
+\exp\left(2sa_n-s\sum_{j=n+1}^\infty p_j +
+\frac{s^2}{4}\sum_{j=n+1}^\infty p_j^2\right)\\
+&\le
+\exp\left(2sa_n-s\sum_{j=n+1}^\infty p_j +
+\frac{s^2p_{n+1}}{4}\sum_{j=n+1}^\infty p_j\right)\\
+&=\exp\left(2sa_n+\left(\frac{s^2p_{n+1}}{4}-s\right)\sum_{j=n+1}^\infty p_j\right)
+\end{align*}
+Setzen wir nun $A\defl\sum_{j=n+1}^\infty p_j$ und
+\begin{align*}
+s = \frac{\sum_{j=n+1}^\infty p_j - 4a_n}{p_{n+1}\sum_{j=n+1}^\infty p_j} =
+\frac{A-4a_n}{Ap_{n+1}},
+\end{align*}
+so ist $s>0$ nach Konstruktion der $p_j$. Eine längere aber elementare Rechnung
+zeigt,
+\begin{align*}
+\exp\left(2sa_n+\left(\frac{s^2p_{n+1}}{4}-s\right)\sum_{j=n+1}^\infty p_j\right)
+=
+\exp\left(-\frac{1}{4}\frac{(A-4a_n)^2}{Ap_{n+1}}\right)
+\end{align*}
+Die Funktion $x\mapsto (A-4x)^2$ hat ein globales Minimum bei $x=\frac{A}{4}$
+und ist auf $(-\infty, \frac{A}{4}]$ monoton fallend. Folglich ist
+$(A-4x)^2\ge \left(A-\frac{A}{2}\right)^2 = \frac{A^2}{4}$ für 
+$x\le\frac{A}{8}$ und daher
+\begin{align*}
+\ldots \le
+\exp\left(-\frac{A}{16 p_{n+1}}\right) \le \exp(-2n),
+\end{align*}
+denn $A\ge 32 p_{n+1} n$.
+
+Schließlich folgt
+\begin{align*}
+&\int_\Omega \inf_{n\ge 1} \frac{1}{a_n}\int_{(X\times Y)^n}
+\RR_{L,P}(f_D)\dP_\omega^n(D)\dnu(\omega)\\
+&\ge 1- \sum_{n=1}^\infty \int_\Omega \int_{(X\times Y)^\infty}
+\Id_{\setd{\RR_{L,P}(f_{D_n}) \le a_n}}\dP_\omega^\infty(D) \dnu(\omega)\\
+&\ge 1-\sum_{n=1}^\infty e^{-2n} = \frac{e^2-2}{e^2-1}\ge \frac{1}{2}.\qedhere
+\end{align*}
+\end{proof}
+
+\begin{bem*}[Abschlussbemerkungen.]
+\begin{bemenum}
+\item Das NFL gilt auch in den folgenden Situationen:
+\begin{itemize}
+  \item $X=\R^d$ und $\eta\in C^\infty([0,1))$.
+  \item $X=\R^2$ und $\eta$ ist \emph{unimodal}, d.h. es gibt ein $x_0\in X$
+  mit $\lambda\mapsto \eta(\lambda x_0)$ fallend für wachsendes $\lambda > 0$.
+  \item $\eta\in\setd{0,1}$, $X\subset\R^2$ und $\setd{\eta = 1}$ ist kompakt,
+   konvex und $0\in \setd{\eta=1}$.
+\end{itemize}
+\item Es gibt keine Super-Klassifikationsmethoden. Ist $\LL$ eine
+Klassifikationsmethode, so gibt es eine universell konsistente
+Klassifikationsmethode $\LL'$ und ein W-Maß $P$ auf $X\times Y$ mit
+\begin{align*}
+\E_{D\sim P^n} \RR_{L_\class,P}(f_D) > \E_{D\sim
+P^n}\RR_{L_\class,P}(f_D'),\qquad n\ge 1.
+\end{align*}
+Dies erscheint auf den ersten Blick natürlich negativ, es hat jedoch auch
+positive Auswirkungen, denn dadurch wird das Feld stetig neu belebt\ldots
+\item Für jede Methode $\LL$, die $\RR_{L_\class,P}^*$ abschätzt und jedes
+$n\ge 1$, $\ep > 0$ gibt es ein $P$ mit
+\begin{align*}
+\E_{D\sim P^n} \abs{\RR_{L_\class,P}(f_D) - \RR_{L_\class,P}^*} \ge
+\frac{1}{4}-\ep.\maphere
+\end{align*}
+\end{bemenum}
+\end{bem*}
+
+Wir wollen dieses Kapitel mit einer offenen Frage beenden. Dazu die folgende
+
+\begin{defn*}
+Eine Klassifikationsmethode $\LL$ heißt \emph{smart}\index{smart}, wenn
+$\E_{D\sim P^n} \RR_{L_\class,P}(f_D)$
+monoton fallend für $n\to\infty$ und alle $P$.\fishhere
+\end{defn*}
+
+\begin{prop*}[Offene Frage]
+Gibt es eine universell konsistente und smarte Klassifikationsmethode?\fishhere
+\end{prop*}
+
+Bis jetzt ist noch keine solche Lernmethode bekannt. Dabei ist die universelle
+Konsistenz entscheidend. Lässt man diese Voraussetzung fallen, so gibt es
+natürlich zahllose smarte Lernmethoden. 

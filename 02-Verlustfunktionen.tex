@@ -1,0 +1,604 @@
+\chapter{Verlustfunktionen}
+\newcommand{\hinge}{\mathrm{hinge}}
+
+Sei $L$ eine Verlustfunktion, dann ist
+\begin{align*}
+\RR_{L,D}(f) \defl \frac{1}{n}\sum_{i=1}^n L(x_i,y_i,f(x_i))
+\end{align*} 
+sinnvoll, wenn man $D$ mit dem empirischen Maß
+\begin{align*}
+\mu=n^{-1} \sum_{i=1}^n \delta_{\setd{(x_i,y_i)}}
+\end{align*}
+identifiziert. Sei weiterhin $\FF$ eine Menge von Funktionen $f: X\to \R$, dann
+suchen wir $(f,D)\in \FF\times (X\times Y)^n$, so dass das Infimum
+\begin{align*}
+\inf_{f\in\FF} \RR_{L,D}(f)+\gamma(f)
+\end{align*}
+für einen \emph{Strafterm} $\gamma$ angenommen wird.
+
+Um diese Frage zu klären, wollen wir nach Eigenschaften der Verlustfunktion
+suchen, die sich auf das Risiko übertragen.
+
+\section{Eigenschaften von Verlustfunktionen}
+
+Wir betrachten im Folgenden Verlustfunktionen
+\begin{align*}
+L : X\times Y \times \R \to [0,\infty).
+\end{align*}
+Während $X$ und $Y$ relativ ``strukturlos'' sind, hat $\R$ sehr viel
+``Struktur''. Wir suchen nun nach Eigenschaften von $\R$ wie
+Topologie, Metrik, Konvexität, \ldots die sich auf $L$ übertragen.
+
+\begin{defn}
+\label{defn:2.1.1}
+Eine Verlustfunktion $L:X\times Y\times \R\to [0,\infty)$ heißt \emph{(strikt)
+konvex}\index{Verlustfunktion!konvexe}, falls $L(x,y,\cdot):\R\to[0,\infty)$
+(strikt) konvex.\fishhere
+\end{defn}
+
+\begin{bem*}[Erinnerung.]
+$\LL_0(X) \defl \setdef{f: X\to\R}{f\text{ messbar}}$.\maphere
+\end{bem*}
+
+\begin{lem}
+\label{prop:2.1.2}
+Sei $L$ eine (strikt) konvexe Verlustfunktion, dann ist auch
+\begin{align*}
+\RR_{L,P}(\cdot) : \LL_0(X)\to [0,\infty]
+\end{align*}
+(strikt) konvex.\fishhere
+\end{lem}
+\begin{proof}
+Übung.\qedhere
+\end{proof}
+
+
+\begin{defn}
+\label{defn:2.1.3}
+Eine Verlustfunktion $L: X\times Y\times \R\to[0,\infty)$ heißt
+\emph{stetig}\index{Verlustfunktion!stetige}, falls 
+%\begin{align*}
+$L(x,y,\cdot) : \R\to[0,\infty)$
+%\end{align*}
+stetig für alle $(x,y)\in (X\times Y)$. $L$ heißt \emph{lokal lipschitz-stetig},
+falls
+\begin{align*}
+\forall a > 0 \exists c_a : \abs{L(x,y,t)-L(x,y,t')} \le c_a\abs{t-t'} 
+\end{align*}
+für alle $(x,y)\in (X\times Y)$ und $t,t'\in [-a,a]$. Die kleinste Konstante
+$c_a$ wird mit $\abs{L}_{a,1}$ bezeichnet.
+
+$L$ heißt \emph{lipschitz-stetig}, falls $\abs{L}_1 \defl \sup_{a\ge 0}
+\abs{L}_{a,1}< \infty$.\fishhere
+\end{defn}
+
+\begin{lem}
+\label{prop:2.1.4}
+Sei $L$ eine stetige Verlustfunktion und $P$ ein W-Maß auf $X\times Y$, so gilt
+für alle Folgen $(f_n)$ in $\LL_0(X)$ und $f\in \LL_0(X)$ mit $f_n\Pto f$,
+\begin{align*}
+\RR_{L,P}(f) \le \liminf_{n\to\infty} \RR_{L,P}(f_n).\fishhere
+\end{align*}
+\end{lem}
+Das Risiko ist also ``halbstetig von unten''. 
+
+\begin{proof}
+Da $f_n\Pto f$ existiert eine Teilfolge mit $f_{n_k} \to f\Pfs$ und daher
+existiert auch eine weitere Teilfolge $(f_{n_{k_l}})$ mit
+\begin{align*}
+\lim\limits_{l\to\infty} \RR_{L,P}(f_{n_{k_l}}) = 
+\liminf\limits_{n\to\infty} \RR_{L,P}(f_n).
+\end{align*}
+Wir schreiben nun kürzer $(f_{n_k})$ für die Teilfolge mit beiden Eigenschaften.
+Da $L$ stetig gilt $L(x,y,f_{n_k}(x))\to L(x,y,f(x))$ $P_X\text{-f.s.}$ und 
+mit dem Lemma von Fatou folgt,
+\begin{align*}
+\RR_{L,P}(f) &= \int_{X\times Y} L(x,y,f(x))\dP(x,y)
+= \int_{X\times Y} \lim\limits_{k\to\infty }L(x,y,f_{n_k}(x)) \dP(x,y)\\
+&\le \liminf_{k\to\infty} \int_{X\times Y} L(x,y,f_{n_k}(x)) \dP(x,y)
+= \lim\limits_{k\to\infty} \RR_{L,P}(f_{n_k})\\
+&= \liminf_{n\to\infty} \RR_{L,P}(f_n).\qedhere
+\end{align*}
+\end{proof}
+
+Optimal für unsere Zwecke wäre ``$=$'' anstat ``$\le$'' im Lemma
+\ref{prop:2.1.4}. Es stellt sich jedoch heraus, dass dies nicht ohne
+zusätzliche Voraussetzungen an $L$ möglich ist.
+
+\begin{defn}
+\label{defn:2.1.5}
+Eine Verlustfunktion $L:X\times Y\times \R\to[0,\infty)$ heißt
+\emph{Nemitski-Verlustfunktion (NVF)},\index{Verlustfunktion!Nemitski-}
+falls eine messbare Funktion $b: X\times Y\to [0,\infty)$ und eine messbare und monoton wachsende Funktion $h: \R\to
+[0,\infty)$ existiert, so dass
+\begin{align*}
+L(x,y,t) \le b(x,y) + h(\abs{t}),\qquad \forall x,y,t.
+\end{align*}
+$L$ heißt \emph{NVF der Ordnung $p\in(0,\infty)$}, falls ein $c>0$ existiert, so
+dass
+\begin{align*}
+L(x,y,t) \le b(x,y) + c\cdot\abs{t}^p,\qquad \forall x,y,t.
+\end{align*}
+Ist $P$ ein W-Maß auf $(X\times Y)$ und $L$ eine NVF, so heißt $L$
+\emph{$P$-integrierbar}\index{Verlustfunktion!$P$-integrierbar}, falls $b$
+$P$-integrierbar.\fishhere
+\end{defn}
+
+\begin{lem}
+\label{prop:2.1.6}
+Sei $P$ ein W-Maß auf $X\times Y$ und $L$ eine stetige, $P$-integrierbare NVF,
+dann gelten.
+\begin{propenum}
+\item\label{prop:2.1.6:1} Sei $(f_n)$ eine gleichmäßig beschränkte Folge in
+$\LL_0(P_X)$ und $f\in \LL_\infty(P_X)$ mit $f_n\to f\Pfs$ Dann folgt
+\begin{align*}
+\RR_{L,P}(f) = \lim\limits_{n\to\infty} \RR_{L,P}(f_n).
+\end{align*}
+\item\label{prop:2.1.6:2} $\RR_{L,P}(\cdot) : \LL_\infty(P_X) \to [0,\infty)$
+ist stetig.
+\item\label{prop:2.1.6:3} Ist $L$ außerdem von der Ordnung $p\in[1,\infty)$, so
+ist
+\begin{align*}
+\RR_{L,P}(f) : \LL_p(P_X) \to [0,\infty)
+\end{align*}
+wohldefiniert und stetig.\fishhere
+\end{propenum}
+\end{lem}
+\begin{proof}
+``\ref{prop:2.1.6:1}'': $f$ ist beschränkt mit $\norm{f}_\infty \le B$. Ferner
+gilt
+\begin{align*}
+\lim\limits_{n\to\infty} \underbrace{\abs{L(x,y,f_n(x))-L(x,y,f(x))}}_{g_n(x)}
+= 0\Pfs
+\end{align*}
+und
+\begin{align*}
+g_n(x) &\le L(x,y,f_n(x)) + L(x,y,f(x))\\
+&\le b(x,y) + h(\abs{f_n(x)}) + b(x,y)+ h(\abs{f(x)})\\
+&\le 2(b(x,y) + h(B))\Pfs
+\end{align*}
+wobei die rechte Seite als Funktion in $(x,y)$ $P$-integrierbar ist. Mit dem
+Satz von Lebesgue folgt nun,
+\begin{align*}
+\abs{\RR_{L,P}(f_n)-\RR_{L,P}(f)} \le \int_{X\times Y} g_n(x) \dP(x,y) \to
+0,\qquad n\to\infty.
+\end{align*}
+
+``\ref{prop:2.1.6:2}'': Sei $(f_n)$ Folge in $\LL_\infty(X)$ und
+$f\in\LL_\infty(X)$ mit $\norm{f_n-f}_\infty \to 0$. Dann ist $f_n$ gleichmäßig
+beschränkt und $f_n\to f$ $P_X$-f.s., also $\RR_{L,P}(f_n)\to
+\RR_{L,P}(f)$.
+
+``\ref{prop:2.1.6:3}'': Es gilt für $f\in\LL_p(P_X)$,
+\begin{align*}
+R_{L,P}(f) = \int L(x,y,f(x))\dP(x,y)
+\le \int b(x,y) + c\abs{f(x)}^p \dP(x,y) < \infty.
+\end{align*}
+Somit ist $\RR_{L,P}(\cdot): \LL_p(P_X)\to [0,\infty)$ wohldefiniert.
+
+Sei nun $(f_n)\subset \LL_p(P_X)$ und $f\in\LL_p(P_X)$ mit $\norm{f_n-f}_p\to
+0$, dann gilt auch $f_n\Pto f$. Mit Lemma \ref{prop:2.1.4} folgt
+\begin{align*}
+\RR_{L,P}(f) \le \liminf_{n\to\infty} \RR_{L,P}(f_n).\tag{*}
+\end{align*}
+Definiere nun $\bar{L}(x,y,t)\defl b(x,y) + c\abs{t}^p - L(x,y,t) \ge 0$, so ist
+$\bar{L}:X\times Y\times \R \to [0,\infty)$ eine stetige Verlustfunktion.
+Erneute Anwendung von \ref{prop:2.1.4} ergibt
+\begin{align*}
+\norm{b}_1 +c\norm{f}_p^p
+- \RR_{L,P}(f) &= 
+\RR_{\bar{L},P}(f) \le \liminf_{n\to\infty} \RR_{\bar{L},P}(f_n)\\
+&= \norm{b}_1 + \liminf_{n\to\infty} c\norm{f_n}_p^p - \RR_{L,P}(f_n).
+\end{align*}
+Da $\norm{f_n}_p\to \norm{f}_p$ ist $-\RR_{L,P}(f)\le -
+\limsup\limits_{n\to\infty} \RR_{L,P}(f_n)$, d.h. mit (*) folgt
+\begin{align*}
+\limsup_{n\to\infty} \RR_{L,P}(f_n) \le \liminf_{n\to\infty} \RR_{L,P}(f_n)
+\end{align*}
+also $\lim\limits_{n\to\infty} \RR_{L,P}(f_n) = \RR_{L,P}(f)$.\qedhere
+\end{proof}
+
+\begin{lem}
+\label{prop:2.1.7}
+Ist $L: Y\times \R\to [0,\infty)$ strikt überwacht und konvex und $Y$ endlich.
+Dann ist $L$ lokal lipschitz.\fishhere
+\end{lem}
+\begin{proof}
+Wir benutzen, dass jede konvexe Abbildung $g:[-a,a]\to [0,\infty)$ lokal
+lipschitz ist. Nach dieser Aussage ist $L(y,\cdot) : \R\to [0,\infty)$ lokal
+lipschitz für alle $y\in Y$. Da $Y$ endlich, folgt die Aussage.\qedhere
+\end{proof}
+
+\begin{lem}
+\label{lem:2.1.8}
+\begin{propenum}
+\item Ist $L$ lokal lipschitz, so ist $L$ NVF.
+\item Ist $L$ lokal lipschitz und $\RR_{L,P}(0) < \infty$, so ist $L$
+$P$-integrierbare NVF.
+\item Ist $L$ lipschitz stetig, so ist $L$ NVF der Ordnung $p=1$.\fishhere
+\end{propenum}
+\end{lem}
+\begin{proof}
+\begin{proofenum}
+\item $\abs{L(x,y,t)-L(x,y,0)} \le \abs{L}_{\abs{t},1}\abs{t}$. Somit ist
+\begin{align*}
+L(x,y,t) \le \underbrace{\abs{L}_{\abs{t},1}\abs{t}}_{h(t)} +
+\underbrace{L(x,y,0)}_{b(x,y)}.
+\end{align*}
+\item Falls $\RR_{L,P}(0) < \infty$ ist $b(x,y)$ $P$-integrierbar.
+\item Falls $L$ lipschitz, ist $\abs{L}_{\abs{t},1} \le \abs{L}_1$ und damit
+\begin{align*}
+L(x,y,t) \le L(x,y,0) + \abs{L}_1\abs{t}.\qedhere
+\end{align*}
+\end{proofenum}
+\end{proof}
+
+\begin{lem}
+\label{prop:2.1.9}
+Sei $L$ lokal lipschitz, $B\ge 0$ und $f,g\in\LL_\infty(P_X)$
+mit $\norm{f}_\infty,\norm{g}_\infty \le B$. Dann gilt
+\begin{align*}
+\abs{\RR_{L,P}(f)-\RR_{L,P}(g)} \le
+\abs{L}_{B,1}\norm{f-g}_{\LL_1(P_X)}.\fishhere
+\end{align*}
+\end{lem}
+\begin{proof}
+Übung.\qedhere
+\end{proof}
+
+\begin{defn}
+\label{defn:2.1.10}
+Eine Verlustfunktion $L$ \emph{kann bei $M>0$ abgeschnitten werden},
+wenn für alle $(x,y)\in X\times Y$ und $t\in\R$ gilt
+\begin{align*}
+L(x,y,\cut{t}) \le L(x,y,t),
+\end{align*}
+wobei 
+\begin{align*}
+\cut{t} = 
+\begin{cases}
+-M, & t \le -M,\\
+t, & t\in (-M,M)\\
+M, & t\ge M.\fishhere
+\end{cases}
+\end{align*}
+\end{defn}
+Man kann dies so interpretieren, dass Abschneiden den Verlust \textit{nicht}
+erhöht.
+
+\begin{lem}
+\label{prop:2.1.11}
+Sei $L$ eine konvexe Verlustfunktion und $M>0$. Dann sind folgende Aussagen
+äquivalent:
+\begin{equivenum}
+\item\label{prop:2.1.11:1} $L$ kann bei $M$ abgeschnitten werden.
+\item\label{prop:2.1.11:2} Für alle $(x,y)\in X\times Y$ hat die Funktion
+$L(x,y,\cdot): \R\to[0,\infty)$ mindestens ein globales Minimum in $[-M,M]$.\fishhere
+\end{equivenum}
+\end{lem}
+\begin{proof}
+Schreibe $M_{x,y}\defl \setdef{t^*\in \R}{L(x,y,t^*)=\inf_{t\in\R} L(x,y,t)}$. Da
+$L$ konvex ist, ist $M_{x,y}$ ein Intervall. 
+
+``\ref{prop:2.1.11:1}$\Rightarrow$\ref{prop:2.1.11:2}": Angenommen es gibt ein
+$(x,y)\in X\times Y$ mit $M_{x,y}\cap [-M,M] = \varnothing$.
+
+\textit{1. Fall $M_{x,y}=\varnothing$}. $L$ ist konvex, also ist $L(x,y,\cdot)$
+strikt monoton, denn falls $L(x,y,\cdot)\in C^2(\R)$, so ist aufgrund der
+Konvexität $L''(x,y,\cdot) \ge 0$. Da aber $M_{x,y}=\varnothing$ folgt
+$L'(x,y,t)\neq 0$ für alle $t$. Für allgemeines $L(x,y,\cdot)$ folgt die strikte
+Monotonie aus der Betrachtung von Subdifferenzialen.
+
+Aber da $L(x,y,\cdot)$ strikt monoton, kann $L$ nicht abgeschnitten
+werden.\dipper
+
+\textit{2. Fall $M_{x,y}\neq \varnothing$}. Da $M_{x,y}$ ein abgeschlossenes
+Intervall, folgt ohne Einschränkung $t\defl\inf M_{x,y}$ erfüllt $M< t<\infty$,
+d.h. $M_{x,y}$  liegt rechts von $[-M,M]$.
+
+Somit ist $L(x,y,\cut{t}) = L(x,y,M) > L(x,y,t)$ da $t>M$ und $L(x,y,\cdot)$
+aufgrund der Konvexität strikt fallend links von $M_{x,y}$.\dipper
+
+``\ref{prop:2.1.11:2}$\Rightarrow$\ref{prop:2.1.11:1}": Es gilt $M_{x,y}\cap
+[-M,M] \neq \varnothing$ und daher ist $\inf M_{x,y} \le M$ und $\sup M_{x,y}\ge
+M$.
+
+$L(x,y,\cdot)$ ist strikt konvex, also ist $L(x,y,\cdot)$ auf $[\sup
+M_{x,y},\infty)$ wachsend und auf $(-\infty,\inf M_{x,y}]$ fallend.
+Somit kann $L$ abgeschnitten werden.\qedhere
+\end{proof}
+
+\section{Margin basierte Verlustfunktionen}
+
+Sei $Y=\setd{-1,1}$ und $\eta(x) = P(Y=1\mid x)$.
+
+\begin{defn}
+\label{defn:2.2.1}
+Eine strikt überwachte Verlustfunktion $L: Y\times \R \to [0,\infty)$ heißt
+\emph{margin-basiert}, falls eine repräsentative Funktion $\ph: \R\to[0,\infty)$
+existiert, d.h. $L(y,t) = \ph(y\cdot t)$.\fishhere
+\end{defn}
+
+\begin{lem}
+\label{lem:2.2.2}
+Sei $L$ margin-basiert und $\ph$ die repräsentative Funktion. Dann gelten:
+\begin{propenum}
+\item $L$ ist genau dann (strikt) konvex, wenn $\ph$ (strikt) konvex.
+\item $L$ ist genau dann stetig, wenn $\ph$ stetig.
+\item $L$ ist genau dann (lokal) lipschitz, wenn $\ph$ (lokal) lipschitz.
+\item Ist $L$ konvex, so ist $L$ (lokal) lipschitz.
+\item $L$ ist $P$-integrierbare NVF.
+\item Ist $L$ lipschitz stetig, so ist $L$ $P$-integrierbare NVF der Ordnung
+$p=1$.\fishhere
+\end{propenum}
+\end{lem}
+\begin{proof}
+Übung.\qedhere
+\end{proof}
+
+\begin{bsp}
+\label{bsp:2.2.3}
+\newcommand{\LS}{\mathrm{LS}}
+\textit{Kleinste Quadrate}. Scharfes Hinsehen ergibt,
+\begin{align*}
+L_\LS(y,t) = (y-t)^2 = (1-yt)^2, \quad\Rightarrow\quad \ph(t) = (1-t)^2.
+\end{align*}
+Damit ist $L_\LS$ strikt konvex, da $\ph$ strikt
+konvex. $\abs{L_\LS}_{a,1} = 2a+2$ für $a\ge 0$. $L_\LS$ kann bei $M=1$
+abgeschnitten werden ($\ph$ hat ein globales Minimum bei $t=1$ und damit
+$L(1,\cdot)$ bei $t=1$ und $L(-1,\cdot)$ bei $t=-1$).\bsphere
+\end{bsp}
+
+\begin{bsp}
+\label{bsp:2.2.4}
+\newcommand{\Hinge}{\mathrm{Hinge}}
+\textit{Hinge loss}.
+\begin{align*}
+L_\Hinge(y,t) = \max\setd{0,1-yt},\quad \Rightarrow\quad \ph(t) =
+\max\setd{0,1-t}.
+\end{align*}
+$L_\Hinge$ ist konvex, lipschitz und $\abs{L_\Hinge}_1 = 1$. Sie ist
+\textit{nicht} strikt konvex und kann bei $M=1$ abgeschnitten werden.\bsphere
+\end{bsp}
+
+\begin{bsp}
+\label{bsp:2.2.5}
+\textit{Quadrierter Hinge-Loss}.
+\begin{align*}
+L(y,t) = \left(\max\setd{0,1-yt}\right)^2,\quad\Rightarrow\quad
+\ph(t) = \left(\max\setd{0,1-t}\right)^2.
+\end{align*}
+Sie stellt eine Mischung aus LS und HL dar. $L$ ist konvex (nicht strikt), lokal
+lipschitz, $\abs{L}_{a,1} = 2a+2$ und kann bei $M=1$ abgeschnitten
+werden.\bsphere
+\end{bsp}
+
+\begin{bsp}
+\label{bsp:2.2.6}
+\textit{Logistische Verlustfunktion für Klassifikation}.
+\begin{align*}
+L_{\log}(y,t) = \log(1+\exp(-yt)),\quad\Rightarrow\quad
+\ph(t) = \log(1+\exp(-yt)).
+\end{align*}
+$L_{\log}$ ist strikt konvex, lipschitz $\abs{L_{\log}}_1 = 1$, kann aber
+\textit{nicht} abgeschnitten werden.~\bsphere
+\end{bsp}
+
+\begin{figure}[!htpb]
+\centering
+\psset{unit=0.5cm}
+\begin{pspicture}(-5,-0.8)(5,5) 
+ \psaxes[labels=none,ticks=none,linecolor=gdarkgray,tickcolor=gdarkgray]{->}%
+ (0,0)(-4.8,-0.5)(4.8,4.8)[\color{gdarkgray}$x$,-90][,0]
+
+ \psplot[linewidth=1.2pt,linecolor=darkblue,algebraic=true]{-4.5}{1}%
+ {1-x}
+ \psline[linewidth=1.2pt,linecolor=darkblue](1,0)(4.5,0)	
+\end{pspicture}
+\begin{pspicture}(-5,-0.8)(5,5) 
+ \psaxes[labels=none,ticks=none,linecolor=gdarkgray,tickcolor=gdarkgray]{->}%
+ (0,0)(-4.8,-0.5)(4.8,4.8)[\color{gdarkgray}$x$,-90][,0]
+
+ \psplot[linewidth=1.2pt,linecolor=purple,algebraic=true]{-4.5}{1}%
+ {(1-x)^2}
+ \psline[linewidth=1.2pt,linecolor=purple](1,0)(4.5,0)	
+\end{pspicture}
+\caption{Hinge loss und quadrierte hinge loss Verlustfunktion}
+\end{figure}
+
+\begin{figure}[!htpb]
+\centering
+\psset{unit=0.5cm}
+\begin{pspicture}(-5,-0.8)(5,5) 
+ \psaxes[labels=none,ticks=none,linecolor=gdarkgray,tickcolor=gdarkgray]{->}%
+ (0,0)(-4.8,-0.5)(4.8,4.8)[\color{gdarkgray}$x$,-90][,0]
+
+ \psplot[linewidth=1.2pt,linecolor=darkblue,algebraic=true]{-4.5}{4.5}%
+ {ln(1+EXP(-x))}
+ 	
+\end{pspicture}
+\caption{Logistische Verlustfunktion}
+\end{figure}
+
+In Übung 6 wurde gezeigt
+\begin{align*}
+\RR_{L_\class,P}(f) - \RR_{L_\class,P}^* \le 
+\sqrt{\RR_{L_\mathrm{LS},P}(f)-\RR_{L_\mathrm{LS},P}^*}
+\end{align*}
+
+\begin{lem}
+\label{prop:2.2.7}
+Für $\eta\in[0,1]$ und $t\in[-1,1]$ gilt
+\begin{align*}
+\abs{2\eta-1}\Id_{(-\infty,0]}((2\eta-1)\sign t)\le
+\abs{2\eta-1}\abs{t-\sign(2\eta-1)}.\fishhere
+\end{align*}
+\end{lem}
+\begin{proof}
+\textit{1. Fall} $\eta =\frac{1}{2}$ ist klar.
+
+\textit{2. Fall} $\eta < \frac{1}{2}$.
+Für $t\in[-1,0)$ ist
+\begin{align*}
+\underbrace{(2\eta-1)}_{<0}\underbrace{\sign t}_{<0} > 0,
+\end{align*}
+somit verschwindet die linke Seite und die rechte ist $\ge 0$.\\
+Für $t\in [0,1)$ gilt umgekehrt,
+\begin{align*}
+\underbrace{(2\eta-1)}_{<0}\underbrace{\sign t}_{=1} < 0,
+\end{align*}
+somit ist die linke Seite gleich $\abs{2\eta-1}< 1$ und $\abs{t-\sign(2\eta-1)}
+= \abs{t+1} \ge 1$.\qedhere
+\end{proof}
+
+\begin{prop}[Zhang's (Un-)Gleichung]
+\label{prop:2.2.8}
+\index{Ungleichung!Zhang's-}
+Sei $f^*_{L_\class}(x) \defl \sign(2\eta(x)-1)$ für $x\in X$. Dann gilt für $f:
+X\to [-1,1]$:
+\begin{align*}
+\RR_{L_\hinge,P}(f) - \RR_{L_\hinge,P}^* =
+\int_X \abs{f(x)-f_{L_\class,P}^*(x)}\abs{2\eta(x)-1}\dP_X(x)
+\end{align*}
+"`Überschuss-$L_\hinge$-Risiko = gewichtete $L^1$-Norm von
+$f-f_{L_\class,P}^*$"'.\\
+Und für $h: X\to\R$ gilt
+\begin{align*}
+\RR_{L_\class,P}(f) - \RR_{L_\class,P}^* \le
+\RR_{L_\hinge,P}(f) - \RR_{L_\hinge,P}^*.\fishhere
+\end{align*}
+\end{prop}
+\begin{proof}
+$L_\hinge(y,t) = \max\setd{0,1-yt} \overset{t\in[-1,1]}{=} 1-yt$. Für $f:
+X\to[-1,1]$ gilt daher
+\begin{align*}
+\RR_{L_\hinge,P}(f) &= \int_X \eta(x)(1-f(x))+(1-\eta(x))(1+f(x))\dP_X\\
+&= \int_X 1+f(x)(1-2\eta(x))\dP_X.
+\end{align*}
+$f(x)(1-2\eta(x))$ ist minimal genau dann, wenn
+\begin{align*}
+\begin{rcases}
+f = 1\text{ auf } \setd{\eta > \frac{1}{2}}\\
+f = -1 \text{ auf }  \setd{\eta < \frac{1}{2}}
+\end{rcases}
+\text{d.h. } f=f^*_{L_\class,P}\text{ auf } \setd{\eta \neq \frac{1}{2}}
+\end{align*}
+Da $L_\hinge$ bei $M=1$ abgeschnitten werden kann folgt somit
+\begin{align*}
+\RR_{L_\hinge,P}^* = \inf_{f: X\to\R} \RR_{L_\hinge,P}(f) 
+= \inf_{f: X\to [-1,1]} \RR_{L_\hinge,P}(f). 
+\end{align*}
+Damit ist
+\begin{align*}
+\RR_{L_\hinge,P}(f)- \RR_{L_\hinge,P}^* &= 
+\int_X 1+ f\cdot(1-2\eta) - 1-f_{L_\class,P}^*\cdot(1-2\eta)\dP_X\\
+&= \int_X \underbrace{(f-f_{L_\class,P}^*)\cdot(1-2\eta)}_{\ge 0}\dP_X,
+\end{align*}
+wobei der Integrand positiv ist, da $f_{L_\class,P}^*$ punktweise das
+Überschussrisiko minimiert und dieses ist positiv, also
+\begin{align*}
+\RR_{L_\hinge,P(f)}- \RR_{L_\hinge,P}^* =
+\int_X \abs{f-f_{L_\class,P}^*}\abs{1-2\eta}\dP_X.
+\end{align*}
+\textit{Ungleichung}. Da $L_\hinge$ bei $M=1$ abgeschnitten werden kann, folgt
+\begin{align*}
+\RR_{L_\hinge,P}(\cut{f}) - \RR_{L_\hinge,P}^* \le
+\RR_{L_\hinge,P}(f)-\RR_{L_\hinge,P}^*
+\end{align*}
+und
+\begin{align*}
+\RR_{L_\class,P}(\cut{f})-\RR_{L_\class,P}^* =
+\RR_{L_\class,P}(f) - \RR_{L_\class,P}^*. 
+\end{align*}
+Daher ist ohne Einschränkung $f: X\to [-1,1]$. In Kapitel \ref{sec:1.2} haben
+wir gezeigt
+\begin{align*}
+\RR_{L_\class,P}(f) - \RR_{L_\class,P}^* &= \int_X
+\abs{2\eta-1}\Id_{(-\infty,0]}((2\eta-1)\sign f) \dP_X\\
+&\overset{\ref{prop:2.2.7}}{\le}
+\int_X
+\abs{2\eta-1}\abs{f-\underbrace{\sign(2\eta-1)}_{=f_{L_\class,P}^*}}\dP_X\\
+&\overset{\text{Zhang}}{=} \RR_{L_\hinge}(f)-\RR_{L_\hinge,P}^*.\qedhere
+\end{align*}
+\end{proof}
+
+\section{Distanzbasierte Verlustfunktionen}
+
+\begin{defn}
+\label{defn:2.3.1}
+Eine Verlustfunktion $L: Y \times \R\to[0,\infty)$ heiß
+\emph{distanzbasiert}\index{Verlustfunktion!distanzbasiert}, falls eine Funktion
+$\psi: \R\to[0,\infty)$ existiert mit
+\begin{align*}
+L(y,t) = \psi(y-t),\qquad y\in Y,\quad t\in\R.
+\end{align*}
+Eine distanzbasierte Verlustfunktion heißt \emph{symmetrisch}, falls $\psi(r) =
+\psi(-r)$ für alle $r\in\R$ heißt \index{Verlustfunktion!symmetrisch}.\fishhere
+\end{defn}
+
+\begin{lem}
+\label{prop:2.3.2}
+Sei $L$ distanzbasiert, so gelten:
+\begin{propenum}
+\item $L$ ist genau dann (strikt) konvex, wenn $\psi$ (strikt) konvex.
+\item $L$ ist genau dann stetig, wenn $\psi$ stetig.
+\item $L$ ist genau dann lipschitz, wenn $\psi$ lipschitz. (Gilt im Allgemeinen
+nicht für lokal lipschitz, siehe $L_\mathrm{LS}$)\\
+\item\label{prop:2.3.2:4} Ist ferner $Y\subset[-M,M]$, so ist $L$ genau
+dann lokal lipschitz, wenn $\psi$ lokal lipschitz.
+\item\label{prop:2.3.2:5} Ist $L$ konvex, so ist $\psi$ lokal lipschitz.
+\item\label{prop:2.3.2:6} $L$ ist eine P-integrierbare NVF.\fishhere 
+\end{propenum}
+\end{lem}
+\begin{proof}
+\ref{prop:2.3.2:4} "`$\Leftarrow$"': Sei $t\in[-a,a]$ und $a > 0$, so gilt
+\begin{align*}
+\abs{L(y,t)-L(y,t')} = \abs{\psi(y-t)-\psi(y-t')} \le
+\abs{\psi}_{1+M,1}\abs{t-t'}.
+\end{align*}
+"`$\Rightarrow$"': Analog folgt $\abs{L}_{a,1} \le \abs{\psi}_{a+M,1}$.
+
+\ref{prop:2.3.2:5} Sei $L$ konvex, dann folgt für $y=0$, dass auch
+\begin{align*}
+t\mapsto \psi(-t) = \psi(0-t) = L(0,t)
+\end{align*}
+konvex und daher ist $\psi$ konvex und folglich auch lokal lipschitz. Mit
+\ref{prop:2.3.2:4} folgt nun, dass $L$ lokal lipschitz.
+
+\ref{prop:2.3.2:6} folgt aus Lemma \ref{prop:2.1.9}.\qedhere
+\end{proof}
+
+\begin{bsp}
+\label{bsp:2.3.3}
+\textit{Kleinste Quadrate}
+\begin{align*}
+L_{\mathrm{LS}}(y,t) \defl (y-t)^2 \Rightarrow \psi(r) = r^2.
+\end{align*}
+$\psi$ ist strikt konvex, nicht lipschitz aber lokal lipschitz und
+symmetrisch.\bsphere
+\end{bsp}
+
+\begin{bsp}
+\label{bsp:2.3.4}
+\textit{Betragsfunktion}.
+\begin{align*}
+L_{\mathrm{abs}}(y,t) \defl \abs{y-t} \Rightarrow \psi(r) = \abs{r}.
+\end{align*}
+$\psi$ ist konvex (nicht strikt), symmetrisch und Lipschitz mit $\abs{L}_1 = 1$.
+\end{bsp}
+
+
+\begin{bsp}
+\label{bsp:2.3.5}
+\textit{Pinball für $\ep \in(0,1)$}.
+\begin{align*}
+\psi(r)\defl 
+\begin{cases}
+-1(1-\ep)r, & r < 0,\\
+\ep r, & r\ge 0
+\end{cases}
+\end{align*}
+$\psi$ ist konvex (nicht strikt), symmetrisch genau dann, wenn $\ep
+=\frac{1}{2}$ und lipschitz mit $\abs{L}_1 = \min\setd{\ep,1-\ep}$.\bsphere
+%TODO: Bild Pinball.
+\end{bsp}

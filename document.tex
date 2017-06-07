@@ -1,0 +1,255 @@
+% =============================================================================
+% Titel:	SLT - Mitschrieb
+% Erstellt:	SS 10
+% Dozent:	Prof. Dr. I. Steinwart
+% Autor:	Jan-Cornelius Molnar
+% =============================================================================
+\documentclass[%
+	paper=a5,%
+	fleqn,%
+% ===================================================
+%  10pt aktivieren, falls *nicht* die Lucida Schrift verwendet wird.
+% =================================================== 
+%	10pt,%
+	DIV=14,%
+	BCOR=0mm,
+	titlepage=false,%
+	twoside=true]%
+	{scrbook}
+
+% =============================================================================
+% 					Benötigte Pakete
+% =============================================================================
+
+% ===================================================
+%  Option nolucida aktivieren, falls *nicht* die Lucida Schrift verwendet wird.
+% =================================================== 
+\usepackage%[nolucida]%
+		   {janmcommon}
+\usepackage{janmscript}
+\usepackage{fancyhdr}
+\usepackage{marginnote}
+\usepackage{makeidx}
+\usepackage{yhmath}
+
+\makeindex
+
+% =============================================================================
+% 					Theorem-Style
+% =============================================================================
+% Theorem Umgebungen *MIT* Numerierung
+\theoremstyle{graymarginwithblueheader}
+\theorembodyfont{\itshape}
+\theoremseparator{}
+\theoremsymbol{}
+
+\newtheorem{prop}{Satz}[section]
+\newtheorem{thm}[prop]{Theorem}
+\newtheorem{lem}[prop]{Lemma}
+\newtheorem{defn}[prop]{Definition}
+\newtheorem{cor}[prop]{Korollar}
+
+\theoremstyle{graymarginwithyellowheader}
+\theorembodyfont{\normalfont}
+\theoremseparator{}
+\theoremsymbol{}
+
+\newtheorem{bsp}[prop]{Bsp}
+
+\theoremstyle{graymarginwithitblackheader}
+\theorembodyfont{\normalfont}
+\theoremseparator{}
+\theoremsymbol{}
+
+\newtheorem{bem}[prop]{Bemerkung.}
+
+% Theorem Umgebungen *OHNE* Numerierung
+\theoremstyle{graymarginwithblueheadern}
+\theorembodyfont{\itshape}
+\theoremseparator{}
+\theoremsymbol{}
+
+\renewtheorem{defn*}{Definition}
+\renewtheorem{prop*}{Satz}
+\renewtheorem{lem*}{Lemma}
+\renewtheorem{cor*}{Korollar}
+
+\theoremstyle{graymarginwithyellowheadern}
+\theorembodyfont{\normalfont}
+\theoremseparator{}
+\theoremsymbol{}
+
+\renewtheorem{bsp*}{Bsp}
+
+\theoremstyle{graymarginwithitblackheadern}
+\theorembodyfont{\normalfont}
+\theoremseparator{}
+\theoremsymbol{}
+
+\renewtheorem{bem*}{Bemerkung.}
+
+% =============================================================================
+% 					Überschriften-Style
+% =============================================================================
+\renewcommand\thesection{\arabic{chapter}-\arabic{section}}
+\renewcommand\thesubsection{\arabic{chapter}-\arabic{section}-\arabic{subsection}}
+\renewcommand\thesubsubsection{\small\ensuremath{\blacksquare}\normalsize}
+\renewcommand\thebsp{\arabic{bsp}}
+
+\setkomafont{chapter}{\normalfont\bfseries\Huge\boldmath\color{darkblue}}
+\setkomafont{section}{\normalfont\bfseries\Large\boldmath\color{darkblue}}
+\setkomafont{subsection}{\normalfont\bfseries\large\boldmath\color{darkblue}}
+\setkomafont{subsubsection}{\normalfont\bfseries\boldmath\color{darkblue}}
+
+% =============================================================================
+% 					PSTricks-Standards
+% =============================================================================
+\psset{linecolor=gdarkgray}
+\psset{tickcolor=gdarkgray}
+\psset{fillcolor=glightgray}
+
+% Startkapitel 0
+\setcounter{chapter}{-1}
+
+
+% =============================================================================
+% 					Header/Footer-Style
+% =============================================================================
+% Select page style
+\pagestyle{fancyplain}
+
+% Reset header & footer
+\fancyhf{}
+
+% Reset chapter & sectionmark
+\renewcommand{\chaptermark}[1]{\markboth{\textsc{#1}}{}}
+\renewcommand{\sectionmark}[1]{\markright{\textsc{#1}}{}}
+
+% Clear headrule
+\renewcommand{\headrule}{}
+
+% =============================================================================
+% 					Listen-Style
+% =============================================================================
+\newenvironment{bemenum}%
+	{\begin{enumerate}[label=\textsc{\alph{*}}.,leftmargin=17pt]}{\end{enumerate}}
+\newenvironment{defnenum}%
+	{\begin{enumerate}[label={\rm(\alph{*})}]}{\end{enumerate}}
+\newenvironment{propenum}%
+	{\begin{enumerate}[label=\arabic{*})]}{\end{enumerate}}
+\newenvironment{equivenum}%
+	{\begin{enumerate}[label=(\roman{*})]}{\end{enumerate}}
+\newenvironment{bspenum}%
+	{\begin{enumerate}[label=\alph{*}),leftmargin=17pt]}{\end{enumerate}}
+\newenvironment{proofenumarabicbr}%
+	{\begin{enumerate}[label=(\arabic{*}),leftmargin=17pt]}{\end{enumerate}}
+\newenvironment{proofenumroman}%
+	{\begin{enumerate}[label=(\roman{*}),leftmargin=17pt]}{\end{enumerate}}
+\newenvironment{proofenum}%
+	{\begin{enumerate}[label=\arabic{*}),leftmargin=17pt]}{\end{enumerate}}
+\newenvironment{proofenuma}%
+	{\begin{enumerate}[label=\alph{*}.,leftmargin=2pt]}{\end{enumerate}}
+
+% =============================================================================
+% 					Eigene Operatoren
+% =============================================================================
+\renewcommand{\labelenumi}{{\normalfont(\alph{enumi})}}
+
+\renewcommand{\card}{\#}
+
+\newcommand{\fs}{\ \text{f.s.}}
+\newcommand{\Pfs}{\ P\text{-f.s.}}
+
+\newcommand{\Pto}{\overset{P}{\to}}
+
+\DeclareMathOperator{\rank}{rank}
+
+\renewcommand{\bar}[1]{{\overline{#1}}}
+\newcommand{\ocirc}[1]{\overset{\circ}{#1}}
+\newcommand{\cut}[1]{\wideparen{#1}}
+
+\DeclareMathOperator*{\argmin}{argmin}
+
+\newcommand{\pre}{{\mathrm{pre}}}
+
+\newcommand{\defl}{\coloneq}
+\newcommand{\defr}{\eqcolon}
+\renewcommand{\le}{\leqslant}
+\renewcommand{\ge}{\geqslant}
+
+
+% =============================================================================
+% 					Document-Body
+% =============================================================================
+\begin{document}
+
+% Titel
+\begin{titlepage}
+\vspace*{2mm}
+\noindent\bf\color{gdarkgray}
+Jan-Cornelius Molnar
+
+\begin{center}
+\vspace*{10mm}
+{\noindent\huge\textbf\textsc\color{darkblue} Nichtparametrische Statistik
+und statistische Lerntheorie}
+
+\vspace*{10mm}
+Aufbauend auf einer Vorlesung von Prof. Dr. I. Steinwart
+
+\vspace*{4mm}
+
+Stuttgart, Sommersemester 2010
+\end{center}
+
+\vspace*{\fill}
+
+\begin{flushright}
+\small
+Version vom \today
+\vspace*{5mm}
+
+Diese Rohfassung enthält sicher noch zahlreiche Druckfehler.
+Für Hinweise auf solche und Kommentare jeder Art bin ich stets
+dankbar.\footnote{\color{gdarkgray} Jan-Cornelius Molnar
+\href{mailto:jan.molnar@studentpartners.de}{jan.molnar@studentpartners.de}}
+Viel Spaß!
+\end{flushright}
+\end{titlepage}
+
+
+% Inhaltsverzeichnis
+\tableofcontents
+
+\fancyhead[RO]{\footnotesize\color{gdarkgray}%
+	\marginnote{$\Big|$\;\textbf{\thesection}}\rightmark}
+\fancyhead[LE]{\footnotesize\color{gdarkgray}%
+	\marginnote{\;\textbf{\thechapter}$\Big|$}\leftmark}
+
+% Zweiseitig
+\fancyfoot[LE]{\footnotesize\color{gdarkgray}%
+ 	\thepage}%
+ \fancyfoot[RO]{\footnotesize\color{gdarkgray}%
+ 	\thepage}%
+ \fancyfoot[RE,LO]{\tiny\color{gdarkgray}\today\; \thistime}
+
+% Inhalt
+\input{00-Grundlagen.tex}
+
+\input{01-GrundkonzepteSLT.tex}
+
+\input{02-Verlustfunktionen.tex}
+
+\input{03-Konzentrationsungleichungen.tex}
+
+\input{04-ERM.tex}
+
+\input{05-RepKernHR.tex}
+
+\input{06-SVM.tex}
+
+\input{07-Verlustfunktionen.tex}
+
+\input{bibliography.tex}
+
+\end{document}

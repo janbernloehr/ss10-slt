@@ -1,0 +1,1567 @@
+\chapter{Support Vector Machines (SVMs)}
+
+\section{Definition, einfache Eigenschaften und Beispiele}
+\label{chap:6.1}
+
+\begin{defn}
+\label{defn:6.1.1}
+Sei $H$ ein RKHS und $L: X\times Y \times \R\to [0,\infty)$ eine konvexe
+Verlustfunktion. Ferner sei $\lambda > 0$ "`Regularisierungsparameter"'. Dann
+heißt eine Lernmethode \emph{Support Vector Machine (SVM)}\index{SVM}, wenn
+\begin{defnenum}
+\item Für jedes $D\in (X\times Y)^m$ die Entscheidungsfunktion $f_{D,\lambda}\in
+H$.
+\item $\lambda \norm{f_{D,\lambda}}_H^2 + \RR_{L,D}(f_{D,\lambda}) = \inf_{f\in
+H} \lambda \norm{f}_H^2 + \RR_{L,D}(f)$.
+\end{defnenum}
+D.h. $f_{D,\lambda}$ minimiert das regularisierte empirische Risiko,
+\begin{align*}
+\lambda \norm{\cdot}_{H^2} + \RR_{L,D}(\cdot),\qquad \text{über }H.\fishhere
+\end{align*}
+\end{defn}
+
+\begin{lem}[Eindeutigkeit]
+\index{SVM!Eindeutigkeit}
+\label{lem:6.1.2}
+Für alle $D\in (X\times Y)^n$, $n\ge 1$, $\lambda > 0$ existiert höchstens ein
+$f_{D,\lambda}\in H$.\fishhere
+\end{lem}
+\begin{proof}
+Angenommen es gibt $f_1\neq f_2\in H$ und beide minimieren 
+$\lambda \norm{\cdot}_{H^2} + \RR_{L,D}(\cdot)$ über $H$. Sei
+$f=\frac{1}{2}(f_1+f_2)$. $L$ konvex, dann ist $\RR_{L,D}(\cdot)$ konvex
+\begin{align*}
+\RR_{L,D}(f) \le \frac{1}{2}\RR_{L,D}(f_1) + \frac{1}{2}\RR_{L,D}(f_2)
+\end{align*}
+Parallelogrammgleichung in $H$:
+\begin{align*}
+\norm{f_1+f_2}_H^2 + \norm{f_1-f_2}_H^2 = 2\norm{f_1}_H^2 + 2\norm{f_2}_H^2.
+\end{align*}
+Da $f_1\neq f_2$ ist
+\begin{align*}
+\norm{\frac{1}{2}(f_1+f_2)}_H^2  < \frac{1}{2}\norm{f_1}_H^2 +
+\frac{1}{2}\norm{f_2}_H^2
+\end{align*}
+und damit
+\begin{align*}
+\lambda\norm{f}_H^2 + \RR_{L,D}(f) &< 
+\frac{1}{2}\left( \norm{f_1}_H^2 + \RR_{L,D}(f_1) \right)
++
+\frac{1}{2}\left( \norm{f_2}_H^2 + \RR_{L,D}(f_2) \right)\\
+&= \inf_{f\in H} \lambda \norm{f}_H^2 + \RR_{L,D}(f).\dipper\qedhere
+\end{align*}
+\end{proof}
+
+\begin{prop}
+\label{prop:6.1.3}
+Ist $\dim H < \infty$, dann existiert ein $f_{D,\lambda}\in H$.\fishhere
+\end{prop}
+\begin{proof}
+$L$ ist konvex, d.h. $L(x,y,\cdot): \R\to [0,\infty)$ konvex und lokal lipschitz
+für alle $x,y$ also ist $L$ insbesondere stetig. Betrachte für $D\in (X\times
+Y)^n$ das Risikofunktional
+\begin{align*}
+\RR_{L,D} : H\to [0,\infty),\qquad f\mapsto \RR_{L,D}(f).
+\end{align*}
+Dieses ist konvex und stetig, da
+\begin{align*}
+f\mapsto \RR_{L,D}(f) = \frac{1}{n}\sum_{i=1}^n L(x_i,y_i,f(x_i))
+\end{align*}
+und die Konvergenz in $H$ die punktweise Konvergenz impliziert. Ferner ist die
+Abbildung
+\begin{align*}
+H\to [0,\infty),\qquad f\mapsto \lambda \norm{f}_H^2 
+\end{align*}
+stetig und konvex (aufgrund der Parallelogrammungleichung sogar strikt konvex)
+und damit ist auch die Abbildung
+\begin{align*}
+H\to [0,\infty),\qquad f\mapsto \lambda \norm{f}_H^2 + \RR_{L,D}(f)\tag{*}
+\end{align*}
+stetig und konvex. Setze $m\defl\RR_{L,D}(0) < \infty$ und
+\begin{align*}
+A =\setdef{f\in H}{\lambda\norm{f}_H^2 + \RR_{L,D}(f)\le m}.
+\end{align*}
+Dann gelten
+\begin{itemize}
+  \item $0\in A$.
+  \item $A$ ist abgeschlossen, da (*) stetig.
+  \item $A$ ist beschränkt, da für $f\in A$ gilt
+\begin{align*}
+\lambda\norm{f}_H^2 \le \lambda \norm{f}_H^2 + \RR_{L,D}(f) \le m,
+\end{align*} 
+ist $\norm{f}_H \le \sqrt{m/\lambda}$.
+\end{itemize}
+Somit ist $A$ nichtleer und kompakt, d.h. (*) besitzt ein Minimum $f^*\in A$ mit
+\begin{align*}
+\lambda\norm{f^*}_H^2 + \RR_{L,D}(f^*)\le m
+\end{align*}
+und für $f\notin A$ gilt
+\begin{align*}
+\lambda\norm{f}_H^2 + \RR_{L,D}(f) > m \ge
+\lambda\norm{f^*}_H^2 + \RR_{L,D}(f^*),
+\end{align*}
+also ist $f^*$ sogar ein globales Minimum.\qedhere
+\end{proof}
+
+\begin{lem}
+\label{prop:6.1.4}
+Falls $f_{D,\lambda}\in H$ existiert gelten
+\begin{propenum}
+\item $\norm{f_{D,\lambda}}_H \le \left(\lambda^{-1} \RR_{L,D}(0)\right)^{1/2}$.
+
+Inbesondere ist $L(x,y,0) \le 1$ für alle $(x,y)\in X\times Y$ und folglich
+\begin{align*}
+\norm{f_{D,\lambda}}_H \le \lambda^{-1/2}.
+\end{align*}
+\item Falls ein $f^*\in H$ existiert mit $\RR_{L,D}(f^*) \le \RR_{L,D}(0)$, ist
+$f_{D,\lambda}\neq 0$.\fishhere
+\end{propenum}
+\end{lem}
+\begin{proof}
+\begin{proofenum}
+\item Man rechnet direkt nach, dass
+\begin{align*}
+\lambda\norm{f_{D,\lambda}}^2 &\le 
+\lambda\norm{f_{D,\lambda}}^2 + 
+\RR_{L,D}(f_{D,\lambda})
+= \min_{f\in H} \lambda \norm{f}_H^2 + \RR_{L,D}(f)\\
+&\le \lambda \norm{0}_H^2 + \RR_{L,D}(0)
+= \RR_{L,D}(0).
+\end{align*}
+\item Für jedes $\alpha\in [0,1]$ sei
+\begin{align*}
+h(\alpha) \defl 2\lambda \alpha \norm{f^*}_H^2 + \RR_{L,D}(f^*)-\RR_{L,D}(0)
+\end{align*}
+%TODO: nachreichen\ldots
+
+Da $\RR_{L,D}(f^*)\le \RR_{L,D}(0)$ und $\alpha \mapsto h(\alpha)$ quadratisch,
+besitzt
+\begin{align*}
+h: [0,1]\to [0,\infty)
+\end{align*}
+ein globales Minimum $\alpha^*\in (0,1]$, denn
+\begin{align*}
+&2\lambda \alpha \norm{f^*}_H^2 + \RR_{L,D}(f^*)-\RR_{L,D}(0) = 0\\
+\Leftrightarrow
+\; &\alpha^* = \frac{\RR_{L,D}(0)-\RR_{L,D}(f^*)}{2\lambda \norm{f^*}_H^2}.
+\end{align*}
+Somit ist
+\begin{align*}
+\lambda \norm{\alpha^* f^*}_H^2 + \RR_{L,D}(\alpha^*f^*)
+&\le h(\alpha^*) < h(0) = \RR_{L,D}(0) \\ &
+= \lambda \norm{0}_H^2 +
+\RR_{L,D}(0).
+\end{align*}
+Also ist $f_{D,\lambda}\neq 0$.\qedhere
+\end{proofenum}
+\end{proof}
+
+\begin{prop}[Representer Theorem]
+\index{Theorem!Representer}
+\label{prop:6.1.5}
+Sei $H$ ein RKHS mit Kern $k$, $L$ eine konvexe Verlustfunktion und $\lambda >
+0$, $D\in (X\times Y)^n$. Schreibe $D=((x_1,y_1),\ldots,(x_n,y_n))$, dann
+existieren ein $f_{D,\lambda}$ und $\alpha_1,\ldots,\alpha_n\in\R$ mit
+\begin{align*}
+f_{D,\lambda} = \sum_{i=1}^n \alpha_i k(x_i,\cdot).\fishhere
+\end{align*}
+\end{prop}
+
+\begin{proof}
+Sei $X'\defl\setd{x_1,\ldots,x_n}$ und
+\begin{align*}
+H\big|_{X'} \defl \setdef{\sum_{i=1}^n \alpha_i k(x_i,\cdot)}{\alpha_i\in\R} =
+\mathrm{span} \setdef{k(x_i,\cdot)}{i=1,\ldots,n}.
+\end{align*}
+Wir zeigen, dass $H\big|_{X'}$ der RKHS von $k\big|_{X'\times X'}$ ist.
+
+Satz \ref{prop:5.2.4} sagte nämlich $\mathrm{span}
+\setdef{k(x_i,\cdot)}{i=1,\ldots,n}$ ist dicht im RKHS von $k\big|_{X'\times
+X'}$. Da $\dim \mathrm{span}
+\setdef{k(x_i,\cdot)}{i=1,\ldots,n}<\infty$, ist $\mathrm{span}
+\setdef{k(x_i,\cdot)}{i=1,\ldots,n}$ abgeschlossen im RKHS von
+$k\big|_{X'\times X'}$, d.h.
+\begin{align*}
+\mathrm{span}
+\setd{k(x_i,\cdot)} =
+\bar{\mathrm{span}
+\setd{k(x_i,\cdot)}}
+=\text{ RKHS von }k\big|_{X'\times X'}.
+\end{align*}
+Betrachte das SVM Problem bezüglich $k\big|_{X'\times X'}$,
+\begin{align*}
+\inf_{f\in H\big|_{X'}} \lambda \norm{f}_H^2 + \RR_{L,D}(f).\tag{*}
+\end{align*}
+Nach Lemma \ref{prop:6.1.3} existiert ein $f_{D,\lambda,H\big|_{X'}}\in
+H\big|_{X'}$. Dieses ist Lösung von (*), denn $\dim H\big|_{X'}< \infty$. Da $H\big|_{X'}\subset H$
+abgeschlossen, existiert das orthogonale Komplement $H\big|_{X'}^\bot$. Für
+$f\in H\big|_{X'}^\bot$ gilt dann
+\begin{align*}
+f(x,\cdot)= \lin{f,k(x_i,\cdot)}_H = 0.
+\end{align*}
+Schreibe $P_{X'}: H\to H$ und $P_{X'}^\bot :H\to H$ für die orthogonale
+Projektion auf $H\big|_{X'}$ bzw. $H\big|_{X'}^\bot$.
+Für $f\in H$ gilt somit $f=P_{X'}f + P_{X'}^\bot f$ und nach (*) ist
+\begin{align*}
+P_{X'}^\bot f(x_i) = 0,\qquad i=1,\ldots,n.
+\end{align*}
+Somit ist auch
+\begin{align*}
+\RR_{L,D}(f) = \RR_{L,D}(P_{X'}f + P_{X'}^\bot f) = \RR_{L,D}(
+P_{X'} f)
+\end{align*}
+und da ferner $\norm{P_{X'} f}_{H}^2\le \norm{f}_H^2$, gilt
+\begin{align*}
+\inf_{f\in H} \lambda\norm{f}_H^2  + \RR_{L,D}(f)
+&\le 
+\inf_{f\in H\big|_{X'}} \lambda\norm{f}_H^2  + \RR_{L,D}(f)\\
+&=
+\inf_{f\in H} \lambda\norm{P_{X'}f}_H^2  + \RR_{L,D}(P_{X'}f)\\
+&\le
+\inf_{f\in H} \lambda\norm{f}_H^2  + \RR_{L,D}(f).  
+\end{align*}
+Insbesondere ist daher
+\begin{align*}
+\inf_{f\in H} \lambda\norm{f}_H^2  + \RR_{L,D}(f)
+&=
+\inf_{f\in H\big|_{X'}} \lambda\norm{f}_{H\big|_{X'}}^2  + \RR_{L,D}(f)\\
+&=
+\lambda\norm{f_{D,\lambda,H\big|_{X'}}}_{H\big|_{X'}}^2  +
+\RR_{L,D}(f_{D,\lambda,H\big|_{X'}}).
+\end{align*}
+Da $f_{D,\lambda,H\big|_{X'}} \in H$ löst $f_{D,\lambda,H\big|_{X'}}$ auch das
+original SVM-Problem und da $f_{D,\lambda}$ eindeutig und $f_{D,\lambda}\in
+H\big|_{X'}$ folgt die Darstellung.\qedhere
+\end{proof}
+
+Als Konsequenz ist für $f=\sum_{i=1}^n\alpha_i k(x_i,\cdot)$,
+\begin{align*}
+&\min_{f\in H} \lambda\norm{f}_H^2 + \RR_{L,D}(f) =
+\min_{\alpha_1,\ldots,\alpha_n\in\R} \lambda\norm{f}^2_H + \RR_{L,D}(f)\\
+&\qquad =
+\min_{\alpha_1,\ldots,\alpha_n\in\R} \lambda\sum_{i,j=1}^n \alpha_i\alpha_j
+k(x_i,x_j) + \RR_{L,D}\left(\sum_{i=1}^n \alpha_i k(x_i,\cdot) \right)
+\end{align*}
+
+Dies ist ein endlichdimensionales und \textit{konvexes} Optimierungsproblem.
+
+\begin{bsp*}
+Verlustfunktion der kleinsten Quadrate $L(x,y,t) = (y-t)^2$. Es ist
+\begin{align*}
+&\frac{\delta}{\delta \alpha_{i_0}} \left( 
+\lambda \sum_{i,j=1}^n \alpha_i\alpha_j k(x_i,x_j) + \frac{1}{n}\sum_{i=1}^n 
+\left(y_i -\sum_{j=1}^n \alpha_j k(x_i,x_j) \right)^2\right)\\
+&=
+2\lambda \sum_{i=1}^n \alpha_i k(x_i,x_{i_0}) + 
+\frac{\delta}{\delta \alpha_{i_0}} \left( 
+\frac{1}{n}\sum_{i=1}^n 
+\left(y_i -\sum_{j=1}^n \alpha_j k(x_i,x_j) \right)^2\right),\tag{*}
+\end{align*}
+wobei
+\begin{align*}
+&\frac{\delta}{\delta \alpha_{i_0}} \left(  
+\left(y_i -\sum_{j=1}^n \alpha_j k(x_i,x_j) \right)^2\right)\\
+&= -2\left(y_i - \sum_{j=1}^n \alpha_j k(x_i,x_j) \right)
+\underbrace{\frac{\delta}{\delta_{a_{i_0}}} \left(\sum_{j=1}^n \alpha_j
+k(x_i,x_j)\right)}_{k(x_i,x_{i_0})}.
+\end{align*}
+Somit gilt
+\begin{align*}
+\text{(*)} &=
+2\lambda \sum_{i=1}^n \alpha_i k(x_i,x_{i_0}) 
+ -\frac{2}{n}\sum_{i=1}^n \left(y_i - \sum_{j=1}^n \alpha_j k(x_i,x_j) \right)
+k(x_i,x_{i_0})\\
+&\overset{!}{=} 0.
+\end{align*}
+Schreibe $k$ als $n\times n$-Matrix $k=\left(k(x_i,x_j)\right)_{i,j=1}^n$. Dann
+ist $k=k^\top$ und die Optimierung ist gleichbedeutend mit
+\begin{align*}
+&2\lambda k\alpha - \frac{2}{n}ky + \frac{2}{n}kk\alpha \overset{!}{=}0
+\Leftrightarrow
+\lambda n k \alpha + kk\alpha = ky\\
+\Leftrightarrow
+&k(\lambda n E_n\alpha + k\alpha) = ky\tag{**}
+\end{align*} 
+wobei $E_n$ die $n$-te Einheitsmatrix bezeichne. Falls $\lambda_n E_n \alpha +
+k\alpha = y$, dann ist (**) erfüllt.
+
+Da $k$ ein Kern ist die Matrix $k$ positiv semi-definit, d.h. $k$ hat $n$
+nichtnegative Eigenwerte,
+\begin{align*}
+\lambda n 
+\begin{pmatrix}
+1 \\
+ &\ddots \\
+ && 1
+\end{pmatrix}
++
+\begin{pmatrix}
+\lambda_1 \\
+ & \ddots \\
+  & & \lambda_n
+\end{pmatrix}.
+\end{align*}
+$\lambda n E_n + k$ hat folglich strikt positive Eigenwerte  und ist daher
+invertierbar.
+\begin{align*}
+\alpha = (\lambda n E_n + k)^{-1}y
+\end{align*}
+ist die eindeutige Lösung und
+\begin{align*}
+f_{D,\lambda} = \sum_{i=1}^n \alpha_i k(x_i,\cdot).\bsphere
+\end{align*}
+\end{bsp*}
+
+\subsection{Ausflug in das Reich der konvexen Analysis}
+
+Sei $E$ ein endlichdimensionaler Vektorraum, $P: E\to\R$ konvex und stetig
+differenzierbar sowie $h_i : E\to \R$ affin linear für $i=1,\ldots,m$.
+
+\begin{defn*}[Primales Optimierungsproblem]
+\index{Optimierungsproblem!Primales}
+Wir suchen
+\begin{align*}
+P^* = \inf_{\omega\in E} P(\omega)
+\end{align*}
+unter den Nebenbedingungen $h_i(\omega) \le 0$ für alle $i=1,\ldots,m$.\fishhere
+\end{defn*}
+
+Wir nehmen für alles Weitere an, dass ein $\omega^*$ existiert mit
+$h_i(\omega^*) \le 0$ für $i=1,\ldots,m$ und $P(\omega^*) = P^*$. Unser Ziel ist
+es das primale Optimierungsproblem auf ein duales Optimierungsproblem
+zurückzuführen.
+
+\begin{defn*}
+\index{Lagrangefunktion}
+Die Funktion
+\begin{align*}
+L(\omega,\beta) \defl P(\omega) + \sum_{i=1}^m \beta_i h_i(\omega),\qquad \omega\in
+E,\; \beta\in\R^n
+\end{align*}
+heißt \emph{Lagrangefunktion}.
+\begin{align*}
+D(\beta) \defl \inf_{\omega\in E} L(\omega, \beta)
+\end{align*}
+heißt die zur Lagrangefunktion gehörige \emph{duale Funktion}.\fishhere
+\end{defn*}
+
+Da $P$ konvex und die $h_i$ affin linear, ist auch $L$ konvex.
+
+\begin{defn*}[Duales Optimierungsproblem]
+\index{Optimierungsproblem!Duales}
+\begin{align*}
+D^* = \sup_{\beta\ge 0} D(\beta).\fishhere
+\end{align*}
+\end{defn*} 
+
+Wie hängen das duale Problem mit seinen Lösungen mit dem primalen Problem
+zusammen?
+
+\begin{lem*}
+Für $\beta \ge 0$ und $\omega\in E$ mit $h_i(\omega)\le 0$ für $i=1,\ldots,m$
+gilt
+\begin{align*}
+D(\beta) \le P(\omega)
+\end{align*}
+und damit insbesondere $D^*\le P^*$.\fishhere
+\end{lem*}
+\begin{proof}
+Man rechnet direkt nach, dass
+\begin{align*}
+D(\beta) = \inf_{\omega'\in E} L(\omega',\beta) \le
+L(\omega,\beta) = P(\omega) + \sum_{i=1}^m \beta_i h_i(\omega) \le
+P(\omega).\qedhere
+\end{align*}
+\end{proof}
+
+\begin{prop*}
+$D^*=P^*$.\fishhere
+\end{prop*}
+\begin{proof}
+Wir überspringen den Beweis, da dieser zu weit in die konvexe Analysis
+hineinführt.\qedhere
+\end{proof}
+
+\begin{cor*}
+Sei $\beta^*\ge 0$ mit $D(\beta^*) = D^*$, dann gilt
+\begin{align*}
+D^* = \max_{\beta \ge 0} \inf_{\omega} L(\omega,\beta) = \min_{\omega}
+\sup_{\beta \ge 0} L(\omega,\beta) = P^*.\fishhere
+\end{align*}
+\end{cor*}
+\begin{proof}
+"`$\le$"': gilt immer.\\
+"`$\ge$"': Sei $\omega^*\in E$ eine primale Lösung, d.h.
+\begin{align*}
+h_i(\omega^*)\le 0,\quad i=1,\ldots,m,\qquad P(\omega^*) = P^*.
+\end{align*}
+Dann ist
+\begin{align*}
+&D^* = D(\beta^*) = \max_{\beta\ge 0}\inf_{\omega\in E}L(\omega,\beta),\\
+&P^* = P(\omega^*) = \min_{\omega, h_i(\omega) = 0}
+P(\omega) = \min_{\omega\in E} \sup_{\beta \ge 0} P(\omega) + \sum_{i=1}^m
+\beta_i h_i(\omega)\tag{*}
+\end{align*}
+denn
+\begin{align*}
+\sup_{\beta \ge 0} P(\omega) + \sum_{i=1}^m \beta_i h_i(\omega) =
+\begin{cases}
+P(\omega), & h_i(\omega) \le 0,\; i=1,\ldots,m,\\
+\infty, & \text{sonst}.
+\end{cases}
+\end{align*}
+und folglich ist
+\begin{align*}
+\text{(*)} = \min_{\omega\in E}\sup_{\beta\ge 0} L(\omega,\beta).
+\end{align*}
+Die Behauptung folgt, dass $P^*=D^*$.\qedhere
+\end{proof}
+
+\begin{prop*}
+Sei $\beta^*$ die duale Lösung, d.h. $\beta^*\ge 0$ und $D(\beta^*)= D^*$ und
+$\omega^*$ die primale Lösung, d.h. $h_i(\omega^*) \le 0$ für $i=1,\ldots,m$
+mit $P(\omega^*) = P^*$.
+Dann folgt
+\begin{align*}
+\max_{\beta \ge 0} L(\omega^*,\beta) = L(\omega^*,\beta^*) = \min_{\omega\in E}
+L(\omega, \beta^*)
+\end{align*}
+und $L(\omega^*,\beta^*) = D^*= P^*$.\fishhere
+\end{prop*}
+
+$(\omega^*,\beta^*)$ ist Sattelpunkt von $L$.
+
+\begin{proof}
+Es gilt
+\begin{align*}
+D^* = \max_{\beta\ge 0}\inf_{\omega\in E} L(\omega, \beta) = 
+\min_{\omega\in E}\sup_{\beta\ge 0} L(\omega,\beta)
+= P(\omega^*) = \sup_{\beta\ge 0} L(\omega^*,\beta).
+\end{align*}
+und
+\begin{align*}
+P^* = \min_{\omega\in E}\sup_{\beta\ge 0} L(\omega,\beta) = \max_{\beta \ge 0}
+\inf_{\omega\in E} L(\omega, \beta) = D^* =D(\beta^*) = \inf_{\omega\in E}
+L(\omega, \beta^*)
+\end{align*}
+sowie
+\begin{align*}
+L(\omega^*,\beta^*) &\ge \inf_{\omega\in E} L(\omega, \beta^*) = P^*,\\
+L(\omega^*,\beta^*) &\le \sup_{\beta\ge 0} L(\omega^*, \beta) = D^*,
+\end{align*}
+und folglich ist
+\begin{align*}
+L(\omega^*,\beta^*) = \sup_{\beta \ge 0} L(\omega^*,\beta) = \inf_{\omega\in E}
+L(\omega,\beta^*) = P^* = D^*
+\end{align*}
+und $\sup$ ist $\max$ und $\inf$ ist $\min$.\qedhere
+\end{proof}
+
+\begin{cor*}
+Seien $\beta^*$ und $\omega^*$ wie oben. Dann ist
+\begin{align*}
+\beta_i^* h_i(\omega^*) = 0\text{ für alle } i=1,\ldots,m.\fishhere
+\end{align*}
+\end{cor*}
+\begin{proof}
+$P(\omega^*) = P^* = L(\omega^*,\beta^*) = P(\omega^*) + \sum_{i=1}^m \beta_i
+h_i(\omega^*)$.\qedhere
+\end{proof}
+
+\begin{cor*}
+Sei $E=E_1\times E_2$, $\omega=(\omega_1,\omega_2)\in E_1\times E_2$ und $L$
+derart, dass:
+
+Für alle $\beta^*\ge 0$ mit $D(\beta^*) = D^*$ existiert genau ein $\omega_1\in
+E_1$ und ein (oder mehrere) $\omega_2\in E_2$ mit $h_i(\omega_1,\omega_2)\le 0$
+für $i=1,\ldots,m$ und
+\begin{align*}
+L((\omega_1,\omega_2),\beta^*) = D(\beta^*) = \inf_{\omega\in E}
+L(\omega,\beta^*).
+\end{align*}
+Dann gilt für jede primale Lösung $\omega^*=(\omega_1^*,\omega_2^*)$,
+\begin{align*}
+\omega_1 = \omega_1^*.
+\end{align*}
+Insbesondere: Falls wir wissen, dass es eine primale Lösung $\omega^*$ gibt, so
+finden wir die erste Komponente $\omega_1^*$ indem wir
+\begin{align*}
+\inf_{\omega\in E} L(\omega,\beta^*)
+\end{align*}
+lösen und für die Lösung $\omega=(\omega_1,\omega_2)$ gilt $\omega_1^* =
+\omega_1$.\fishhere
+\end{cor*}
+\begin{proof}
+Sei $\omega^*$ eine Lösung, dann ist
+\begin{align*}
+h_i(\omega^*) = h_i(\omega_1^*,\omega_2^*) \le 0,\qquad i=1,\ldots,m
+\end{align*}
+und der vorige Satz zeigte $L(\omega^*,\beta^*) = D^*= D(\beta^*)$. Mit der
+vorausgesetzten Eindeutigkeit in der ersten Komponente folgt $\omega_1^* =
+\omega_1$.\qedhere
+\end{proof}
+
+Als Anwendung betrachten wir SVMs mit Hinge-loss.
+
+\begin{bsp*}
+SVMs mit Hinge-loss. Das Optimierungsproblem
+\begin{align*}
+\min_{f\in H} \lambda\norm{f}_H^2 + \frac{1}{n}\sum_{i=1}^n \max\setd{0,1-y_i
+f(x)}
+\end{align*}
+ist ein SVM Optimierungsproblem, da $L_\text{hinge}(y,t) = \max\setd{0,1-yt}$.
+Dieses ist äquivalent zu dem Optimierungsproblem
+\begin{align*}
+\min_{\atop{f\in H}{\xi\in\R^n}} \frac{1}{2}\lin{f,f} + c\sum_{i=1}^{n}
+\xi_i,\qquad c= \frac{1}{2\lambda n}
+\end{align*}
+mit den Nebenbedingungen
+\begin{align*}
+\xi_i \ge 0,\quad \xi_i \ge 1-y_if(x_i)
+\Leftrightarrow
+\xi_i \ge \max{0,1-y_if(x_i)}.
+\end{align*}
+Die Lagrangefunktion des Problems ist
+\begin{align*}
+L(f,\xi,\beta,\gamma) = \frac{1}{2}\lin{f,f} + c\sum_{i=1}^n \xi_i -
+\sum_{i=1}^n \beta_i \xi_i  + \sum_{i=1}^n \gamma_i(1-y_if(x_i)-\xi_i).
+\end{align*}
+$L$ ist differenzierbar und
+\begin{align*}
+\frac{\delta}{\delta f} L(f,\xi,\beta, \gamma)
+= f - \sum_{i=1}^n \gamma_i y_i k(x_i,\cdot)
+\overset{!}{=} 0
+\end{align*}
+führt auf die eindeutige Lösung
+\begin{align*}
+f = \sum_{i=1}^n \gamma_iy_i k(x_i,\cdot).
+\end{align*}
+Weiterhin führt
+\begin{align*}
+\frac{\delta}{\delta \xi_i} L(f,\xi,\beta,\gamma) = c-\beta_{i_0} - \gamma_{i_0}
+\overset{!}{=} 0
+\end{align*}
+auf $\beta_{i_0} + \gamma_{i_0} = c$.
+
+Ist $\beta + \gamma = c$, so minimiert jedes $\xi$. Ist andererseits
+$\beta+\gamma\neq c$, so gibt es keine Lösung.
+
+Setzen wir dies in unser Optimierungsproblem ein, so erhalten wir
+\begin{align*}
+D(\beta,\gamma) &= \frac{1}{2}\sum_{i=1}^n y_i y_j \gamma_i \gamma_j k(x_i,x_j)
++ \sum_{i=1}^n \gamma_i
+- \sum_{i=1}^n y_i y_j \gamma_i \gamma_j k(x_i,x_j)\\
+&= \sum_{i=1}^n \gamma_i
+- \frac{1}{2}\sum_{i=1}^n y_i y_j \gamma_i \gamma_j k(x_i,x_j)
+\end{align*}
+mit $\beta\ge 0$, $\gamma\ge 0$ und $\beta + \gamma = c$, d.h.
+$\gamma\in[0,c]^n$ und $\beta \defl c-\gamma$.
+
+Damit ist das duale Problem
+\begin{align*}
+\max_{\gamma\in[0,c]^n} \sum_{i=1}^n \gamma_i - \frac{1}{2}
+\sum_{i,j=1}^n y_iy_j \gamma_i\gamma_j k(x_i,x_j).\tag{*}
+\end{align*}
+- mit der Definition $\mathbf{k} = (y_iy_j k(x_i,x_j))_{i,j=1}^n$ -
+\begin{align*}
+\max_{\gamma\in[0,c]^n} \lin{\gamma,1} -
+\frac{1}{2}\lin{\gamma,\mathbf{k}\gamma}.
+\end{align*}
+Ist $\gamma^*$ Lösung des dualen Problems, so ist
+\begin{align*}
+f_{D,x} = \sum_{i=1}^n y_i \gamma_i^* k(x_i,\cdot)
+\end{align*}
+die Lösung der ersten Komponente des primalen Problems.
+\begin{align*}
+\xi_i^* = \max\setd{0,1-y_i f_{D,x}(x_i)}
+\end{align*} 
+ist die zweite Komponente.
+
+\begin{bem*}
+Sei $\gamma\in[0,c]^n$ und $f_\gamma = \sum_{i=1}^n y_i \gamma_i k(x_i,\cdot)$.
+Gilt nun 
+\begin{align*}
+P(f_\gamma,\xi_\gamma) - D(\gamma) \le \ep,
+\end{align*}
+dann ist auch
+\begin{align*}
+P(f_\gamma) - P^* \le \ep,
+\end{align*}
+da $D(\gamma)\le P^*$.
+\begin{align*}
+P(f_\gamma,\xi_\gamma) = \sum_{i,j=1}^n y_iy_j \gamma_i\gamma_j k(x_i,x_j) +
+c\sum_{i=1}^n \max\setd{0,1-y_if_\gamma(x_i)} - \sum_{i=1}^n \gamma_i.\maphere
+\end{align*}
+\end{bem*}
+Dann ist
+\begin{align*}
+\lambda\norm{f_\gamma}^2_H + \RR_{L,D}(f_\gamma) - \min_{f\in
+H}\left(\lambda\norm{f}_H^2 + \RR_{L,D}(f) \right)
+= 2\lambda\left(P(f_\gamma,\xi_\gamma) - P^* \right).
+\end{align*}
+Gilt nun
+\begin{align*}
+P(f_\gamma,\xi_\gamma) - P^* \le \frac{\ep}{2\lambda}\tag{+}
+\end{align*}
+so ist
+\begin{align*}
+\lambda\norm{f_\gamma}^2_H + \RR_{L,D}(f_\gamma) 
+\le \inf_{f\in
+H}\left(\lambda\norm{f}_H^2 + \RR_{L,D}(f) \right)
++\ep.\bsphere
+\end{align*}
+\end{bsp*}
+
+\textit{Wie löst man das duale Problem?}
+\begin{itemize}
+  \item Standardsoftware.
+  \item \emph{Gradient assent}. Zu $\gamma$ berechne den Gradienten von (*) und
+  mache einen Step in Richtung des steilsten Anstiegs. Wiederhole den Vorgang,
+  bis (+) erreicht ist.
+  
+  Ein Problem bei diesem Verfahren ist, dass die Kernmatrix ein enormer
+  Platzfresser ist. Es gibt jedoch zahlreiche Verfahren, die nicht die gesamte
+  Kernmatrix in den RAM laden muss.
+  \item Man betrachtet die Abbildung
+\begin{align*}
+\gamma_i \mapsto D(\gamma + \gamma_ie_i).
+\end{align*}
+Diese ist eine eindimensionale konkave und quadratische Funktion und ihr
+Optimierungsproblem ist explizit lösbar.
+\begin{enumerate}
+  \item Suche Richtung $i^*$ mit maximalem Gewinn in $D$ bei Optimierung in
+  Richtung $i^*$.
+  \item Optimiere in Richtung $i^*$.
+  \item Gehe zu (a), falls (*) nicht erfüllt ist.
+\end{enumerate}
+Die meisten verfügbaren Programme machen dies so.
+\end{itemize}
+
+\section{Orakelungleichungen für SVMs}
+\index{Orakelungleichung!SVM}
+
+\begin{prop}
+\label{prop:6.2.1}
+Sei $(X,d)$ ein kompakter, metrischer Raum, $L$ eine konvexe und lokal
+lipschitz-stetige Verlustfunktion mit $L(x,y,0) \le 1$ für alle $(x,y)\in
+X\times Y$. Ferner sei $H$ ein RKHS über $X$ mit stetigem Kern $k$ und
+$\norm{k}_\infty \le 1$ und $P$ sei ein Wahrscheinlichkeitsmaß auf $X\times Y$.
+
+Für alle $\lambda > 0$, $n\ge 1$, $\ep > 0$ und $\tau > 0$ gilt mit einer
+Wahrscheinlichkeit $P^n$ nicht kleiner als $1-\ep^{-\tau}$:
+\begin{align*}
+&\lambda\norm{f_{D,\lambda}}_H^2 + \RR_{L,P}(f_{D,\lambda})-\RR_{L,P}^*
+< \inf_{f\in H}\left( \lambda\norm{f}_H^2 + \RR_{L,P}(f) - \RR_{L,P}^* \right)\\
+&+ 4\ep \abs{L}_{2\lambda^{-1/2},1}
++ \left(2\abs{L}_{2\lambda^{-1/2},1}\lambda^{-1/2} + 1 \right)\\
+&\cdot \sqrt{\frac{2\tau +2\log 2\NN(B_H, \norm{\cdot}_\infty,
+\frac{1}{2}\lambda^{1/2}\ep)}{n}}.\fishhere
+\end{align*}
+\end{prop}
+
+\begin{proof}
+Satz \ref{prop:5.3.7} zeigte, dass die Abbildung
+\begin{align*}
+\id : H \to C(X)
+\end{align*}
+kompakt ist. Daraus folgt
+\begin{align*}
+\log\NN(B_H,\norm{\cdot}_\infty,\ep) < \ep,\qquad \ep > 0.
+\end{align*}
+Lemma \ref{prop:6.1.4} und \ref{prop:5.3.1} zeigten
+\begin{align*}
+&\norm{f_{D,\lambda}}_H \le \lambda^{-1/2},\qquad \lambda > 0,\\
+&\norm{f_{D,\lambda}}_\infty \le \lambda^{-1/2},\qquad \text{da }\norm{\id: H\to
+C(X)} = \norm{k}_\infty \le 1.
+\end{align*} 
+Sei nun $\delta > 0$, dann existiert ein $f_\delta\in H$ mit
+\begin{align*}
+\lambda\norm{f_\delta}_H^2 + \RR_{L,P}(f_\delta) \le
+\inf_{f\in H} \left(\lambda \norm{f}_H^2  + \RR_{L,P}(f) \right) + \delta,
+\end{align*}
+und damit
+\begin{align*}
+&\lambda\norm{f_{D,\lambda}}^2_H  + \RR_{L,P}(f_{D,\lambda}) -
+\inf_{f\in H}\left(\lambda\norm{f}_H^2 + \RR_{L,P}(f) \right)\\
+&\le
+\lambda\norm{f_{D,\lambda}}^2_H  + \RR_{L,P}(f_{D,\lambda}) -
+\lambda\norm{f_\delta}_H^2 - \RR_{L,P}(f_\delta) + \delta\\
+&\quad -\RR_{L,D}(f_{D,\lambda}) + \RR_{L,D}(f_{D,\lambda})
+\tag{*}
+\end{align*}
+Weiterhin ist
+\begin{align*}
+\lambda\norm{f_{D,\lambda}}^2_H  + \RR_{L,D}(f_D) \le
+\lambda\norm{f_\delta}_H^2 + \RR_{L,D}(f_\delta),
+\end{align*}
+da $f_{D,\lambda}$ diese Funktion minimiert. Es folgt
+\begin{align*}
+\text{(*)} &\le
+\lambda\norm{f_\delta}_H^2 + \RR_{L,P}(f_{D,\lambda}) 
+-\lambda\norm{f_\delta}_H^2 - \RR_{L,P}(f_\delta)
++ \delta\\
+&\quad -\RR_{L,D}(f_{D,\lambda}) + \RR_{L,D}(f_\delta)\\
+&=
+\RR_{L,P}(f_{D,\lambda}) - \RR_{L,D}(f_{D,\lambda}) - \left(\RR_{L,P}(f_\delta)
+- \RR_{L,D}(f_\delta)\right) + \delta\\
+&\le 
+\abs{\RR_{L,P}(f_{D,\lambda}) - \RR_{L,D}(f_{D,\lambda})} +
+\abs{\left(\RR_{L,P}(f_\delta) - \RR_{L,D}(f_\delta)\right)} + \delta.\tag{**}
+\end{align*}
+Dann gilt ferner
+\begin{align*}
+\lambda\norm{f_\delta}_H^2 &\le \lambda\norm{f_\delta}_H^2 + \RR_{L,P}(f_\delta)
+\le \inf_{f\in H} \left(\lambda\norm{f}_H^2 + \RR_{L,P}(f) \right) + \ep\\
+&\le \RR_{L,P}(0) + \delta
+\le 1 + \delta \le 4,
+\end{align*}
+falls $\delta \le 3$. Damit ist
+\begin{align*}
+&f_\delta \in 2\lambda^{-1/2}B_H,\\
+&f_{D,\lambda}\in \lambda^{-1/2}B_H\subset 2\lambda^{-1/2}B_H.
+\end{align*}
+Folglich ist
+\begin{align*}
+\text{(**)} \le 2\sup_{f\in 2\lambda^{-1/2}B_H} \abs{\RR_{L,P}(f)-\RR_{L,D}(f)}
++ \delta
+\end{align*}
+für jedes $\delta > 0$ also gilt auch
+\begin{align*}
+\text{(**)} \le 2\sup_{f\in 2\lambda^{-1/2}B_H} \abs{\RR_{L,P}(f)-\RR_{L,D}(f)}.
+\end{align*}
+Definiere nun
+\begin{align*}
+B\defl 2\lambda^{-1/2}\abs{L}_{2\lambda^{-1/2}} + 1.
+\end{align*}
+Für $f\in 2\lambda^{-1/2}B_H$ gilt dann
+\begin{align*}
+L(x,y,f(x)) &\le \abs{L(x,y,f(x))-L(x,y,0)} + \underbrace{L(x,y,0)}_{\le 1}\\
+&\le \abs{L}_{2\lambda^{-1/2},1}\abs{f(x)-0} + 1
+\le \abs{L}_{2\lambda^{-1/2},1}2\lambda^{-1/2} + 1
+\le B.
+\end{align*}
+Sein nun $\FF_\ep$ ein $\ep$-Netz von $2\lambda^{-1/2}B_H$ und
+\begin{align*}
+\abs{\FF_\ep} = \NN(2\lambda^{-1/2}B_H,\norm{\cdot}_\infty,\ep) =
+\NN(B_H,\norm{\cdot}_\infty,\frac{1}{2}\lambda^{1/2}\ep).
+\end{align*}
+Für $f\in 2\lambda^{-1/2}B_H$ gibt es $g\in\FF_\ep$ mit $\norm{f-g}_\infty <\ep$
+und
+\begin{align*}
+\abs{\RR_{L,D}(f)-\RR_{L,P}(f)} &\le
+\abs{\RR_{L,D}(f)-\RR_{L,D}(g)} + 
+\abs{\RR_{L,D}(g)-\RR_{L,P}(g)}\\
+&\quad+ \abs{\RR_{L,P}(g)-\RR_{L,P}(f)}\\
+&\le 2\ep \abs{L}_{2\lambda^{-1/2},1} + 
+\abs{\RR_{L,D}(g)-\RR_{L,P}(g)}.
+\end{align*}
+Somit ist
+\begin{align*}
+&\lambda \norm{f_{D,\lambda}}_H^2
++ \RR_{L,P}(f_{D,\lambda}) - \inf_{f\in H}
+\left(\lambda\norm{f}_H^2 + \RR_{L,P}(f) \right)\\
+&\quad \le 4\ep \abs{L}_{2\lambda^{-1/2},1}
++ 2\sup_{g\in \FF_\ep} \abs{\RR_{L,P}(g)-\RR_{L,D}(g)}.
+\end{align*}
+Wir schätzen weiterhin ab,
+\begin{align*}
+&P^n\bigg(\bigg\{D\; :\; \lambda\norm{f_{D,\lambda}}^2_H +
+\RR_{L,P}(f_{D,\lambda}) - \inf_{f\in H} \left( \lambda\norm{f}_H^2 +
+\RR_{L,P}(f) \right) \\
+&\qquad \qquad \quad \ge B\sqrt{\frac{2\tau}{m}} + 4\ep
+\abs{L}_{2\lambda^{-1/2}} \bigg\} \bigg)\\
+&\le
+P^n\left(\setdef{D}{2\sup_{g\in \FF_\ep}\abs{\RR_{L,P}(g) - \RR_{L,D}(g)}\ge
+B\sqrt{\frac{2\tau}{m}} } \right)\\
+&\overset{!}{\le}
+2\abs{\FF_\ep}e^{-\tau}
+= \exp(-\tau + \log 2\NN(B_H,\norm{\cdot}_\infty, \frac{1}{2}\lambda^{1/2}\ep)
+),
+\end{align*}
+wobei der union bound und die Hoeffdings Ungleichung verwendet wurden. Mit einer
+Variablentransformation für $\tau$ folgt schließlich die Behauptung.\qedhere
+\end{proof}
+
+\begin{bem*}
+Mit etwas mehr Theorie über Hilberträume kann man zeigen, dass das inf
+tatsächlich angenommen wird.\maphere
+\end{bem*}
+
+\begin{cor}
+\label{prop:6.2.2}
+Es gelten die Voraussetzungen des Satzes \ref{prop:6.2.1} und außerdem sei $L$
+lipschitz stetig mit $\abs{L}_1 \le 1$. Ferner existieren Konstanten $a\ge 1$,
+$p > 0$ mit
+\begin{align*}
+\log \NN(B_H,\norm{\cdot}_\infty,\ep) \le a \ep^{-2p},\qquad \ep > 0,
+\end{align*}
+dann folgt, dass für alle $\lambda\in (0,1]$, $\tau > 0$ und $n\ge 1$ mit einer
+Wahrscheinlichkeit $P^n$ nicht kleiner als $1-e^{-\tau}$ gilt,
+\begin{align*}
+\lambda\norm{f_{D,\lambda}}_H^2 + \RR_{L,P}(f_{D,\lambda})
+- \RR_{L,P}^* &\le
+\inf_{f\in H} \lambda\norm{f}_H^2 + \RR_{L,P}(f) - \RR_{L,P}^*\\
+&\quad + 2\lambda^{-1/2}\left(\frac{a}{n}\right)^{(2+2p)^{-1}}
++ 4\lambda^{-1/2}\sqrt{\frac{2\tau+2}{n}}.\fishhere
+\end{align*}
+\end{cor}
+\begin{proof}
+Eine einfache Rechnung zeigt \ldots
+\begin{align*}
+\sqrt{2\tau + 2\log(2\NN(B_H,\norm{\cdot}_\infty, \frac{1}{2}\lambda^{1/2}\ep))}
+\le
+\sqrt{2\tau + 2\log 2 + a\left(\frac{1}{2}\lambda^{1/2}\ep \right)^{-2p}}
+\end{align*}
+und da $2\log 2\le 2$, $\sqrt{s+r}\le \sqrt{s}+\sqrt{r}$ für $s,r>0$,
+\begin{align*}
+\le \sqrt{2(\tau+1)} + a^{1/2}2^p\lambda^{-p/2}\ep^{-p}.
+\end{align*}
+Da $4\ep \abs{L}_{2\lambda^{-1/2},1} \le 4\ep$ und analog
+\begin{align*}
+2\abs{L}_{2\lambda^{-1/2},1}\lambda^{-1/2} + 1
+\le 2\lambda^{-1/2}+1
+\le 4\lambda^{-1/2},
+\end{align*}
+erhalten wir
+\begin{align*}
+&4\ep \abs{L}_{2\lambda^{-1/2},1} +
+\left(2\abs{L}_{2\lambda^{-1/2},1}\lambda^{-1/2} + 1 \right)
+\cdot \sqrt{\frac{2\tau +2\log 2\NN(B_H, \norm{\cdot}_\infty,
+\frac{1}{2}\lambda^{1/2}\ep)}{n}}\\
+&\le 4\ep + 4\lambda^{-1/2} \left( \sqrt{\frac{2(\tau+1)}{n}}
++ \frac{a^{1/2}2^p\lambda^{-p/2}\ep^{-p}}{\sqrt{n}}\right).
+\end{align*}
+Betrachten wir nun
+\begin{align*}
+&h(\ep) \defl \ep + \lambda^{-1/2} 2^p \lambda^{-p/2}
+\ep^{-p}\left(\frac{a}{n}\right)^{1/2},
+\end{align*}
+so führt das Lösen von $h'(\ep) = 0$ auf die Minimalstelle
+\begin{align*}
+\ep^* = p^{(1+p)^{-1}} 2^{(1+p)^{-1}} \lambda^{-1/2}
+\left(\frac{a}{n}\right)^{(2+2p)^{-1}}.
+\end{align*}
+Setzen wir diese ein, ergibt sich,
+\begin{align*}
+h(\ep^*) = \underbrace{2^{\frac{p}{1+p}}}_{\le 2}p^{\frac{1-p}{1+p}}
+\lambda^{-1/2} \left(\frac{a}{n}\right)^{\frac{1}{2+2p}}
+\end{align*}
+Weiterhin besitzt
+\begin{align*}
+&q(p) = p^{\frac{1-p}{1+p}},\\
+&q'(p) =
+-\frac{p^{-\frac{2p}{1+p}}\left(2\ln p^p - 1 + p^2\right)}{(1+p)^2}
+\end{align*}
+ein Maximum in $p=1$. Folglich ist
+\begin{align*}
+h(\ep^*) \le 2 \lambda^{-1/2} \left(\frac{a}{n}\right)^{\frac{1}{2+2p}}.
+\end{align*}
+Setzen wir dies in die Orakelungleichung \ref{prop:6.2.1} ein, folgt die
+Behauptung.\qedhere
+\end{proof}
+
+\begin{bsp*}
+Sei $X\subset \R^n$ kompakt, $O = X^\circ$ nichtleer.
+%  $k$ sei stetiger Kern auf
+% $X$, so dass $k\big|_O$ $m$-fach stetig differenzierbar und alle Ableitungen
+% stetig auf $X$ fortsetzbar sind.
+\begin{align*}
+C_b^m(\bar{O}) \defl
+\setdef{f\in C(X)\cap C^m(O)}{f^{(k)} \text{
+stetig fortsetzbar auf $X$},\; 1\le k\le m}.
+\end{align*}
+Weiterhin sei $k\in C_b^m(\bar{O})$ ein Kern mit RKHS $H$. Mit Korollar
+\ref{prop:5.3.11} folgt, dass
+\begin{align*}
+\id : H\to C_b^m(\bar{O})
+\end{align*}
+eine stetige Abbildung ist. Aus den Bemerkungen in Kapitel \ref{sec:4.2} folgt
+für die Entropiezahl $e_n$,
+\begin{align*}
+e_n\left(\id : C_b^m(\bar{O})\to l_\infty(\bar{O}) \right) \le
+cn^{-\frac{m}{d}},\qquad n\ge 1
+\end{align*}
+mit einer Konstanten $c$.
+%TODO: Diagramm
+
+Aus der Multiplikativität von Entropiezahlen und $e_i(\cdot) = \norm{\cdot}$
+folgt, weiter
+\begin{align*}
+e_n(\id : H\to l_\infty(\bar{O})) \le cn^{-\frac{m}{d}} \norm{\id: H\to
+C_b^m(\bar{O})}.
+\end{align*}
+Wir können nun
+Lemma \ref{prop:4.2.3} anwenden und erhalten
+\begin{align*}
+\log \NN(B_H,\norm{\cdot}_\infty,\ep) \le \log 4
+\left(\frac{c}{\ep}\right)^{d/m}.
+\end{align*}
+Mit $a=\ln 4 c^{d/m}$ und $2p = \frac{d}{m}$ ist nun Korollar \ref{prop:6.2.2}
+anwendbar.
+
+Betrachten wir nun den Gauß-Kern
+\begin{align*}
+\Omega_\sigma(x,x') = \exp(-\sigma^2\norm{x-x'}^2)
+\end{align*}
+mit RKHS $H_\Omega$, dann können wir $m$ beliebig groß wählen. Es gilt dann
+\begin{align*}
+e_n(\id : H_\sigma \to l_\infty(X)) \le c \sigma^m n^{-m/d},\qquad \sigma\ge
+1,\quad m\ge 1,\quad n\ge 1
+\end{align*}
+und $c$ einer von $n,m,\sigma$ unabhängigen Konstanten. Folglich ist
+\begin{align*}
+\log \NN(B_\sigma,\norm{\cdot}_\infty,\ep)
+\le \log 4
+\left(\frac{c\sigma^m}{\ep}\right)^{\frac{d}{m}}
+=
+\underbrace{c^{d/m}\log( 4) \sigma^d}_{\defr a} \ep^{-\frac{d}{m}}.
+\end{align*}
+Die rechte Seite der Orakelungleichung ist somit bis auf Konstanten, die von
+$n$, $\tau$, $m$, $\lambda$ unabhängig sind
+\begin{align*}
+\lambda^{-1/2} \sigma^{d\cdot \frac{1}{2+2\frac{d}{2m}}}
+n^{-\frac{1}{2+2\frac{d}{2m}}} + 4\lambda^{-1/2}\sqrt{\frac{2\tau + 2}{n}}
+= \lambda^{-1/2}\sigma^{\frac{dm}{2m+d}}n^{-\frac{m}{2m+d}}+
+4\lambda^{-1/2}\sqrt{\frac{2\tau + 2}{n}}
+\end{align*}
+Für $m>>1$ entspricht dies ungefähr
+\begin{align*}
+\lambda^{-1/2}\sigma^{d/2}n^{-1/2} +
+4\lambda^{-1/2}\sqrt{\frac{2\tau+2}{n}}.\bsphere
+\end{align*}
+\end{bsp*}
+
+\section{Die Funktion $A(\lambda)$}
+
+Wir definieren die Funktion $A$ durch
+\begin{align*}
+A(\lambda) \defl \inf_{f\in H} \left(\lambda\norm{f}_H^2 + \RR_{L,P}(f) \right) -
+\RR_{L,P}^*,\qquad \lambda > 0.
+\end{align*}
+Im Folgenden untersuchen wir, wann $A(\lambda)\approx 0$.
+
+\begin{prop}
+\label{prop:6.3.1}
+Sei $P$ ein W-Maß auf $X\times Y$ und $L$ eine $P$-integrierbare NVF. Dann gilt
+für jedes $p\in (0,\infty]$
+\begin{align*}
+\RR_{L,P}^* =
+\inf_{f\in\LL_p(P_X)}\RR_{L,P}(f) = \RR_{L,P,\LL_p(P_X)}^*.\fishhere
+\end{align*}
+\end{prop}
+
+Es genügt also beschränkte, messbare Funktionen zur Berechnung des Bayes-Risikos
+zu betrachten.
+
+\begin{proof}
+"`$p=\infty$"': Sei $f: Y\to \R$ messbar mit $\RR_{L,P}(f)  < \infty$. (Falls es
+keine solche Funktion gibt, sind wird fertig.) Setze nun
+\begin{align*}
+f_n \defl f\cdot \chi_{\setd{\abs{f}\le n}},
+\end{align*}
+dann ist $f_n\in \LL_\infty$ für alle $n\ge 1$. Weiterhin gilt
+\begin{align*}
+\abs{\RR_{L,P}(f_n)-\RR_{L,P}(f)} &\le 
+\int_{X\times Y} \abs{L(x,y,f_n(x))-L(x,y,f(x))}\dP(x,y)\\
+&= 
+\int_{\setd{\abs{f} > n}} \abs{L(x,y,0)-L(x,y,f(x))} \dP(x,y)\\
+&\le
+\int_{\setd{\abs{f} > n}} L(x,y,0)+L(x,y,f(x)) \dP(x,y)
+\end{align*}
+und da $L(x,y,t)\le b(x,y) + h(\abs{t})$ folgt
+\begin{align*}
+\le \int_{\setd{\abs{f} > n}} \underbrace{b(x,y)+ h(0)}_{\text{(*)}} +
+\underbrace{L(x,y,f(x))}_{\text{(**)}} \dP(x,y).
+\end{align*}
+(*) $\in L^1(P)$, denn $L$ eine $P$-integrierbare NVF, (**) $\in L^1(P)$, da
+$\RR_{L,P}(f) < \infty$ und folglich
+\begin{align*}
+\le \int_{X\times Y} \chi_{\setd{\abs{t}> n}} g \dP \to 0,\qquad n\to\infty,
+\end{align*}
+denn $g_n\le g$ und $g_n\to 0$. Für $\ep\downarrow 0$ gibt es daher eine
+beschränkte Funktion $f_\ep$ mit
+\begin{align*}
+\abs{\RR_{L,P}(f_\ep)-\RR_{L,P}(f)} \le \ep.
+\end{align*}
+Dann ist
+\begin{align*}
+\RR_{L,P}(f) - \ep \le \RR_{L,P}(f_\ep) \le \RR_{L,P}(f) + \ep
+\end{align*}
+und die Behauptung folgt.
+
+"`$p<\infty$"': $\LL_\infty(P_Y) \subset \LL_p(P_X)$. Damit sind wir
+fertig.\qedhere
+\end{proof}
+
+\begin{prop}
+\label{prop:6.3.2}
+Sei $P$ ein W-Maß auf $X\times Y$ und $L$ eine $P$-integrierbare NVF der Ordnung
+$p\in [1,\infty)$ und ist $H$ ein universeller RKHS (also insbesondere
+ist $X$ kompakt). Dann gilt
+\begin{align*}
+\RR_{L,P}^* = \RR_{L,P,H}^* \defl \inf_{f\in H} \RR_{L,P}(f).\fishhere
+\end{align*}
+\end{prop}
+\begin{proof}
+Satz \ref{prop:2.1.6} besagt, dass die Abbildung
+\begin{align*}
+\RR_{L,P} : \LL_p(P_X) \to \R
+\end{align*} 
+stetig ist; weiterhin sind die Abbildungen
+\begin{align*}
+\id : H\to C(X),\qquad \id : C(X)\to \LL_p(P_X)
+\end{align*}
+stetig und haben dichtes Bild. Folglich existiert zu $g\in\LL_p(P_X)$ eine Folge
+$(f_n)$ in $H$ mit $\norm{f_n-g}_{\LL_p(P_X)} \to 0$.  Aufgrund der Stetigkeit
+von $\RR_{L,P}$ ist
+\begin{align*}
+\lim\limits_{n\to\infty} \RR_{L,P}(f_n) = \RR_{L,P}(g)
+\end{align*}
+und mit Satz \ref{prop:6.3.1} folgt die Behauptung
+\begin{align*}
+\RR_{L,P,H}^* = \RR_{L,P,\LL_p(X)}^* = \RR_{L,P}^*.\qedhere
+\end{align*}
+\end{proof}
+
+\begin{cor*}
+Falls die Voraussetzungen des Satzes \ref{prop:6.3.2} erfüllt sind, ist
+\begin{align*}
+A(\lambda) = \inf_{f\in H} \left(\lambda \norm{f}_H^2 + \RR_{L,P}(f)\right) -
+\RR_{L,P,H}^*,\qquad \lambda \ge 0.\fishhere
+\end{align*}
+\end{cor*}
+
+\begin{bem*}
+Satz \ref{prop:6.3.2} gilt auch für nicht universelle Kerne, falls der RKHS $H$
+dicht in $\LL_p(P_X)$ liegt.\maphere
+\end{bem*}
+
+\begin{lem}
+\label{prop:6.3.3}
+Sei $L$ eine Verlustfunktion, $H$ ein RKHS über $X$ und $P$ ein W-Maß auf
+$X\times Y$, so dass $\RR_{L,P,H}^* = \RR_{L,P}^*$. Dann erfüllt die Funktion
+$A: [0,\infty)\to [0,\infty]$ die folgenden Eigenschaften:
+\begin{equivenum}
+\item\label{prop:6.3.3:1} $A$ ist monoton steigend, stetig und konkav.
+\item\label{prop:6.3.3:2} $A(0) = 0$.
+\item\label{prop:6.3.3:3} $\mu^{-1}A(\mu)\le \lambda^{-1}A(\lambda)$ für $0 <
+\lambda < \mu$.
+\item\label{prop:6.3.3:4} $A(\lambda)\le \RR_{L,P}(0)-\RR_{L,P,H}^*$ für alle
+$\lambda \ge 0$.
+\item\label{prop:6.3.3:5} $A$ ist subadditiv, d.h. $A(\lambda + \mu) \le
+A(\lambda) + A(\mu)$ für $\lambda,\mu\ge 0$.
+\item\label{prop:6.3.3:6} Falls eine Funktion $h:[0,1]\to [0,\infty)$ mit
+$\lim_{\lambda\to 0} h(\lambda) = 0$ und $A(\lambda)\le \lambda h(\lambda)$ für $\lambda\in[0,1]$
+existiert, dann ist
+\begin{align*}
+A(\lambda) = 0,\qquad \lambda \ge 0.\fishhere
+\end{align*}
+\end{equivenum}
+\end{lem}
+
+\begin{proof}
+"`\ref{prop:6.3.3:2}"': Man rechnet direkt nach, dass
+\begin{align*}
+A(0) =  \inf_{f\in H} \left(0\cdot \norm{f}_H^2 + \RR_{L,P}(f) \right) -
+\RR_{L,P,H}^*
+= \inf_{f\in H} \RR_{L,P}(f) - \RR_{L,P,H}^* = 0.
+\end{align*}
+
+"`\ref{prop:6.3.3:1}"': \textit{$A$ ist konkav}. Zu $\lambda\in[0,\infty)$ und
+$f\in H$ definiere
+\begin{align*}
+h_f(\lambda) \defl \lambda\norm{f}_H^2 + \RR_{L,P}(f) -\RR_{L,P,H}^*. 
+\end{align*}
+Dann ist $h_f$ affin linear und
+\begin{align*}
+A(\lambda) = \inf_{f\in H} h_f(\lambda).
+\end{align*}
+Seien $\ep > 0$, $\lambda,\mu \ge 0$ und $\alpha\in [0,1]$. Wir zeigen nun, dass
+\begin{align*}
+\alpha (A\lambda) + (1-\alpha)A(\mu) \le A(\alpha \lambda + (1-\alpha)\mu).
+\end{align*}
+Da $A$ das Infimum über $h_f$ ist, existieren $f_1,f_2,f_3\in H$, so dass
+\begin{align*}
+&A(\lambda) \le h_{f_1}(\lambda) \le A(\lambda)+ \ep,\\
+&A(\mu) \le h_{f_2}(\mu) \le A(\mu) + \ep,\\
+&h_{f_3}(\alpha\lambda + (1-\alpha)\mu)
+\le A(\alpha\lambda + (1-\alpha)\mu) + \ep
+\end{align*}
+Somit gilt
+\begin{align*}
+\alpha (A\lambda) + (1-\alpha)A(\mu) &\le \alpha h_{f_1}(\lambda) + (1-\alpha)
+h_{f_2}(\mu)\\
+&\le \alpha A(\lambda) + (1-\alpha)A(\mu) + \ep\\
+&\le \alpha h_{f_3}(\lambda) + (1-\alpha)h_{f_3}(\mu) + \ep
+\end{align*}
+und da $h_f$ affin linear also konkav folgt
+\begin{align*}
+\ldots \le
+h_{f_3}(\alpha\lambda + (1-\alpha)\mu)+ \ep
+\le A(\alpha \lambda + (1-\alpha)\mu) + 2\ep.
+\end{align*}
+Grenzübergang $\ep\to 0$ liefert, dass $A$ konkav ist.
+
+\textit{$A$ ist stetig in $0$}. Sei $\ep > 0$, dann existiert ein $f_\ep\in H$
+mit
+\begin{align*}
+\RR_{L,P}(f_\ep) - \RR_{L,P,H}^* \le \ep.
+\end{align*}
+Ohne Einschränkung ist $f_\ep\neq 0$, denn sonst ist $A\equiv 0$. Für
+$\lambda\le \norm{f_\ep}_H^{-2}\ep$ folgt daher,
+\begin{align*}
+0 \le A(\lambda) = \inf_{f\in H} \left(\lambda \norm{f}_H^2 + \RR_{L,P}(f)
+\right) - \RR_{L,P,H}^*
+\le
+\underbrace{\lambda\norm{f_\ep}^2}_{\le \ep} + \underbrace{\RR_{L,P}(f_\ep) -
+\RR_{L,P,H}^*}_{\le \ep} \le 2\ep.
+\end{align*}
+Somit folgt $A(\lambda)\to 0 = A(0)$ für $\lambda \to 0$.
+
+\textit{$A$ ist monoton steigend}. Seien $0\le \lambda\le \mu$, dann ist
+\begin{align*}
+h_f(\lambda) \le h_f(\mu),\qquad f\in H
+\end{align*}
+und folglich
+\begin{align*}
+A(\lambda) = \inf_{f'\in H} h_{f'}(\lambda) \le h_f(\mu)
+\end{align*}
+Dies gilt für jedes $f$, also auch für das Minimum
+\begin{align*}
+A(\lambda)\le A(\mu).
+\end{align*}
+
+"`\ref{prop:6.3.3:3}"': Sei $\lambda\le \mu$, dann ist
+\begin{align*}
+&A(\lambda) = A\left(\frac{\lambda}{\mu}\mu +
+\left(1-\frac{\lambda}{\mu}\right)\cdot 0 \right)
+\ge
+\frac{\lambda}{\mu}A(\mu) + \left(1-\frac{\lambda}{\mu}\right)A(0)
+= \frac{\lambda}{\mu}A(\mu)\\
+\Rightarrow\;
+&\frac{1}{\mu}A(\mu) \le \frac{1}{\lambda}A(\lambda).
+\end{align*}
+
+"`\ref{prop:6.3.3:5}"': Ohne Einschränkung sei $\lambda\le \mu$ und folglich,
+\begin{align*}
+A(\lambda + \mu) \le \frac{\lambda+\mu}{\mu}A(\mu)
+=\frac{\lambda}{\mu}A(\mu) + A(\mu)
+\le A(\lambda) + A(\mu)
+\end{align*}
+
+\textit{$A$ ist stetig}. Sei $\lambda > 0$, dann gilt für $\mu\ge 0$,
+\begin{align*}
+A(\mu) \le A(\lambda + \mu) \le A(\lambda) + A(\mu) \to A(\mu),\qquad
+\lambda \to 0.
+\end{align*}
+
+"`\ref{prop:6.3.3:4}"': 
+\begin{align*}
+A(\lambda) &
+= \inf_{f\in H} h_f(\lambda)
+= \inf_{f\in H} \left(\lambda\norm{f}_H^2 + \RR_{L,P}(f) \right) +
+\RR_{L,P,H}^*\\
+& \le \RR_{L,P}(0) - \RR_{L,P,H}^*.
+\end{align*}
+
+"`\ref{prop:6.3.3:6}"': 
+Für $\lambda\in (0,1]$ gilt nach \ref{prop:6.3.3:3}
+\begin{align*}
+A(1) \le \lambda^{-1}A(\lambda) \le h(\lambda).
+\end{align*}
+Konvergiert $h(\lambda)\to 0$ für $\lambda\to 0$, so ist
+$A(1) = 0$. Da $A$ konkav und nichtnegativ folgt $A\equiv 0$.\qedhere
+\end{proof}
+
+\begin{prop}
+\label{prop:6.3.4}
+Existiert ein $f^*\in H$ mit
+\begin{align*}
+\RR_{L,P}(f^*) = \RR_{L,P}^* = \RR_{L,P,H}^*.
+\end{align*}
+Dann ist
+\begin{align*}
+A(\lambda) \le \lambda\norm{f^*}_H^2,\qquad \lambda \ge 0.\fishhere
+\end{align*}
+\end{prop}
+\begin{proof}
+Sei $\lambda \ge 0$, dann ist
+\begin{align*}
+A(\lambda) = \inf_{f\in H} \left( \lambda\norm{f}_H^2 + \RR_{L,P}(f) \right) -
+\RR_{L,P}^* \le \lambda\norm{f^*}_H^2.\qedhere
+\end{align*}
+\end{proof}
+
+\begin{bem*}[Bemerkungen.]
+\begin{bemenum}
+\item Sei $L$ konvex und $k$ beschränkt, dann gilt
+\begin{align*}
+\exists c\ge 0 \forall \lambda \ge 0 : A(\lambda) \le c\lambda
+\Leftrightarrow
+\exists f^*\in H : \RR_{L,P}(f^*) = \RR_{L,P}^*.\tag{*}
+\end{align*}
+\item Ein schnelleres Konvergenzverhalten als in (*) ist nur in trivialen
+Situationen möglich. Lemma \ref{prop:6.3.3} zeigte, dass dann $A(\lambda)=0$ für
+$\lambda \ge 0$, d.h.
+\begin{align*}
+\RR_{L,P}(0) = \RR_{L,P}^*.
+\end{align*}
+\item In vielen Situationen ist $A(\lambda)\le c\lambda^\beta$ für $\lambda \ge
+0$, mit $c\ge 0$ und $\beta\in(0,1]$ (z.B. gilt dies für die Verlustfunktion
+der kleinsten Quadrate), wobei
+\begin{align*}
+\exists c\ge 0 \forall \lambda \ge 0 : A(\lambda)\le c\lambda^\beta,\quad
+\beta\in(0,1] \Leftrightarrow
+\exists f_{L,P}^* \in \left[L_2(P_X),H \right]_{\beta,\infty}.\maphere
+\end{align*}
+\end{bemenum}
+\end{bem*}
+
+\begin{lem}
+\label{prop:6.3.5}
+Sei $\RR_{L,P}^*= \RR_{L,P,H}^*$ und $I\subset (0,\infty)$ ein beschränktes
+Intervall und $\Lambda$ sei ein endliches $\ep$-Netz von $I$.
+
+Für Konstanten $\alpha,c\in (0,\infty)$ gilt dann
+\begin{align*}
+\min_{\lambda\in\Lambda} \left(A(\lambda) + c\lambda^{-\alpha} \right)
+\le A(2\ep) + \inf_{\lambda\in I} \left(A(\lambda) + c\lambda^{-\alpha}
+\right).\fishhere
+\end{align*}
+\end{lem}
+
+\begin{proof}
+Ohne Einschränkgung ist $\Lambda\defl\setd{\lambda_1,\ldots,\lambda_m}$ mit
+$\lambda_{i-1}\le \lambda_i$ und $\lambda_0 \defl \inf I$.
+
+Es gilt $0 < \lambda_i-\lambda_{i-1} \le 2 \ep$ für alle $i=1,\ldots,m$,
+denn $B_\ep(\lambda_i)\cap B_\ep(\lambda_{i+1})\neq \varnothing$, sonst wäre
+$\Lambda$ kein $\ep$-Netz. 
+
+Sei nun $\delta > 0$, dann existiert ein $\lambda^*\in I$ mit
+\begin{align*}
+A(\lambda^*) + c(\lambda^*)^{-\alpha} \le 
+\inf_{\lambda\in I} \left(A(\lambda) + c\lambda^{-\alpha} \right) + \delta
+\end{align*}
+und folglich existiert ein $i$ mit $\lambda_{i-1}\le \lambda^*\le\lambda_i$,
+also $\lambda_i \le \lambda^*+ 2\ep$. Dann gilt
+\begin{align*}
+\min_{\lambda\in\Lambda} \left(A(\lambda) + c\lambda^{-\alpha}\right)
+&\le A(\lambda_i) + c(\lambda_i)^{-\alpha}
+\le A(\lambda^*+2\ep) + c(\lambda^*)^{-\alpha}\\
+&\le A(2\ep) + \inf_{\lambda\in I} \left(A(\lambda) + c\lambda^{-\alpha} \right)
++ \delta.
+\end{align*}
+Im Limes für $\delta \to 0$ folgt die Behauptung.\qedhere 
+\end{proof}
+
+\section{Konsistenz und Lernraten für SVMs}
+
+\begin{prop}
+\label{prop:6.4.1}
+Sei $(X,d)$ ein kompakter, metrischer Raum, $L$ eine konvexe, lipschitz-stetige
+Verlustfunktion mit $\abs{L}_1 \le 1$ und $L(x,y,0)\le 1$ für alle $(x,y)\in
+X\times Y$. Ferner sei $H$ ein universeller RKHS mit Kern $k$,
+$\norm{k}_\infty\le 1$ und
+\begin{align*}
+\log \NN(B_H,\norm{\cdot}_\infty,\ep) \le a \ep^{-2p},\qquad \ep > 0,
+\end{align*}
+wobei $a\ge 1$ und $p>0$ Konstanten. Dann ist für alle Folgen $(\lambda_n)$ in
+$[0,1]$ mit 
+\begin{align*}
+\lambda_n\to 0\quad  \text{und} \quad
+n\lambda_n^{1+p} \to \infty
+\end{align*}
+die Lernmethode
+\begin{align*}
+(X,Y)^n \ni D \mapsto f_{D,\lambda_n}
+\end{align*}
+universell konsistent.\fishhere
+\end{prop}
+
+SVMs mit geeigneter Regularisierung sind also universell konsistent.
+
+\begin{proof}
+$L$ ist konvex, lipschitz-stetig und erfüllt $L(x,y,0)\le 1$. Somit ist $L$ eine
+$P$-integrierbare NVF der Ordnung $1$ und es folgt
+\begin{align*}
+\RR_{L,P,H}^* = \RR_{L,P}^*.
+\end{align*}
+Korollar \ref{prop:6.2.2} sichert weiterhin, dass
+\begin{align*}
+\RR_{L,P}(f_{D,\lambda_n}) - \RR_{L,P}^*
+\le A(\lambda_n) + 2 \lambda_n^{-1/2} \left(\frac{a}{n}\right)^{\frac{1}{2+2p}}
++ 4 \lambda_n^{-1/2} \sqrt{\frac{2\tau+2}{n}}
+\end{align*}
+mit einer Wahrscheinlichkeit nicht kleiner als $1-e^{-\tau}$.
+
+Da $A(\lambda_n)\to 0$ und $n\lambda^{1+p}\to \infty$ folgt, dass
+\begin{align*}
+\lambda_n^{-1/2} \left(\frac{1}{n}\right)^{\frac{1}{2+2p}}
+= \left(\frac{1}{\lambda_n^{1+p}n}\right)^{\frac{1}{2+2p}} \to 0,
+\end{align*}
+sowie
+\begin{align*}
+4\lambda_n^{-1/2}\sqrt{\frac{2\tau+2}{n}}
+= 4\sqrt{2\tau+2}\frac{1}{\sqrt{\lambda_n n}}
+\le
+4\sqrt{2\tau+2}\frac{1}{\sqrt{\lambda_n^{1+p} n}}
+\to 0.\qedhere
+\end{align*}
+\end{proof}
+
+\begin{bsp*}
+Betrachte die Verlustfunktion $L=L_\mathrm{hinge}$, dann besagt Zhang's
+Ungleichung \ref{prop:2.2.8}
+\begin{align*}
+\RR_{L_\mathrm{class},P}(f)-\RR_{L_\mathrm{class},P}^*
+\le \RR_{L,P}(f)-\RR_{L,P}^*.
+\end{align*}
+Damit ist die SVM, die $L$ benutzt, unter den Voraussetzungen des Satzes
+\ref{prop:6.4.1} nicht nur universell konsistent bezüglich $L$, sondern auch
+universell klassifikationskonsistent.\maphere
+\end{bsp*}
+
+\begin{prop}
+\label{prop:6.4.2}
+Es gelten die Voraussetzungen von Satz \ref{prop:6.4.1}. Zudem seien $c > 0$ und
+$\beta\in (0,1]$ Konstanten mit
+\begin{align*}
+A(\lambda) \le c\lambda^\beta.
+\end{align*}
+Für $n\ge 1$ definiere dann
+\begin{align*}
+\lambda_n \defl n^{-\frac{1}{(1+p)(1+2\beta)}}.
+\end{align*}
+Dann lernt die Lernmethode
+\begin{align*}
+(X\times Y)^n \ni D \mapsto f_{D,\lambda_n}
+\end{align*}
+in Verteilung mit der Rate $n^{-\frac{1}{(1+p)(1+2\beta)}}$.\fishhere
+\end{prop}
+
+\begin{proof}
+Mit Korollar \ref{prop:6.2.2} folgt,
+\begin{align*}
+\lambda\norm{f_{D,\lambda_n}}_H^2 + \RR_{L,P}(f_{D,\lambda_n})-\RR_{L,P}^*
+\le c\lambda_n^\beta  + 2\lambda_n^{-1/2}\left(\frac{a}{n}\right)^{(2+2p)^{-1}}
++ 4\lambda_n^{-1/2}\sqrt{\frac{2\tau+2}{n}}
+\end{align*}
+mit einer Wahrscheinlichkeit nicht kleiner als $1-\ep^{-\tau}$. Einsetzen ergibt
+die Behauptung.\qedhere
+\end{proof}
+
+\begin{bem*}[Bemerkungen.]
+\begin{bemenum}
+\item Die Definition von $\lambda_n$ ist asymptotisch (bezgl. $n$) für die
+Orakelungleichung aus Korollar \ref{prop:6.2.2} die beste Wahl.
+\item Um $\lambda_n$ so definieren zu können, benötigt man Wissen über $\beta$.
+In der Regel verfügt man darüber jedoch nicht!\maphere
+\end{bemenum}
+\end{bem*}
+
+\begin{defn}
+\label{defn:6.4.3}
+Sei $L$ eine Verlustfunktion, die bei 1 abgeschnitten werden kann, $H$ ein RKHS
+über $X$ und $\Lambda = (\Lambda_n)$ eine Familie von endlichen Teilmengen von
+$(0,1]$. Für $n\ge 3$ und $D=((x_1,y_1),\ldots,(x_n,y_n))\in (X\times Y)^n$
+definiere
+\begin{align*}
+&m \defl \left\lfloor \frac{n}{2} \right\rfloor,\\
+&D_1 = ((x_1,y_1),\ldots,(x_m,y_m)),\\
+&D_2 = ((x_{m+1},y_{m+1}),\ldots,(x_n,y_n)),
+\end{align*}
+und betrachte
+\begin{align*}
+f_{D_1,\lambda} &= \argmin\limits_{f\in H} \left(\lambda\norm{f}_H^2 +
+\RR_{L,D_1}(f) \right),\\
+\lambda_{D_2} &\in \argmin_{\lambda\in \Lambda_n}
+\RR_{L,D_2}(\cut{f}_{D_1,\lambda}).
+\end{align*}
+Dann heißt $D\mapsto f_{D,\lambda_{D_2}}$ \emph{TV-SVM
+(Training/Validation-Support vector machine)}.~\fishhere
+\index{SVM!TV}
+\end{defn}
+
+\begin{prop}
+\label{prop:6.4.4}
+Es gelten die Voraussetzungen von Satz \ref{prop:6.4.1} und $L$ sei bei $1$
+abschneidbar. Ferner sei $\Lambda_n$ ein $\ep_n$-Netz von $(0,1]$, wobei
+$\ep_n>0$. Für $\tau \ge 1$ sei ferner
+\begin{align*}
+\tau_n=2\tau+4\log \abs{\Lambda_n} + 1.
+\end{align*}
+Dann gilt mit einer Wahrscheinlichkeit $P^n$ nicht kleiner als $1-e^{-\tau}$,
+\begin{align*}
+\RR_{L,P}(\cut{f}_{D_1,\lambda_2}) - \RR_{L,P}^* &\le
+\inf_{\lambda\in (0,1]} \bigg( A(\lambda) +
+3\lambda^{-1/2}\left(\frac{a}{n}\right)^{(2+2p)^{-1}} 
+\\ &
++12\lambda^{-1/2}\sqrt{\frac{\tau_n}{n}} \bigg) + A(2\ep_n).
+\end{align*}
+Insbesondere ist die TV-SVM universell konsistent, falls $\ep_n\to 0$ und
+$n^{-1}\log \abs{\Lambda_n}\to 0$. Ist außerdem $A(\lambda)\le
+c\lambda^\beta$ für $\lambda \ge 0$ und geeignetes $c\ge 0$ und $\beta\in(0,1]$,
+so lernt die TV-SVM in Verteilung mit Rate $n^{-\frac{\beta}{(1+p)(1+2\beta)}}$,
+sofern $\ep \le \min\setd{n^{-1},\abs{\Lambda_n}}$, verhält sich die Lernrate
+polynomial in $n$.\fishhere
+\end{prop}
+
+\begin{proof}
+Da $m=\lfloor\frac{n}{2}\rfloor$ ist $m> \frac{n}{2}$. Mit Korollar
+\ref{prop:6.2.2} folgt somit
+\begin{align*}
+\RR_{L,P}(f_{D_1,\lambda} ) - \RR_{L,P}^*  &\le A(\lambda) +
+2\lambda^{-1/2}\left(\frac{a}{n}\right)^{(2+2p)^{-1}} +
+4\lambda^{-1/2}\sqrt{\frac{2\tau+2}{m}}\\
+&\le A(\lambda) + 3\lambda^{-1/2}\left(\frac{a}{n}\right)^{(2+2p)^{-1}}
++ 8\lambda^{-1/2}\sqrt{\frac{\tau+1}{n}}
+\end{align*}
+mit einer Wahrscheinlichkeit nicht kleiner als $1-e^{-\tau}$. Mit dem union
+bound folgt, dass diese Abschätzung für alle $\lambda\in \Lambda_n$ simultan mit
+einer Wahrscheinlichkeit $P^n$ nicht kleiner als $1-\abs{\Lambda_n}e^{-\tau}$
+gilt.
+Ferner gilt
+\begin{align*}
+L(x,y,\cut{t}) \le \underbrace{\abs{L}_1}_{\le 1} + \underbrace{L(x,y,0)}_{\le
+1} \le 2 \defr B.
+\end{align*}
+Satz \ref{prop:4.1.2} impliziert mit $n-m \ge n/2-1\ge n/4$, dass
+\begin{align*}
+\RR_{L,P}(f_{D_1},\lambda_{D_2}) \le
+\inf_{\lambda\in \Lambda_n}  \RR_{L,P}(\cut{f}_{D,\lambda}) +
+4\sqrt{\frac{2\tau + 2\log 2\abs{\Lambda_n}}{n}} 
+\end{align*}
+mit Wahrscheinlichkeit $P^{n-m}$ nicht kleiner als $1-e^{-\tau}$. Man sieht mit
+Lemma \ref{prop:6.3.5} leicht ein, dass somit auch mit einer Wahrscheinlichkeit
+$P^n$ nicht kleiner als $1-(1+\abs{\Lambda_n})e^{-\tau}$ gilt
+\begin{align*}
+\RR_{L,P}(\cut{f}_{D_1,\lambda_{D_2}}) - \RR_{L,P}^* 
+&\le \inf_{\lambda\in \Lambda_n}  \left(\RR_{L,P}(\cut{f}_{D,\lambda}) -
+\RR_{L,P}^*\right) + 4\sqrt{\frac{2\tau + 2\log 2\abs{\Lambda_n}}{n}}\\
+&\le
+\inf_{\lambda\in \Lambda_n}
+\left( A(\lambda)+ 3\lambda^{-1/2}\left(\frac{a}{n} \right)^{(2+2p)^{-1}}
++ 8\lambda^{-1/2}\sqrt{\frac{\tau+1}{n}}
+\right)\\
+&+ 4\sqrt{\frac{2\tau+2\log 2\abs{\Lambda_n}}{n}}\\
+&\le
+\inf_{\lambda\in (0,1]}
+\left(A(\lambda) + 3\lambda^{-1/2}\left(\frac{a}{n} \right)^{(2+2p)^{-1}}+
+8\lambda^{-1/2}\sqrt{\frac{\tau+1}{n}} \right)\\
+& + A(2\ep)
++ 4\sqrt{\frac{2\tau+2\log 2\abs{\Lambda_n}}n}.
+\end{align*}
+Weiterhin ist
+\begin{align*}
+2\tau + 2\log 2 \abs{\Lambda_n}
+\le 2\tau + 2 + 2\log \abs{\Lambda_n}
+\le \tau_n 
+\end{align*}
+sowie $\tau+1\le \tau_n$ und $\lambda^{-1/2}\ge 1$ für $\lambda\in (0,1]$. Somit
+folgt die Behauptung.\qedhere
+\end{proof}
+
+\begin{bsp*}
+Wähle $\Lambda_n$ als $\frac{1}{n}$-Netz mit Kardinalität $\le 2-n$. Dann ist
+die Konstruktion von $\beta$ unabhängig von $D$ und die TV-SVM lernt mit Rate
+$n^{-\frac{\beta}{(1+p)(1+2\beta)}}$.\bsphere
+\end{bsp*}
+
+\begin{bem*}[Bemkerungen.]
+\begin{bemenum}
+\item Die TV-SVM kann bei geeigneter Modifikation auch weitere Parameter adaptiv
+bestimmen, wie z.B. den Kernparameter $\sigma$ des Gaußkerns.
+\item In der Praxis werden kleinere Netze $\Lambda_n$ benutzt, z.B.
+$10\le \abs{\Lambda_n}\le 20$ mit geometrischer Verteilung.
+\item Die benutzte Technik mit $\norm{\cdot}_\infty$-Überdeckungszahlen war
+Stand der Forschung bis ca. 2002. Dies kann noch deutlich verbessert werden,
+denn in Satz \ref{prop:6.2.1} haben wir ausgenutzt, dass $f_{D,\lambda}\in
+\lambda^{-1/2}B_H$. Dies führte zu $b\approx \lambda^{-1/2}$ in Hoeffdings
+Ungleichung. Man kann dies aus mehreren Gründen noch deutlich verbesern
+\begin{enumerate}[label=\arabic{*}.),leftmargin=2pt]
+  \item Sei $f_{D,\lambda}\in \argmin_{f\in H}\left( \lambda\norm{f}_H^2 +
+  \RR_{L,P}(f)\right)$, dann gilt
+\begin{align*}
+\lambda\norm{f_{D,\lambda}}_H^2
+\le
+\lambda\norm{f_{D,\lambda}}_H^2 + \RR_{L,P}(f_{D,\lambda}) - \RR_{L,P}^*
+= A(\lambda). 
+\end{align*}
+Für $A(\lambda)\le c\lambda^\beta$ folgt somit
+\begin{align*}
+\norm{f_{D,\lambda}}_H \le
+\sqrt{c}\lambda^{\frac{\beta-1}{2}},\qquad \lambda \ge 0.
+\end{align*}
+Wir sind bisher also stets von $\beta = 0$ und $c=1$ ausgegangen\ldots
+\item Sei $\lambda_n$ eine Nullfolge mit $\lambda_n^{-1/2} n^{-(2+2p)^{-1}} \to
+0$ polynomial. Dann besagt Korollar \ref{prop:6.2.2}, dass mit hoher
+Wahrscheinlichkeit gilt
+\begin{align*}
+\lambda_n \norm{f_{D,\lambda_n}}^2 &\le \lambda_n \norm{f_{D,\lambda_n}}_H^2 +
+\RR_{L,P}(f_{D,\lambda_n}) - \RR_{L,P}^*\\ & \le A(\lambda_n)
++ \lambda_n^{-1/2}n^{-(2+2p)},
+\end{align*}
+was polynomial gegen Null konvergiert, falls $A(\lambda)\le c\lambda^\beta$. Sei
+$\alpha$ der entsprechende Exponent, dann folgt
+\begin{align*}
+\norm{f_{D,\lambda_n}}_H^2 \le \kappa \lambda^{-1/2}n^{-\alpha},\tag{*}
+\end{align*}
+mit hoher Wahrscheinlichkeit. Betrachte nun im Beweis von Satz \ref{prop:6.2.1}
+nur noch die Datensätze für die (*) gilt. Dies ergibt eine bessere
+Orakelungleichung, welche wiederum auf eine Verbesserung von (*) führt.
+Iteration dieses Arguments liefert eine deutlich verbesserte Orakelungleichung.
+\item Kann $L$ abgeschnitten werden, z.B. bei $M=1$, so folgt
+\begin{align*}
+\norm{\cut{f}_{D,\lambda}}_\infty \le 1,
+\end{align*}
+wobei wir bisher verwendet haben, dass
+\begin{align*}
+\norm{f_{D,\lambda}}_\infty \le \lambda^{-1/2}.
+\end{align*}
+Man sollte daher eigentlich
+\begin{align*}
+\RR_{L,P}(\cut{f}_{D,\lambda}) - \RR_{L,P}^*
+\end{align*}
+abschätzen.
+\item In vielen Fällen liegt ein sogenanntes \emph{variance bound} vor,
+\begin{align*}
+\E (L\circ f  - L\circ f_{L,P}^*)^2 \le
+V(\E(L\circ f - L\circ f_{L,P}^*))^\th,
+\end{align*}
+wobei $L\circ f(x,y) = L(x,y,f(x))$ und $V>0$, $\th\in [0,1]$ Konstanten.
+
+Vergleichen wir nun die Fehlerterme von Bernsteins-
+\begin{align*}
+\sqrt{\frac{\sigma^2 \tau}{n}} + \frac{B}{n}
+\end{align*}
+und Hoeffdings-Ungleichung
+\begin{align*}
+B\sqrt{\frac{\tau}{n}},
+\end{align*}
+so können wir $\sigma^2$ durch $\E (L\circ f  - L\circ f_{L,P}^*)^2$
+"`ersetzen"'. Dies führt zu einer neuen Orakelungleichung, die zeigt, dass
+\begin{align*}
+\RR_{L,P}(f)-\RR_{L,P}^*\tag{**}
+\end{align*}
+mit hoher Wahrscheinlichkeit klein ist (z.B. $O(n^{-\alpha\th})$). Das variance
+bound zeigt dann, dass $\sigma^2 \hat{=} \E (L\circ f  - L\circ f_{L,P}^*)^2$
+ebenfalls mit hoher Wahrscheinlichkeit klein ist und folglich ist (**) noch
+kleiner (z.B. $O(n^{-\alpha\th-1/2})$). Iteration dieses Arguments ergibt eine
+deutliche Verbesserung.
+\item Dies zusammengenommen kann Lernraten bis zu $O(n^{-1})$ ergeben.
+Vergleiche  dies mit unserem Ergebnis
+$O(n^{-\frac{\beta}{(1+p)(1+2\beta)}})$, welches nie kleiner ist als
+$O(n^{-1/3})$.
+\item Bisher haben wir nur Überdeckungszahlen bezüglich der Supremumsnorm
+verwendet. Dies erfordert, dass der Eingaberaum kompakt ist.
+Oftmals sind die Daten jedoch auf ganz $\R^n$ verteilt (z.B.
+Gauß-verteilt).
+Man kann anstatt $\NN(B_H,\norm{\cdot}_\infty,\ep)$ bessere Überdeckungszahlen
+wie $\NN(B_H,\norm{\cdot}_{L^2(P_X)},\ep)$ betrachten. Dies geht jedoch nicht
+mehr mit elementaren Methoden. Dafür erhält man z.B. für die Verlustfunktion der
+kleinsten Quadrate optimale Lernraten. Resultate in dieser Richtung sind relativ
+neu (2007-2009).\maphere
+\end{enumerate}
+\end{bemenum}
+\end{bem*}

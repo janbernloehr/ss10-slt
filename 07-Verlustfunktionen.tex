@@ -1,0 +1,194 @@
+\chapter{Verlustfunktionen II}
+
+Bisher haben wir die Verlustfunktionen studiert, die das Lernziel gut
+beschrieben ($L_\mathrm{class}$, $L_\mathrm{hinge}$, $L_\mathrm{LS}$, \ldots).
+Wir haben aber auch schon gesehen, dass $L_\mathrm{hinge}$ in einem günstigen
+Verhältnis zu $L_\mathrm{class}$ steht (Zhang's Ungleichung)
+\begin{align*}
+\RR_{L_\mathrm{class},P}(f)-\RR_{\mathrm{class},P}^* 
+\le \RR_{L_\mathrm{hinge},P}(f)-\RR_{L_\mathrm{hinge},P}^*.
+\end{align*}
+Während die Minimierung des Überschussrisikos von $L_\mathrm{class}$ ein
+kombinatorisches Optimierungsproblem darstellt und somit äußerst diffiziel
+werden kann, beschreibt die Minimierung des Überschussrisikos von
+$L_\mathrm{hinge}$ ein konvexes Optimierungsproblem, zu dessen Lösung wir
+bereits Methoden kennengelernt haben (siehe Kapitel \ref{chap:6.1}). Dies
+motiviert den Einsatz von $L_\mathrm{hinge}$ z.B. in SMVs. Weiterhin haben wir
+in den Übungen gesehen, dass
+\begin{align*}
+\RR_{L_\mathrm{class},P}(f)-\RR_{L_\mathrm{class},P}^* \le
+\sqrt{\RR_{L_\mathrm{LS},P}(f)-\RR_{L_\mathrm{LS},P}^*}.
+\end{align*}
+
+Ziel dieses Abschnitts ist es nun zu untersuchen, wie man eine
+Zielverlustfunktion $L$, welche das Lernziel beschreibt, durch eine
+Ersatzverlustfunktion ersetzen kann, die einer "`solchen"' Ungleichung genügt. 
+
+\section{Marginbasierte Verlustfunktionen}
+
+\begin{prop}[Satz von Bartlett, Jordan, Mc Auliffe (2007)]
+\label{prop:7.1}
+Sei $L$ eine konvexe, marginbasierte Verlustfunktion, die durch
+\begin{align*}
+\phi: \R\to [0,\infty)  
+\end{align*}
+dargestellt wird ($L(y,t) = \phi(y-t)$). Dann sind äquivalent
+\begin{equivenum}
+\item $\phi$ ist in $0$ differenzierbar mit $\phi'\big|_0 = 0$.
+\item Es existiert eine Funktion $Y: [0,1]\to [0,\infty)$ streng monoton und
+\begin{align*}
+Y(\RR_{L_\mathrm{class},P}(f)-\RR_{L_\mathrm{class},P}^*)\tag{*}
+\le \RR_{L,P}(f)-\RR_{L,P}^*
+\end{align*}
+für alle W-Maße $P$ auf $X\times \setd{-1,1}$ und $f: X\to \R$.
+
+In diesem Fall gilt
+\begin{align*}
+Y(t) &= \phi(0) - \inf_{s\in\R}
+\left(\frac{t+1}{2}\phi(s) + \left(1-\frac{t+1}{2}\right)\phi(-s) \right)\\
+&\overset{\eta = \frac{t+1}{2}}{=}
+\phi(0) - \inf_{s\in\R} \left(\eta \phi(s) + (1-\eta)\phi(s) \right).\fishhere 
+\end{align*} 
+\end{equivenum}
+\end{prop}
+
+\begin{bsp*}
+Die Äquivalenz gilt für $L_\mathrm{hinge}$ und $L_\mathrm{LS}$ mit 
+\begin{align*}
+&L_\mathrm{hinge}, && Y(t) = t, && \text{für alle } t\in [0,1],\\
+&L_\mathrm{LS}, && Y(t) = t^2, && \text{für alle }t\in [0,1].\bsphere
+\end{align*}
+\end{bsp*}
+
+\begin{prop*}
+Existieren $q\in [0,\infty]$, $c_p > 0$ mit
+\begin{align*}
+P_X\left(\setdef{x\in X}{\abs{2\eta(x)-1} < t}\right)
+\le (c_p t)^q,\qquad t\in [0,\infty),\tag{**}
+\end{align*}
+und gilt für das in (*) definiert $Y$, $Y(t) \ge ct^p$ für ein $p>1$. Dann gilt
+\begin{align*}
+\RR_{L_\mathrm{class},P}(f)-\RR_{L_\mathrm{class},P}^*
+\le 2c^{-\frac{q+1}{q+p}} c_p^{\frac{q(p-1)}{q+p}}\left(\RR_{L,P}(f)-\RR_{L,P}^*
+\right)^{\frac{q+1}{q+p}}.\fishhere
+\end{align*}
+\end{prop*}
+
+(**) heißt \emph{Tsybakov's Noise Assumption}  (2004). Es ist
+\begin{align*}
+&\eta = \frac{1}{2} \Leftrightarrow
+\abs{2\eta-1} = 0,
+&&\eta \approx \frac{1}{2} \Leftrightarrow
+\abs{2\eta-1} \approx 0.
+\end{align*}  
+Die linke Seite in (**) misst die Masse der $x$, bei denen $\eta(x)$ nahe bei
+$\frac{1}{2}$ ist. Die rechte Seite beschränkt diese Masse. Für $t\to 0$ sagt
+die Noise Assumption
+\begin{align*}
+P_X\left(\setdef{x\in X}{\abs{2\eta(x)-1} < t}\right)
+ = O(t^q).
+\end{align*}
+
+\newcommand{\aclass}{{\alpha-\mathrm{class}}}
+Wir definieren
+\begin{align*}
+L_{\aclass}(y,t) \defl
+\begin{cases}
+1-\alpha, & y = 1,\quad t < 0,\\
+\alpha, & y= -1, \quad t\ge 0,\\
+0 , & \text{sonst}.
+\end{cases}
+\end{align*}
+
+\begin{prop}
+\label{prop:7.2}
+Sei $L$ eine konvexe Verlustfunktion, die durch $\phi$ dargestellt werden kann,
+mit
+\begin{align*}
+L_\aclass(y,t) =
+\begin{cases}
+1-\alpha\phi(t), & y=1,\\
+\alpha\phi(t), & y=-1.
+\end{cases}
+\end{align*}
+Dann sind äquivalent
+\begin{equivenum}
+\item $\phi$ ist in $0$ differenzierbar mit $\phi'(0) = 0$.
+\item Es gibt eine streng monoton steigende Funktion $Y: [0,1]\to [0,\infty)$
+mit
+\begin{align*}
+Y\left(\RR_{\aclass,P}(f)-\RR_{\aclass,P}^* \right)
+\le \RR_{L_\alpha,P}(f)-\RR_{L_\alpha,P}^*.\fishhere
+\end{align*}
+\end{equivenum}
+\end{prop}
+
+\begin{bsp*}
+Für $0<\alpha\le \frac{1}{2}$ sind
+\begin{align*}
+&L_\mathrm{hinge}, && Y(t) = t,\\
+&L_\mathrm{LS}, && Y(t) = \frac{t^2}{2\alpha(1-\alpha)+(1-2\alpha)}.\bsphere
+\end{align*}
+\end{bsp*}
+
+\section{Distanzbasierte Verlustfunktionen}
+
+\newcommand{\Med}{\mathrm{Median}}
+Für die Verlustfunktion der kleinsten Quadrate $L_\mathrm{LS}$ ist
+\begin{align*}
+\norm{f-f_{L,P}^*}_{L^2(P_X)}^2
+= \RR_{L,P}(f) - \RR_{L,P}^*,\qquad f_{L,P}^* = \E(Y\mid x).
+\end{align*}
+Wie wollen nun den bedingten Median schätzen. Dazu nehmen wir an, dass
+\begin{align*}
+\Med(Y\mid x) = \setd{f^*(x)},\qquad P_X-\fs
+\end{align*}
+
+\begin{prop}
+\label{prop:7.2.1}
+Sei $L(y,t) = \abs{y-t}$ für $y\in\R$ und $t\in \R$. Dann sind für $f: X\to \R$
+äquivalent
+\begin{equivenum}
+\item $\RR_{L,P}(f) = \RR_{L,P}^*$,
+\item $f= f^*$ $P_X$-$\fs$
+\end{equivenum}
+D.h. der Minimierer des Überschussrisikos entspricht dem Median.\fishhere
+\end{prop}
+
+Wenn wir bereits wissen, das $\RR_{L,P}(f)\approx \RR_{L,P}(f^*)$, wie nahe ist
+dann $f$ an $f^*$?
+
+\begin{defn*}
+Eine Verteilung $Q$ auf $[-1,1]$ hat den \emph{Mediantyp} $q\in (1,\infty)$,
+wenn $\alpha_Q\in [0,2]$ und ein $b_Q> 0$ existieren, so dass für $t^*=\Med(Q)$
+und jedes $s\in [0,\alpha_Q]$ gelten
+\begin{align*}
+Q((t^*-s,t^*)) \ge b_Q s^{q-1},\qquad
+Q((t^*,t^*+s)) \ge b_Q s^{q-1}.\fishhere
+\end{align*}
+\end{defn*}
+
+\begin{defn*}
+Sei $p\in (0,\infty]$, $q\in (1,\infty)$ und $P$ ein W-Maß auf $X\times [-1,1]$.
+Dann hat $P$ einen \emph{$p$-mittelbaren Mediantyp $q$}, wenn folgende
+Eigenschaften erfüllt sind
+\begin{defnenum}
+\item $P(Y\mid x)$ hat Mediantyp $q$ $P_X$-$\fs$.
+\item Die Abbildung $\gamma: X\to \R,\quad x\mapsto b_{P(Y\mid
+x)}\alpha_{P(Y\mid x)}^{q-1}$ erfüllt $\gamma^{-1}\in L_p(P_X)$.\fishhere
+\end{defnenum}
+\end{defn*}
+
+\begin{bsp*}
+Alle Dichten von $P(Y\mid x)$ erfüllen für $p=\infty$ und $q=2$,
+\begin{align*}
+\min\setd{1+f^*(x),1-f^*(x)} \ge \alpha^*.
+\end{align*}
+Unter diesen Voraussetzungen gilt
+\begin{align*}
+&r \defl \frac{p_q}{p+1},\\
+&\norm{f-f^*}_{L_r(P_X)}
+\le c\left(\RR_{L,P}(f)-\RR_{L,P}^* \right)^{1/q}
+\end{align*}
+für alle $f: X\to [-1,1]$ und $r=q=2$.\bsphere
+\end{bsp*}

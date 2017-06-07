@@ -1,0 +1,206 @@
+\chapter{Konzentrationsungleichungen}
+
+Im Lemma \ref{lem:1.3.7} hatten wir gezeigt:
+\begin{align*}
+\mu^n\left(\setdef{\omega\in\Omega^n}{\frac{1}{n}\sum_{i=1}^n
+h(\omega_i)-\E_\mu h \ge t} \right) \le \frac{\E_\mu h^2}{t^2n}
+\end{align*}
+für alle Maße $\mu$, $n\ge 1$, $t>0$ und $h: \Omega\to\R$.
+
+\begin{prop}
+\label{prop:3.1}
+Sei $(\Omega,\AA,\mu)$ ein Wahrscheinlichkeitsraum, dann gilt für alle $f:
+\Omega\to\R$ mit $\E_\mu \abs{f}< \infty$ und $t>0$,
+\begin{align*}
+\mu\left(\setdef{\omega\in\Omega}{f(\omega)\ge t} \right)
+\le \frac{\E_\mu \abs{f}}{t}.\fishhere
+\end{align*}
+\end{prop}
+
+\begin{lem}
+\label{prop:3.2}
+Für $x>-1$ gilt
+\begin{align*}
+(1+x)\ln(1+x) -x \ge \frac{3}{2}\frac{x^2}{x+3}.\fishhere
+\end{align*}
+\end{lem}
+\begin{proof}
+Seien $f(x) = (1+x)\ln(1+x)-x$ und $g(x) = \frac{3}{2}\frac{x^2}{x+3}$. Dann
+folgt
+\begin{align*}
+&f'(x) = \ln(1+x), && g'(x) = \frac{3}{2}\frac{x^2+6x}{(x+3)^2},\\
+&f''(x) = \frac{1}{1+x}, && g''(x) = \frac{27}{(x+3)^3}, 
+\end{align*}
+und es gelten
+\begin{align*}
+&f'(0) = 0,\quad f(0) = 0,\\
+&f'(0) = 0, \quad g(0) = 0. 
+\end{align*}
+Wir zeigen nun $f''(x)\ge g''(x)$ für alle $x>-1$. Es ist
+\begin{align*}
+&0 \le x^2(x+9) = x^3+9x^2\\
+\Rightarrow\;
+&x^3+9x^2+27x+27 = (x+3)^3 \ge  27(1+x) = 27x + 27\\
+\Rightarrow\;
+&\frac{27}{(x+3)^3} \le \frac{1}{1+x}.
+\end{align*}
+Für $x\ge 0$ folgt mit dem Hauptsatz der Differential- und Integralrechnung,
+\begin{align*}
+f'(x) = f'(x)-f'(0) = \int_0^x f''(t)\dt
+\ge \int_0^x g''(t)\dt = g'(x)-g'(0) = g'(x).
+\end{align*}
+Das selbe Argument angewandt auf $f$ liefert, $f(x) \ge g(x)$ und für $x\in
+(-1,0]$ folgt $-f(x) \ge -g(x)$.\qedhere
+\end{proof}
+
+\begin{prop}[Bernsteins Ungleichung]
+\index{Bernsteins Ungleichung}
+\label{prop:3.3}
+Sei $(\Omega,\AA,P)$ ein Wahrscheinlichkeitsraum und $B>0$, $\sigma > 0$ und
+$n\ge 1$. Ferner seien $\xi_1,\ldots,\xi_n: \Omega\to\R$ i.i.d. (unabhängige und
+identisch verteilte) Zufallsvariablen, so dass gilt
+\begin{align*}
+\begin{rcases}
+\E_P \xi_i &= 0,\\
+\norm{\xi_i}_\infty &\le B,\\
+\E_P \xi^2 &\le \sigma^2
+\end{rcases}
+\text{ für alle } i = 1,\ldots,n.
+\end{align*}
+Dann gilt
+\begin{align*}
+P\left(\frac{1}{n} \sum_{i=1}^n \xi_i \ge \sqrt{\frac{2\sigma^2\tau}{n}} +
+\frac{2 B \tau}{3n}\right) \le e^{-\tau},\quad \text{für alle } \tau >
+0.\fishhere
+\end{align*}
+\end{prop}
+\begin{proof}
+Fixiere $t \ge 0$ und $\ep > 0$, dann gilt
+\begin{align*}
+P\left(\sum_{i=1}^n \xi_i \ge \ep n \right)
+&= 
+P\left(\exp\left(t\sum_{i=1}^n \xi_i\right) \ge \exp(t\ep n) \right)\\
+&\overset{\text{Markov}}{\le}
+e^{-t\ep n}\E_P \exp\left(t\sum_{i=1}^n \xi_i \right)\\
+&\overset{\text{Unabh.}}{=}
+e^{-t\ep n} \prod_{i=1}^n \E_P e^{t\xi_i}.
+\end{align*}
+Folglich ist
+\begin{align*}
+\E_P e^{t\xi_i} = \E_P \sum_{k=0}^\infty \frac{t^k}{k!}\xi_i^k
+= \sum_{k=0}^\infty \frac{t^k}{k!}\E_P\xi^k
+\end{align*}
+und da $\E_P \xi_i = 0$ und $\E_P \xi^k \le \sigma^2 B^{k-2}$ folgt
+\begin{align*}
+\E_P e^{t\xi} &= 1 + \sum_{k=2}^\infty \frac{t^k}{k!}\E_P \xi_i^k
+\le 1 + \sum_{k=2}^\infty \frac{t^k}{k!}\sigma^k B^{k-2}
+= 1 + \frac{\sigma^2}{B^2}\sum_{k=2}^\infty \frac{t^k}{k!}B^k\\
+&= 1 + \frac{\sigma^2}{B^2}\left(e^{tB} -tB-1\right).
+\end{align*}
+Damit gilt
+\begin{align*}
+P\left(\sum_{i=1}^n \xi_i \ge \ep n \right)
+&\le e^{-tn \ep}
+\left( 1+ \frac{\sigma^2}{B^2}\left(e^{tB}-tB-1\right) \right)^n\\
+&\le
+e^{-tn \ep}
+\exp\left( n\frac{\sigma^2}{B^2}\left(e^{tB}-tB-1\right) \right)
+\end{align*}
+Sei $h(t)\defl - t n \ep + \frac{n\sigma^2}{B^2}\left(e^{tB}-tB-1\right)$, dann
+suchen wir kritische Punkte
+\begin{align*}
+h'(t) = -n \ep + \frac{n\sigma^2}{B^2}\left(Be^{tB}-B\right)
+= -n \ep + \frac{n\sigma^2}{B}\left(e^{tB}-1\right)
+\overset{!}{=} 0.
+\end{align*}
+$t$ ist genau dann kritisch, wenn
+\begin{align*}
+\frac{\sigma^2n}{B} e^{tB} = \ep n + \frac{\sigma^2 n}{B}
+\Leftrightarrow
+e^{tB} = \frac{\ep B}{\sigma^2} + 1
+\Leftrightarrow
+t^* = \frac{1}{B}\log\left( 1+ \frac{\ep B}{\sigma^2}\right).
+\end{align*}
+$t^*$ ist der einzige Kandidat für ein Optimum. Weiterhin ist
+\begin{align*}
+\lim\limits_{t\to\pm\infty} h(t) = \infty
+\end{align*}
+und folglich hat $h$ ein globales Minimum bei $t^*$. Setzen wir $y=\frac{\ep
+B}{\sigma^2}$, dann gilt $t^*=\frac{1}{B}\log(1+y)$ und somit
+\begin{align*}
+&-t^* \ep n + \frac{\sigma^2 n}{B^2}\left(e^{t^*B}-t^*B-1\right)\\
+= &-\frac{\ep n}{B}\log(1+y) + \frac{\sigma^2 n}{B^2}(1+y-\log(1+y)-1)\\
+= &\frac{\sigma^2 n}{B^2}
+\left(-y\log(1+y) + y - \log(1+y) \right)\\
+= &-\frac{\sigma^2n}{B^2}\left((1+y)\log(1+y)-y \right)\\
+\overset{\ref{prop:3.2}}{\le}
+&-\frac{\sigma^2 n}{B^2} \frac{3}{2}\frac{y^2}{y+3}
+\overset{\text{Rechnung}}{=}
+- \frac{3n\ep^2}{2\ep B + 6\sigma^2}.
+\end{align*}
+Damit ist
+\begin{align*}
+P\left(\frac{1}{n}\sum_{i=1}^n \xi_i \ge \ep \right)
+\le \exp \left(-\frac{3n\ep^2}{2\ep B+6\sigma^2} \right).
+\end{align*}
+Wähle nun
+\begin{align*}
+\tau \defl \frac{3n \ep^2}{2\ep B + 6\sigma^2},
+\end{align*}
+dann folgt
+\begin{align*}
+\ep = \sqrt{\frac{2\sigma^2\tau}{n} + \frac{B^2\tau^2}{9n^2}} + \frac{B\tau}{3n}
+\le \sqrt{\frac{2\sigma^2\tau}{n}} + \frac{2B\tau}{3n}.\qedhere
+\end{align*}
+\end{proof}
+
+\begin{prop}[Hoeffdings Ungleichung]
+\index{Hoeffdings Ungleichung}
+\label{prop:3.4}
+Sei $(\Omega,\AA,P)$ ein Wahrscheinlichkeitsraum, $a<b$, $1\le n\in\N$ und
+$\xi_1,\ldots,\xi_n : \Omega\to[a,b]$ i.i.d. Dann gilt für $\tau >0$,
+\begin{align*}
+P \left(\frac{1}{n}\sum_{i=1}^n \left(\xi_i - \E_P \xi_i\right)\ge
+(b-a)\sqrt{\frac{\tau}{2n}} \right) \le e^{-\tau}.\fishhere
+\end{align*}
+\end{prop}
+\begin{bem*}[Beobachtung.]
+Für $a=-b$ betrachte $\eta_i = \xi_i - \E_P\xi_i$.\\
+Dann ist $\E_P\eta_i = 0$, $\E_P\eta_i^2 = \E_P\xi_i^2 - (\E_P\xi_i)^2 \le b^2
+\defr \sigma^2$ und $\norm{\eta_i}_\infty \le 2b \defr B$. Mit Bernstein folgt,
+\begin{align*}
+P\left(\frac{1}{n}\sum_{i=1}^n \eta_i \ge \sqrt{\frac{2b^2\tau}{n}} +
+\frac{4b\tau}{3n} \right) \le e^{-\tau},
+\end{align*}
+wobei $\sqrt{\frac{2b^2\tau}{n}} = 2b\sqrt{\frac{\tau}{2n}} =
+(b-a)\sqrt{\frac{\tau}{2n}}$.\maphere
+\end{bem*}
+
+\begin{lem}[Lemma (Union bound)]
+\index{Union bound}
+\label{prop:3.5}
+Sei $(\Omega,\AA,P)$ ein Wahrscheinlichkeitsraum, $f_1,\ldots,f_n: \Omega\to\R$
+messbar. Dann gilt für alle $t\in\R$
+\begin{align*}
+\mu\left(\sup_{i=1,\ldots,n} f_i \ge t\right) \le
+\sum_{i=1}^n \mu(f_i\ge t).\fishhere
+\end{align*}
+\end{lem}
+\begin{proof}
+$\setd{\sup_{i=1,\ldots,n} f_i \ge t} = \bigcup_{i=1}^n \setd{f_i\ge
+t}$.\qedhere
+\end{proof}
+
+\begin{bem*}
+Betrachte $\xi_1,\ldots,\xi_n,-\xi_1,\ldots,-\xi_n$ und das union bound für die
+Summe über  1. Block $(\defr f_1)$ + 2. Block $(\defr f_2)$. Somit ist
+\begin{align*}
+\abs{\frac{1}{n}\sum_{i=1}^n \xi_i} = \sup\setd{f_1,f_2} 
+\end{align*}
+und folglich gilt
+\begin{align*}
+P \left(\abs{\frac{1}{n} \sum_{i=1}^n\xi_i } \ge \sqrt{\frac{2\sigma^2\tau}{n}}
++ \frac{2B\tau}{3 n} \right) \le 2e^{-\tau}.\maphere
+\end{align*}
+\end{bem*}
+"`Zweiseitige Bernstein-Ungleichung"' (Hoeffdings analog!)

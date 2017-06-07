@@ -1,0 +1,1305 @@
+\chapter{Reproduzierende Kernhilberträume (RKHS)}
+
+
+
+Es gibt zwei schöne Klassen von Banachräumen
+\begin{itemize}
+  \item Funktionenräume.
+  \item Hilberträume.
+\end{itemize}
+
+RKHS sind beides, der $L^2([0,1])$ übrigens \textit{kein} Funktionenraum!
+
+\section{Kerne und Beispiele}
+
+\begin{defn}
+\label{defn:5.1.1}
+Eine Funktion $k: X\times X\to\R$ für die ein Hilbertraum $H$ und ein $\Phi:
+X\to H$ existieren, so dass
+\begin{align*}
+k(x,x') = \lin{\Phi(x),\Phi(x')}_H,\qquad \forall x,x'\in X,
+\end{align*}
+heißt \emph{Kern}.\fishhere\index{Kern}
+\end{defn}
+
+\begin{bem*}[Bemerkungen.]
+\begin{bemenum}
+\item Im Allgemeinen sind $H$ und $\Phi$ nicht eindeutig.\\
+Betrachte z.B. $k(x,x') = x\cdot x'$ für $x,x'$, so ist $k$ ein Kern, denn
+\begin{align*}
+&H_1 = \R,\quad \Phi_1 = \id_\R,\quad \lin{\Phi_1(x),\Phi_1(x')} = x\cdot x'.\\
+&H_2 = \R^2,\quad \Phi_2(x) = \frac{1}{\sqrt{2}}\left(x,x\right)
+\end{align*}
+\item $H$ heißt \emph{Featurespace} (Merkmalraum), $\Phi$ heißt
+Featuremap.\maphere
+\end{bemenum}
+\end{bem*}
+
+\begin{lem}
+\label{prop:5.1.2}
+Seien $f_n:X\to\R$, so dass $(f_n(x))_{n\ge 1}\in l_2$ für alle $x\in X$, so
+definiert
+\begin{align*}
+k(x,x') = \sum_{n\ge 1} f_n(x)f_n(x'),\qquad x,x'\in X
+\end{align*}
+einen Kern.\fishhere
+\end{lem}
+\begin{proof}
+$k$ ist wohl definiert, denn nach Cauchy-Schwarz ist
+\begin{align*}
+\sum_{n\ge 1} \abs{f_n(x)f_n(x')}
+\le \norm{(f_n(x))}_{l_2}\norm{(f_n(x'))}_{l_2} < \infty.
+\end{align*}
+Sei $H=l^2$ und $\Phi: X\to H$ gegeben durch
+\begin{align*}
+\Phi(x) = (f_n(x))_{n\ge 1},\qquad x\in X.
+\end{align*}
+Dann ist $\lin{\Phi(x),\Phi(x')} = k(x,x')$ und daher $k$ ein Kern.\qedhere
+\end{proof}
+
+\begin{lem}
+\label{prop:5.1.3}
+Ist $k$ ein Kern auf $X$ und $A:X'\to X$ eine Abbildung, dann definiert
+\begin{align*}
+k'(x,x') = k(A(x),A(x')),\qquad x,x'\in X
+\end{align*}
+einen Kern auf $X'$.\fishhere
+\end{lem}
+\begin{proof}
+Sei $H$ ein Featurespace von $k$ und $\Phi: X\to H$ die zugehörige Featuremap.
+Setze
+\begin{align*}
+\Psi(x) = \Phi(A(x)), 
+\end{align*}
+so gilt
+\begin{align*}
+k'(x,x') = k(A(x),A(x')) = \lin{\Phi(A(x)),\Phi(A(x'))}_H
+= \lin{\Psi(x),\Psi(x')}_H,
+\end{align*}
+d.h. $\Psi$ ist Featuremap von $k'$.\qedhere
+\end{proof}
+
+\begin{lem}
+\label{prop:5.1.4}
+Sind $k_1$ und $k_2$ Kerne auf $X$ und $\alpha\ge 0$. Dann sind auch $k_1+k_2$
+und $\alpha \cdot k_1$ Kerne auf $X$.\fishhere
+\end{lem}
+\begin{proof}
+Der Beweis ist eine leichte Übung.\qedhere
+\end{proof}
+
+\begin{lem}
+\label{prop:5.1.5}
+Sind $k_1$ und $k_2$ Kerne auf $X$, so ist auch $k_1\cdot k_2$ ein Kern auf
+$X$.\fishhere
+\end{lem}
+\begin{proof}
+Der Beweis erfolgt unter Verwendung des Tensorprodukts von Hilberträumen. Wir
+überspringen diesen, da wir die Aussage nicht benötigen.\qedhere
+\end{proof}
+
+\begin{lem}[Lemma für Polynom-Kerne]
+\label{prop:5.1.6}
+\index{Lemma!für Polynom-Kerne}
+Seien $m\ge 0$, $d\ge 1$ natürliche Zahlen und $0 \le c \in\R$. Dann definiert
+\begin{align*}
+k(x,x') = \left(\lin{x,x'}_{\R^d} + c\right)^m,\qquad x,x'\in \R^d
+\end{align*}
+einen Kern auf $\R^d$.\fishhere
+\end{lem}
+\begin{proof}
+Nach Konstruktion existiert ein Polynom $p$ der Ordnung $m$ mit
+\begin{align*}
+k(x,x') = p(\lin{x,x'}),\qquad x,x'\in \R^d,
+\end{align*}
+wobei $p$ nur nichtnegative Koeffizienten besitzt. Es genügt daher zu zeigen,
+dass die Monome
+\begin{align*}
+(x,x') \mapsto \lin{x,x'}^m
+\end{align*}
+einen Kern definieren. Nun ist
+\begin{align*}
+\lin{x,x'}_{\R^d}^m = \left(\sum_{i=1}^d x_ix_i' \right)^m
+\end{align*}
+also können wir Lemma \ref{prop:5.1.2} anwenden mit $f_i(x) = \pi_i(x)$ der
+Projektion auf die $i$-te Koordinate und deren Potenzen.\qedhere
+\end{proof}
+
+\begin{lem}[Lemma für Taylor-Kerne]
+\label{prop:5.1.7}
+\index{Lemma!für Taylor-Kerne}
+%Sei $\ocirc{B}_{\R^d}\defl \setdef{x\in\R^d}{\norm{x}_2 < 1}$ und 
+Sei $f: (-r,r)\to \R$
+mit $r\in (0,\infty]$,
+\begin{align*}
+f(x) = \sum_{n=0}^\infty a_n t^n,\qquad t\in (-r,r).
+\end{align*}
+Falls $a_n\ge 0$ für alle $n\ge 0$, definiert
+\begin{align*}
+k(x,x') = f(\lin{x,x'}_{\R^d}) = \sum_{n=0}^\infty a_n \lin{x,x'}_{\R^d}^n
+\end{align*}
+einen Kern auf $\sqrt{r}\ocirc{B}_{\R^d}=\setdef{x\in\R^d}{\norm{x}_2 <
+\sqrt{r}}$.\fishhere
+\end{lem}
+\begin{proof}
+Für $x,x'\in \sqrt{r}\ocirc{B}_{\R^d}$ ist
+\begin{align*}
+\abs{\lin{x,x'}_{\R^d}} \le \norm{x}_2\norm{x'}_2 < r
+\end{align*}
+und daher die Konstruktion sinnvoll. Ferner seien
+\begin{align*}
+c_{j_1,\ldots,j_d} =
+\frac{n!}{\prod_{i=1}^d j_i!},\qquad\qquad 
+\sum_{j=1}^d j_i = n,
+\end{align*}
+dann gilt
+\begin{align*}
+k(x,x') &= \sum_{n=0}^\infty a_n \left( \sum_{i=1}^d x_i x_i'\right)^n
+=
+\sum_{n=0}^\infty a_n \sum_{\atop{j_1,\ldots,j_d\ge 0}{j_1+\ldots+j_d =n}}
+c_{j_1,\ldots,j_d} \prod_{i=1}^d x_i^{j_i}(x_i')^{j_i}\\
+&=
+\sum_{n=0}^\infty a_n \sum_{\atop{j_1,\ldots,j_d\ge 0}{j_1+\ldots+j_d =n}}
+c_{j_1,\ldots,j_d} \left(\prod_{i=1}^d x_i^{j_i}\right)\left(\prod_{i=1}^d
+(x_i')^{j_i}\right).
+\end{align*}
+Setze $\Phi: X\to l_2(\N_0^d)$, wobei $l_2(I)\defl
+\setdef{(a_i)_{i\in\II}}{\norm{(a_i)}_2 < \infty}$, dann ist
+\begin{align*}
+\Phi(x) = \left(\sqrt{a_{j_1+\ldots+j_d}c_{j_1,\ldots,j_d}}\prod_{i=1}^d
+x_i^{j_i} \right)_{(j_1,\ldots,j_d)\in\N_0^d}
+\end{align*}
+eine Featuremap, denn
+\begin{align*}
+&\sum_{n=0}^\infty a_n \sum_{\atop{j_1,\ldots,j_d\ge 0}{j_1+\ldots+j_d =n}}
+c_{j_1,\ldots,j_d} \left(\prod_{i=1}^d x_i^{j_i}\right)\left(\prod_{i=1}^d
+(x_i')^{j_i}\right)\\
+&=
+\sum_{n=0}^\infty \sum_{\atop{j_1,\ldots,j_d\ge 0}{j_1+\ldots+j_d =n}}
+\sqrt{a_{j_1+\ldots+j_d}c_{j_1,\ldots,j_d}}\left(\prod_{i=1}^d x_i^{j_i}\right)
+\sqrt{a_{j_1+\ldots+j_d}c_{j_1,\ldots,j_d}}\left(\prod_{i=1}^d
+(x_i')^{j_i}\right)\\
+&= \lin{\Phi(x),\Phi(x')}_{l^2(\N_0^d)}.\qedhere
+\end{align*}
+\end{proof}
+
+
+\begin{bsp}
+\label{bsp:5.1.8}
+\index{Exponential Kern}
+\textit{Exponential Kern}. Die Abbildung
+\begin{align*}
+k(x,x') = \exp\left(\lin{x,x'}_{\R^d} \right),\qquad x,x'\in\R^d
+\end{align*}
+ist ein Kern.\bsphere
+\end{bsp}
+
+\begin{bsp}
+\label{bsp:5.1.9}
+\index{Gauß Kern}
+\textit{Gauß Kern} oder \textit{Gauß'scher RBF-Kern}. Die Abbildung
+\begin{align*}
+k_\sigma(x,x') = \exp\left(-\sigma^2\norm{x-x'}_{\R^d}^2\right),\qquad
+x,x'\in\R^d
+\end{align*}
+ist ein Kern.
+\begin{proof}
+Eine einfache Rechnung zeigt
+\begin{align*}
+\norm{x-x'}^2 &= \lin{x-x',x-x'} = 
+\lin{x,x} - 2\lin{x,x'} + \lin{x',x'}\\
+&= \norm{x}^2 + \norm{x'}^2 - 2\lin{x,x'}.
+\end{align*}
+Setzen wir $h(x) = \exp\left(\sigma^2\norm{x}_{\R^d}^2\right)$, so können wir
+den Gauß-Kern schreiben als
+\begin{align*}
+\exp\left(-\sigma^2\norm{x-x'}_{\R^d}^2\right)
+=
+\frac{\exp\left(2\sigma^2\lin{x,x'}_{\R^d}\right)}
+{h(x)
+h(x')}.
+\end{align*}
+Ferner ist $(x,x')\mapsto \exp(2\sigma^2\lin{x,x'})$ ein Kern nach BSP
+\ref{bsp:5.1.8} und Lemma \ref{prop:5.1.3}. Betrachten wir einen zugehörigen
+Featurespace $H$ und eine Featuremap $\Phi$ und setzen
+\begin{align*}
+\Phi_\sigma = \frac{1}{h}\Phi : X\to H,
+\end{align*}
+so gilt
+\begin{align*}
+\lin{\Phi_\sigma(x),\Phi_\sigma(x')} &= 
+\lin{\frac{\Phi(x)}{h(x)},\frac{\Phi(x')}{h(x')}}
+= \frac{1}{h(x)h(x')} \lin{\Phi(x),\Phi(x')}\\
+&= \frac{\exp(2\sigma^2\lin{x,x'})}{h(x)h(x')}.\qedhere\bsphere
+\end{align*}
+\end{proof}
+\end{bsp}
+
+\begin{defn}
+\label{defn:5.1.10}
+Eine Funktion $k: X\times X\to\R$ heißt \emph{positiv definit}\index{positiv
+definit}, falls
+\begin{align*}
+\sum_{i,j=1}^n \alpha_i\alpha_j k(x_i,x_j) \ge 0
+\end{align*}
+für alle $n\ge 1$ und $\alpha_1,\ldots,\alpha_n\in\R$, d.h. die Grammatritzen
+$(k(x_i,x_j))_{i,j=1}^n$ sind positiv definit.
+
+$k$ heißt \emph{strikt positiv
+definit}\index{positiv definit!strikt}, falls für alle paarweise verschiedenen
+$x_1,\ldots,x_n$ und $\alpha_1,\ldots,\alpha_n\in\R$ gilt
+\begin{align*}
+\sum_{i,j=1}^n \alpha_i\alpha_j k(x_i,x_j) = 0 \Rightarrow
+\alpha_1=\ldots=\alpha_n = 0.
+\end{align*}
+
+$k$ heißt \emph{symmetrisch}\index{symmetrisch} falls $k(x,x')=k(x',x)$ für alle
+$x,x'\in X$.\fishhere
+\end{defn}
+
+\begin{prop}
+\label{prop:5.1.11}
+$k: X\times X\to\R$ ist genau dann ein Kern, wenn $k$ positiv definit und
+symmetrisch.\fishhere
+\end{prop}
+\begin{proof}
+"`$\Rightarrow$"': Sei $\Phi: X\to H$ eine Featuremap von $k$, dann gilt
+\begin{align*}
+k(x,x') = \lin{\Phi(x),\Phi(x')}
+\end{align*}
+und jedes Skalarprodukt ist positiv definit und symmetrisch
+\begin{align*}
+0 &\le \lin{h,h} = \lin{\sum_{i=1}^n \alpha_i\Phi(x_i),\sum_{j=1}^n \alpha_j
+\Phi(x_j) }\\
+&=
+\sum_{i,j=1}^n \alpha_i \alpha_j \lin{\Phi(x_i),\Phi(x_j)}
+= 
+\sum_{i,j=1}^n \alpha_i \alpha_j k(x_i,x_j).
+\end{align*}
+"`$\Leftarrow$"':
+Wir müssen Featurespace und -map konstruieren. Dazu setzen wir
+\begin{align*}
+H_\mathrm{pre} = \setdef{\sum_{i=1}^n \alpha_i k(x_i,\cdot)}{n\ge 1,\;
+\alpha_1,\ldots,\alpha_n\in\R,\; x_1,\ldots,x_n\in X}
+\end{align*}
+und für $f=\sum_{i=1}^n \alpha_i k(x_i,\cdot)$ und $g=\sum_{j=1}^n \beta_j
+k(x_j,\cdot)$ setze in $H_\mathrm{pre}$,
+\begin{align*}
+\lin{f,g}_{H_\mathrm{pre}} = 
+\sum_{i=1}^n\sum_{j=1}^n \alpha_i \beta_j k(x_i,x_j).
+\end{align*}
+Weiterhin ist
+\begin{align*}
+&\lin{f,g}_{H_\mathrm{pre}} = 
+\sum_{j=1}^m \beta_j f(x_j'),\\
+&\lin{f,g}_{H_\mathrm{pre}} = 
+\sum_{i=1}^m \alpha_i g(x_i),
+\end{align*}
+also ist $\lin{\cdot,\cdot}_{H_\mathrm{pre}}$ von der speziellen Darstellung von
+$f$ oder $g$ unabhängig und daher wohldefiniert.
+
+Offensichtlich ist $\lin{\cdot,\cdot}_{H_\mathrm{pre}}$ bilinear und
+symmetrisch, da $k$ symmetrisch.
+
+Zu zeigen ist also noch, dass $\lin{f,f}=0\Rightarrow f=0$. Wir zeigen dazu,
+dass $\lin{\cdot,\cdot}_{H_\mathrm{pre}}$ die Cauchy-Schwarz'sche Ungleichung
+erfüllt.
+
+\textit{1. Fall}. Ist $\lin{f,f}=0$ und $\lin{g,g} = 0$, dann ist
+\begin{align*}
+&0\le \lin{f+g,f+g} = \lin{f,f} + 2\lin{f,g} + \lin{g,g} = 2\lin{f,g},\\
+&0\le \lin{f-g,f-g} = \lin{f,f} - 2\lin{f,g} + \lin{g,g} = -2\lin{f,g}.
+\end{align*}
+Folglich ist $\lin{f,g}=0$ und die Cauchy-Schwarz'sche Ungleichung folgt. 
+
+\textit{2. Fall}. Ohne Einschränkung ist $\lin{g,g}>0$, setzen wir also $\alpha
+= - \frac{\lin{f,g}}{\lin{g,g}}$. Dann folgt
+\begin{align*}
+0\le \lin{f+\alpha g,f+\alpha g} = \ldots = \lin{f,f} -
+\frac{\lin{f,g}^2}{\lin{g,g}}.
+\end{align*}
+
+% Somit ist $\lin{\cdot,\cdot}_{H_\mathrm{pre}}$ ein Skalarprodukt auf
+% $H_\mathrm{pre}$. 
+
+Sei nun $f\in H_\mathrm{pre}$ mit $\lin{f,f} = 0$ und
+$
+f= \sum_{i=1}^n \alpha_i k(x_i,\cdot).
+$
+Dann ist
+\begin{align*}
+\abs{f(x)}^2 &= \abs{\sum_{i=1}^n \alpha_i k(x_i,\cdot)}^2
+=
+\abs{\lin{f,k(x,\cdot)}}^2\\
+&\le \lin{f,f}\lin{k(x,\cdot),k(x,\cdot)} = 0.
+\end{align*}
+Folglich ist $\lin{\cdot,\cdot}_{H_\mathrm{pre}}$ ein Skalarprodukt und damit
+$H_\mathrm{pre}$ ein Prähilbertraum.
+
+Zu $H_\mathrm{pre}$ existiert eine Vervollständigung $H$ mit einer isometrischen
+Einbettung $J: H_\mathrm{pre}\to H$.
+Setze nun $\Phi: X \to H$, $x\mapsto JK(x,\cdot)$, dann gilt
+\begin{align*}
+\lin{\Phi(x),\Phi(x')}_H &= \lin{Jk(x,\cdot),Jk(x',\cdot)}_H =
+\lin{k(x,\cdot),k(x',\cdot)}_{H_\mathrm{pre}} \\ &= k(x,x').\qedhere
+\end{align*}
+\end{proof}
+
+\begin{cor}
+\label{prop:5.1.12}
+Sind $k_n$, $n\ge 1$ Kerne auf $X$ und gibt es eine Funktion
+$k: X\times X \to \R$ mit $k_n(x,x')\to k(x,x')$ für alle $x,x'\in X$, so ist
+$k$ ein Kern.\fishhere
+\end{cor}
+\begin{proof}
+Alle $k_n$ sind symmetrisch und daher ist es die Grenzfunktion $k$ auch.
+Weiterhin gilt
+\begin{align*}
+0 \le \sum_{i,j=1}^d \alpha_i\alpha_j k_n(x_i,x_j) \to
+\sum_{i,j=1}^n \alpha_i\alpha_j k(x_i,x_j)
+\end{align*}
+und daher ist $k$ positiv definit.\qedhere
+\end{proof}
+
+\section{RKHS (Reproduzierende Kern-Hilbert-Räume)}
+
+Bisher waren Featurespace und -map nicht eindeutig, es gibt aber eine kanonische
+Wahl, den RKHS.
+
+\begin{defn}
+\label{defn:5.2.1}
+\begin{defnenum}
+\item Ein Hilbertraum $H$, der aus Funktionen $f: X\to\R$ besteht, heißt
+Hilbertfunktionenraum über $X$. (HFS)\index{Hilbertfunktionenraum}
+\item Ein HFS $H$ über $X$ heißt RKHS, falls die Dirac-Funktionale
+\begin{align*}
+\delta_x: H\to\R,\quad f\mapsto f(x)
+\end{align*}
+für alle $x\in X$ stetig sind.
+\item\label{defn:5.2.1:3} Eine Funktion $k: X\times X\to \R$ heißt
+\emph{reproduzierender Kern}
+\index{reproduzierender Kern}
+eines HFS über $X$, falls für jedes $x\in X$ $k(x,\cdot)\in H$ und
+die \emph{reproduzierende Eigenschaft}\index{reproduzierende Eigenschaft} erfüllt ist,
+\begin{align*}
+f(x) = \lin{f,k(x,\cdot)},\qquad \text{für alle } f\in H,\; x\in X.\fishhere
+\end{align*}
+\end{defnenum}
+\end{defn}
+
+\begin{bem*}[Bemkerungen.]
+\begin{bemenum}
+\item $L_2([0,1])$ ist kein RKHS (nicht mal ein HFS).
+\item Norm-Konvergenz in einem RKHS $H$ impliziert punktweise Konvergenz.
+\begin{proof}
+Sei $x\in X$ und gelte $\norm{f_n-f}_H\to 0$, dann gilt
+\begin{align*}
+f(x) = \delta_x(f) =
+\delta_x\left(\lim\limits_{n\to\infty} f_n\right) =
+\lim\limits_{n\to\infty} \delta_x(f_n) 
+= \lim\limits_{n\to\infty} f_n(x).\qedhere
+\end{align*}
+\end{proof}
+\item \ref{defn:5.2.1:3} wurde für den im Beweis von Satz \ref{prop:5.1.11}
+konstruierten Hilbertraum schon "`fast"'
+gezeigt.\maphere
+\end{bemenum}
+\end{bem*}
+
+\begin{lem}
+\label{prop:5.2.2}
+Sei $H$ ein HFS über $X$ und $k: X\times X\to \R$ ein reproduzierender Kern von
+$H$. Dann gelten
+\begin{propenum}
+\item $H$ ist ein RKHS.
+\item $k$ ist ein Kern, $H$ ist ein FS von $k$ und
+\begin{align*}
+\Phi: X\to H,\qquad x\mapsto k(x,\cdot)
+\end{align*}
+die \emph{kanonische Featuremap} von $k$.\fishhere
+\end{propenum}
+\end{lem}
+\begin{proof}
+\begin{proofenum}
+\item Eine direkte Rechung zeigt
+\begin{align*}
+\abs{\delta_x(f)} = \abs{f(x)} = \abs{\lin{f,k(x,\cdot)}_H} \le
+\norm{f}_H\norm{k(x,\cdot)}_H.
+\end{align*}
+Somit ist $\delta_x$ stetig und $\norm{\delta_x} \le \norm{k(x,\cdot)}$.
+\item Für $x'\in X$ fest schreibe $f\defl k(x',\cdot)$. Dann ist $f\in H$ per
+definitionem und
+\begin{align*}
+\lin{\Phi(x),\Phi(x')}_H &= \lin{k(x,\cdot),f}_H = \lin{f,k(x,\cdot)}_H = f(x) =
+k(x',x)\\ &= \lin{\Phi(x'),\Phi(x)}.\qedhere
+\end{align*}
+\end{proofenum}
+\end{proof}
+
+\begin{prop}[Existenz und Eindeutigkeit des reproduzierenden Kerns]
+\label{prop:5.2.3}
+Sei $H$ ein RKHS über $X$. Dann gilt
+\begin{align*}
+k: X\times X\to \R,\qquad
+k(x,x')=\lin{\delta_x,\delta_{x'}},
+\end{align*}
+ist der einzige reproduzierende Kern von $H$. Ist ferner $(e_i)_{i\in\II}$ eine
+Orthonormalbasis (ONB), so gilt
+\begin{align*}
+k(x,x') = \sum_{i\in\II} e_i(x) e_i(x'),\qquad x,x'\in X.\fishhere
+\end{align*}
+\end{prop}
+\begin{proof}
+\textit{Existenz}. Der Darstellungssatz von Fréchet-Riesz besagt, dass
+\begin{align*}
+I : H\to H',\qquad f\mapsto \lin{f,\cdot}_H
+\end{align*}
+ein isometrischer Isomorphismus ist, d.h. $H=H'$. Sei $J=I^{-1}: H'\to H$, so
+ist auch $J$ ein isometrischer Isomorphismus und  für $f\in H$ und $\omega\in
+H'$ gilt
+\begin{align*}
+\omega(f) = \lin{J\omega,f}_H.\tag{*}
+\end{align*}
+Für $x,x'$ folgt
+\begin{align*}
+k(x,x') = \lin{\delta_x,\delta_{x'}}_{H'} = \lin{J\delta_x,J\delta_{x'}}_H
+\overset{\text{(*)}}{=} \delta_x(J\delta_{x'}) = J\delta_{x'}(x).
+\end{align*}
+Folglich ist $J\delta_{x'} = k(\cdot,x')$ und damit
+\begin{align*}
+f(x') - \delta_{x'}(f) = \lin{f,J\delta_{x'}}_H = 
+\lin{f,k(\cdot,x')}_H = \lin{f,k(x',\cdot)}_H,
+\end{align*}
+d.h. $k$ ist reproduzierender Kern von $H$.
+
+\textit{Eindeutigkeit}. Sei $\tilde{k}$ ein beliebiger reproduzierender Kern von
+$H$.
+
+Für $x'\in X$ gilt $k(x',\cdot)\in H$. Für die ONB $(e_i)_{i\in\II}$ folgt
+\begin{align*}
+k(x',\cdot) = \sum_{i\in\II} \lin{k(x',\cdot), e_i}_He_i =
+\sum_{i\in\II} e_i(x')e_i,
+\end{align*}
+wobei
+\begin{align*}
+k(x',x) = \sum_{i\in\II } e_i(x')e_i(x)
+\end{align*}
+punktweise existiert. Insbesondere ist $\tilde{k}$ der einzige reproduzierende
+Kern von $H$ und die Darstellung mithilfe der ONB $(e_i)_{i\in\II}$ hängt nicht
+von der Wahl der ONB ab.\qedhere
+\end{proof}
+
+\begin{prop}
+\label{prop:5.2.4}
+Sei $k$ ein Kern über $X$ mit Featurespace $H_0$ und Featuremap $\Phi_0:X\to
+H_0$. Dann gelten
+\begin{propenum}
+\item\label{prop:5.2.4:1} $H\defl\setdef{f: X\to\R}{\exists \omega\in H_0 : f(x) =
+\lin{\omega,\Phi_0(x)}_{H_0} \forall x\in X}$ mit
+\begin{align*}
+\norm{f}_H \defl \inf\setdef{\norm{\omega}_{H_0}}{\lin{\omega,\Phi_0(\cdot)}_{H_0}
+= f}
+\end{align*}
+ist der einzige RKHS von dem $k$ ein reproduzierender Kern ist.
+\item\label{prop:5.2.4:2} Der Operator $V: H_0\to H$, $\omega\mapsto
+\lin{\omega,\Phi_0(\cdot)}_{H_0}$ ist eine metrische Surjektion, d.h. linear,
+beschränkt und $V\ocirc{B}_{H_0} = \ocirc{B}_H$.
+\item\label{prop:5.2.4:3} $H_\pre = \setdef{\sum_{i=1}^n \alpha_i
+k(x_i,\cdot)}{n\ge 1,\; \alpha_i\in \R,\; x_i\in X}$ ist dicht in $H$.
+\item\label{prop:5.2.4:4} Für $f\in H_\pre$ mit $f=\sum_{i=1}^n \alpha_i
+k(x_i,\cdot)$ gilt
+\begin{align*}
+\norm{f}_H^2 = \sum_{i,j=1}^n \alpha_i\alpha_j k(x_i,x_j).\fishhere 
+\end{align*}
+\end{propenum}
+\end{prop}
+
+\begin{bem*}[Verleich.]
+\ref{prop:5.1.11}: Der FS ist eine Vervollständigung von $H_\pre$.
+
+\ref{prop:5.2.4}: Es existiert eine Vervollständigung, die aus Funktionen $X\to
+\R$ besteht und die RKHS ist.\maphere
+\end{bem*}
+
+\begin{proof}
+\begin{proofenum}
+\item
+Zeige $H$ ist HFS über $X$. Offensichtlich besteht $H$ aus Funktionen $X\to \R$
+und $V: H_0\to H$ ist linear. Für $f\in H$ gilt ferner
+\begin{align*}
+\norm{f}_H = \inf\setdef{\norm{\omega}_{H_0}}{\omega\in V^{-1}(\setd{f})}.
+\end{align*}
+Zeige $\norm{\cdot}_H$ ist Hilbertraumnorm auf $H$.
+\begin{proofenuma}
+\item $\ker V = \setdef{\omega\in H_0}{V\omega = 0}=V^{-1}(\setd{0})$ ist
+abgeschlossen, da $V$ stetig.
+% Für eine Folge $(\omega_n)$ in $\ker V$ mit $\omega_n\to \omega\in H_0$ gilt
+% \begin{align*}
+% \lin{\omega,\Phi_0(x)}_{H_0} = \lim\limits_{n\to\infty}
+% \underbrace{\lin{\omega_n,\Phi_0(x)}_{H_0}}_{V\omega_n(x) = 0} = 0,
+% \end{align*}
+% d.h. $V\omega(x) = 0$ für alle $x\in X$ und daher ist $\omega\in \ker V$.
+\item Sei $\tilde{H}$ das orthogonale Komplement von $\ker V$ in $H_0$. 
+%, also $\tilde{H}\bot \ker V$ und $H_0= \tilde{H}\oplus \ker V$.
+Dann ist
+\begin{align*}
+V\big|_{\tilde{H}} : \tilde{H}\to H
+\end{align*}
+injektiv nach Konstruktion und außerdem surjektiv, denn $V$ ist surjektiv, d.h.
+zu $f\in H$ existiert ein $\omega\in H_0$ mit $V\omega = f$. Dann ist
+\begin{align*}
+&\omega = \tilde{\omega} + \omega_0,\quad
+\tilde{\omega} \in \tilde{H},\; \omega_0\in H_0,\\
+&f = V(\tilde{\omega}+\omega_0) = V(\tilde{\omega}) +
+\underbrace{V(\omega_0)}_{=0} = V\big|_{\tilde{H}}(\tilde{\omega}).
+\end{align*}
+\item Zeige $\norm{f}_H^2 = \norm{(V\big|_{\tilde{H}})f}_H$.
+\begin{align*}
+\norm{f}_H^2 &= \inf \setdef{\norm{\omega_0 +
+\tilde{\omega}}_{H_0}^2}
+{\omega_0\in \ker V, \tilde{\omega}\in H} \\ &
+= \inf \setdef{\norm{\omega_0}_{H_0}^2 + \norm{\tilde{\omega}}_{H_0}^2}
+{\omega_0\in \ker V, \tilde{\omega}\in H}\\
+&= \norm{V\big|_{\tilde{H}}^{-1}(f)}_{\tilde{H}}^2.
+\end{align*}
+Damit ist $H$ ein Hilbertraum, da $\tilde{H}$ ein Hilbertraum ist,
+$V\big|_{\tilde{H}}: \tilde{H}\to H$ bijektiv linear und isometrisch.
+
+Ferner folgt, dass $V$ eine metrische Surjektion ist.
+\end{proofenuma}
+\item
+Zeige $H$ ist ein RKHS und $k$ ein reproduzierender Kern von $H$.
+\begin{proofenuma}
+\item Für $x\in X$ gilt
+\begin{align*}
+k(x,\cdot) = \lin{\Phi_0(x),\Phi_0(\cdot)}_{H_0} = V\Phi_0(x)
+\end{align*}
+und folglich ist $k(x,\cdot)\in H$.
+\item $\Phi_0(x)\in \tilde{H} = (\ker V)^\bot$, denn es gilt für $\omega\in \ker
+V$,
+\begin{align*}
+\lin{\omega, \Phi_0(x)}_{H_0} = V_\omega(x) = 0,\qquad x\in X.
+\end{align*}
+\item Zeige, dass $f(x)= \lin{f,k(x,\cdot)}_H$. Da $f =
+V(V\big|_{\tilde{H}})^{-1}f$ und $V\big|_{\tilde{H}}$ Isometrie, folgt
+\begin{align*}
+f(x) = \lin{(V\big|_{\tilde{H}})^{-1}f,\Phi_0(x)}_{H_0} = 
+\lin{f,V\big|_{\tilde{H}},\Phi_0(x)}_H = \lin{f, k(x,\cdot)}_H.
+\end{align*}
+Somit ist $k$ ein reproduzierender Kern und nach Lemma \ref{prop:5.2.2} $H$ ein
+RKHS.
+\end{proofenuma}
+\item Zeige \ref{prop:5.2.4:3} und \ref{prop:5.2.4:4} gilt für jeden RKHS
+$\bar{H}$ für den $k$ reproduzierender Kern ist. Wir zeigen dazu, dass
+
+\begin{align*}
+H_\pre = \setdef{\sum_{i=1}^n \alpha_i k(x_i)}{n\ge 1,\; \alpha_i\in\R,\;
+x_i\in X}
+\end{align*}
+dicht ist in $\bar{H}$ und für $f = \sum_{i=1}^n \alpha_i k(x_i,\cdot)$ gilt
+\begin{align*}
+\norm{f}_{\bar{H}}^2 = \sum_{i,j=1}^n \alpha_i \alpha_j k(x_i,x_j).
+\end{align*}
+\begin{proofenuma}
+\item $k(x,\cdot) \in H_\pre$ und folglich ist $H_\pre \subset \bar{H}$ und
+$k(x,\cdot)\in \bar{H}$.
+\item Zeige, dass $\bar{H_\pre}^{\bar{H}} = \bar{H}$. Angenommen
+$\bar{H_\pre}^{\bar{H}} \subsetneq \bar{H}$, dann ist ${H_\pre}^\bot \neq (0)$,
+d.h. es existiert ein $f\in {H_\pre}^\bot$ und ein $x\in X$ mit $f(x)\neq 0$
+und $f\ \bot\  k(x,\cdot)$.
+\begin{align*}
+\Rightarrow 0 \neq f(x) = \lin{f,k(x,\cdot)}_{\bar{H}} = 0.\dipper 
+\end{align*}
+D.h. $\bar{H_\pre}^\bar{H}=\bar{H}$, also ist $H_\pre$ dicht in $\bar{H}$.
+
+Sei nun $f=\sum_{i=1}^n \alpha_i k(x_i,\cdot)$, dann gilt
+\begin{align*}
+\norm{f}_{\bar{H}}^2 &= \norm{\sum_{i=1}^n \alpha_i k(x_i,\cdot)}_{\bar{H}}^2
+= \lin{\sum_{i=1}^n \alpha_i k(x_i,\cdot),\sum_{j=1}^n \alpha_j k(x_j,\cdot)}\\
+&= \sum_{i,j=1}^n \alpha_i\alpha_j \lin{k(x_i,\cdot),k(x_j,\cdot)}_{\bar{H}}
+= \sum_{i,j=1}^n \alpha_i\alpha_j k(x_i,x_j)
+\end{align*}
+aufgrund der repräsentierenden Eigenschaft angewandt auf $g=k(x_i,x\cdot)$.
+\end{proofenuma}
+\item Zeige schließlich $H$ ist der einzige RKHS für den $k$ ein
+reproduzierender Kern ist.
+
+Seien dazu $H_1$ und $H_2$ RKHS für die $k$ ein reproduzierender Kern ist. Nach
+dem bisher Gezeigten ist $H_\pre$ dicht in $H_1$ und $H_2$ und die Normen von
+$H_1$ und $H_2$ sind auf $H_\pre$ identisch. Wir zeigen nun, dass $H_1\subset
+H_2$ und $\norm{f}_{H_1}= \norm{f}_{H_2}$ für alle $f\in H_1$. Dann folgt die
+Gleichheit aus der Symmetrie des Problems und $H$ ist eindeutig.
+
+Sei also $f\in H_1$, dann existiert eine Folge $(f_n)$ in $H_\pre$ mit
+\begin{align*}
+\norm{f_n-f}_{H_1}\to 0,\qquad n\to\infty.
+\end{align*}
+Folglich ist $(f_n)$ Cauchyfolge in $H_\pre$
+bezüglich $\norm{\cdot}_{H_1}$ und damit auch bezüglich $\norm{\cdot}_2$, also
+ist $(f_n)$ Cauchyfolge in $H_2$, d.h. es existiert ein $g\in H_2$, so dass
+\begin{align*}
+\norm{f_n-g}_{H_2} \to 0,\qquad n\to\infty.
+\end{align*}
+Da die Konvergenz in $H_{1,2}$ der punktweisen Konvergenz entspricht gilt daher
+auch
+\begin{align*}
+f(x) = \lim\limits_{n\to\infty} f_n(x) = g(x),\qquad x\in X.
+\end{align*}
+Folglich ist $f=g\in H_2$ und daher $H_1\subset H_2$. Da außerdem
+\begin{align*}
+\norm{f_n-f}_{H_2} \to 0,\qquad n\to\infty
+\end{align*}
+folgt $\norm{f_n}_{H_2}\to \norm{f}_{H_2}$, d.h.
+\begin{align*}
+\norm{f}_{H_1} =\lim\limits_{n\to\infty} \norm{f_n}_{H_1}
+=
+\lim\limits_{n\to\infty} \norm{f_n}_{H_2}
+=
+\norm{f}_{H_2}.\qedhere
+\end{align*}
+\end{proofenum}
+\end{proof}
+
+\begin{bem*}[Interpretation.]
+\begin{itemize}
+  \item[-] Zu jedem Kern $k$ existiert genau ein RKHS, so dass $k$ ein
+  reproduzierender Kern von $H$ ist.
+  \item[-] Zu jedem RKHS $H$ existiert genau ein reproduzierender Kern von $H$
+  und dieser ist auch ein Kern.
+\end{itemize}
+\noindent
+Zwischen Kern und RKHS besteht also eine 1:1 Relation.
+
+Der RKHS ist der "`kleinste Featurespace"' im Sinne von Surjektionen. $H$
+besteht aus den Funktionen, die entstehen, wenn Daten in einen Featurespace $H_0$
+abgebildet werden und dann ein linearer Ansatz gemacht wird.\maphere
+\end{bem*}
+
+\section{Eigenschaften von Kernen und RKHS}
+
+Ziel dieses Abschnittes ist es, eine Beziehung zwischen den Eigenschaften von
+Kernen und den Eigenschaften der Funktionen eines RKHS herzustellen.
+
+\begin{lem}
+\label{prop:5.3.1}
+Sei $k$ ein Kern auf $X$ und $H$ der RKHS von $k$, dann sind äquivalent
+\begin{equivenum}
+\item\label{prop:5.3.1:1} $k$ ist beschränkt.
+\item\label{prop:5.3.1:2} Alle $f\in H$ sind beschränkt.
+\end{equivenum}
+In diesem Fall gilt zudem
+\begin{align*}
+\norm{\id: H\to \LL_\infty(X)} = \norm{k}_\infty ,\qquad
+\norm{k}^2_\infty = \sup_{x\in X} k(x,x) < \infty.\fishhere
+\end{align*}
+% mit
+% \begin{align*}
+% 
+% \end{align*}
+\end{lem}
+\begin{proof}
+"`\ref{prop:5.3.1:1}$\Rightarrow$\ref{prop:5.3.1:2}"': Für $f\in H$ und $x\in X$
+gilt da $k(x,\cdot)\in H_\pre$ nach Satz \ref{prop:5.2.4},
+\begin{align*}
+\abs{f(x)} &= \abs{\lin{f,k(x,\cdot)}_H} \le \norm{f}_H\norm{k(x,\cdot)}_H
+= \norm{f}_H \sqrt{k(x,x)}\\
+&\le \norm{f}_H \underbrace{\norm{k}_\infty}_{< \infty}.
+\end{align*}
+Somit ist $f\in \LL_\infty(X)$ und $\norm{f}_\infty \le \norm{k}_\infty
+\norm{f}_H$.
+Also gilt insbesondere
+\begin{align*}
+\norm{\id : H\to \LL_\infty(X)} \le \norm{k}_\infty.
+\end{align*}
+"`\ref{prop:5.3.1:2}$\Rightarrow$\ref{prop:5.3.1:1}"': $\id: H\to \LL_\infty(X)$
+ist wohldefiniert nach Voraussetzung. Wir zeigen, dass $\id: H\to \LL_\infty(X)$
+stetig ist. Dazu benutzen wir den Satz vom abgeschlossenen Graphen. Sei dazu
+$(f_n)$ eine Folge in $H$ und $g\in \LL_\infty(X)$ mit
+\begin{align*}
+\norm{f_n-f}_H \to 0,\qquad \norm{\id(f_n) - g}_{\LL_\infty(X)} \to 0,\tag{*}
+\end{align*}
+so ist zu zeigen, dass $f=g$.
+
+Nach (*) gelten
+\begin{align*}
+f_n(x)\to f(x),\qquad f_n(x)\to g(x),\qquad \forall x\in X.
+\end{align*}
+Somit ist $f(x) = g(x)$ für alle $x\in X$ und daher ist
+\begin{align*}
+\id : H\to \LL_\infty(X)
+\end{align*}
+%abgeschlossen also stetig?
+stetig. Weiterhin ist
+\begin{align*}
+k(x,x) &\le \norm{k(x,\cdot)}_\infty
+\le \norm{\id: H \to \LL_\infty(x)}\norm{k(x,\cdot)}_H\\
+&= \norm{\id: H\to \LL_\infty(x)}\sqrt{k(x,x)}
+\end{align*}
+und daher
+\begin{align*}
+&\sqrt{k(x,x)} \le \norm{\id: H\to \LL_\infty(x)},\\
+\Rightarrow &
+\norm{k}_\infty \le  \norm{\id: H\to \LL_\infty(x)}.
+\end{align*}
+Insbesondere ist $k$ auf der Diagonalen beschränkt. Schließlich ist
+\begin{align*}
+\abs{k(x,x')} &= \abs{\lin{k(x,\cdot),k(x',\cdot)}_H}
+\le \norm{k(x,\cdot)}_H\norm{k(x',\cdot)}_H\\
+&= \sqrt{k(x,x)}\sqrt{k(x',x')}
+\le \norm{k}_\infty^2.\qedhere
+\end{align*}
+\end{proof}
+
+\begin{lem}
+\label{prop:5.3.2}
+Sei $k$ ein Kern auf $X$ und $H$ der RKHS von $k$, dann sind äquivalent
+\begin{equivenum}
+\item\label{prop:5.3.2:1} $k(x,\cdot)$ ist messbar für alle $x\in X$.
+\item\label{prop:5.3.2:2} Alle $f\in H$ sind messbar.\fishhere
+\end{equivenum}
+\end{lem}
+\begin{proof}
+"`\ref{prop:5.3.2:2}$\Rightarrow$\ref{prop:5.3.2:1}"': $k(x,\cdot)\in H$.
+
+"`\ref{prop:5.3.2:1}$\Rightarrow$\ref{prop:5.3.2:2}"': $k(x,\cdot)$ ist messbar
+und folglich besteht
+\begin{align*}
+H_\pre = \span \setdef{h(x,\cdot)}{x\in X}
+\end{align*}
+aus messbaren Funktionen. Sei nun $f\in H$, dann existiert eine Folge $(f_n)$ in
+$H_\pre$ mit $\norm{f_n-f}_H\to 0$ und folglich ist $f(x) =
+\lim\limits_{n\to\infty} f_n(x)$ für alle $x\in X$.\qedhere
+\end{proof}
+
+\begin{lem}
+\label{prop:5.3.3}
+Sei $k$ Kern auf $X$ mit RKHS $H$ und $k(x,\cdot)$ messbar für alle $x\in X$ und
+$H$ separabel. Dann ist $k$ messbar und die kanonische Featuremap $\Phi: X\to H$
+ist messbar.\fishhere
+\end{lem}
+\begin{proof}
+Wir überspringen den Beweis.\qedhere
+\end{proof}
+
+\begin{lem}
+\label{prop:5.3.4}
+Sei $X$ ein Hausdorff-Raum, $k$ ein Kern auf $X$ mit RKHS $H$. Dann sind
+äquivalent
+\begin{equivenum}
+\item\label{prop:5.3.4:1} $k$ ist beschränkt und separat stetig, d.h.
+$k(x,\cdot)$ ist stetig für alle $x\in X$.
+\item\label{prop:5.3.4:2} Alle $f\in H$ sind stetig und beschränkt. In diesem
+Fall gilt
+\begin{align*}
+\norm{\id: H\to C_b(X)} = \norm{k}_\infty < \infty.\fishhere
+\end{align*}
+\end{equivenum}
+\end{lem}
+\begin{proof}
+"`\ref{prop:5.3.4:1}$\Rightarrow$\ref{prop:5.3.4:2}"': $H_\pre \subset C_b(X)$
+nach Voraussetzung. Sei $f\in H$, dann existiert eine Folge $(f_n)$ in $H_\pre$
+mit $\norm{f_n-f}_H \to 0$. Da $k$ beschränkt folgt mit Lemma
+\ref{prop:5.3.1}, dass
+\begin{align*}
+\norm{f_n-f}_\infty \to 0
+\end{align*}
+und folglich ist $f\in C_b(X)$.
+
+"`\ref{prop:5.3.4:2}$\Rightarrow$\ref{prop:5.3.4:1}"': $k(x,\cdot)\in H$ ist
+stetig nach Voraussetzung und beschränkt nach Lemma \ref{prop:5.3.1}. Somit ist
+$k$ beschränkt und $\norm{k}_\infty = \norm{\id: H\to C_b(X)}$.\qedhere
+
+\end{proof}
+
+\begin{defn}
+\label{defn:5.3.5}
+Sei $k$ ein Kern auf $X$ mit RKHS $H$ und kanonischer Featuremap $\Phi: X\to H$.
+Dann heißt $d_k: X\times X\to [0,\infty)$
+\begin{align*}
+d_k(x,x') \defl \norm{\Phi(x)-\Phi(x')}_H
+= \sqrt{k(x,x)+k(x',x')-2k(x,x')}
+\end{align*}
+die \emph{Kernmetrik}\index{Kernmetrik} von $k$.\fishhere
+\end{defn}
+
+Man sieht leicht ein, dass $d_k$ genau dann eine Metrik ist, wenn $\Phi$
+injektiv ist.
+Im Allgemeinen ist $d_k$ lediglich eine Semi-Metrik.
+
+\begin{lem}
+\label{prop:5.3.6}
+Sei $(X,\tau)$ ein Hausdorff-Raum, $k$ ein Kern auf $X$ und $H$ ein RKHS von
+$k$, $\Phi: X\to H$ die kanonische Featuremap. Dann sind äquivalent
+\begin{equivenum}
+\item\label{prop:5.3.6:1} $k$ ist stetig.
+\item\label{prop:5.3.6:2} $k$ ist separat stetig und $x\mapsto k(x,x)$ ist
+stetig.
+\item\label{prop:5.3.6:3} $\Phi: X\to H$ ist stetig.
+\item\label{prop:5.3.6:4} $\id : (X,\tau) \to (X,d_k)$ ist stetig, d.h. jede
+$d_k$-offene Kugel ist $\tau$-offen.\fishhere
+\end{equivenum}
+\end{lem}
+
+\begin{proof}
+"`\ref{prop:5.3.6:1}$\Rightarrow$\ref{prop:5.3.6:2}"': Trivial.
+
+"`\ref{prop:5.3.6:2}$\Rightarrow$\ref{prop:5.3.6:4}"': $d_k(\cdot,x):
+(X,\tau)\to \R$ ist stetig und daher ist die Kugel
+\begin{align*}
+B_\ep(x',d_k) = \setdef{x'}{d_k(x,x') < \ep}
+\end{align*}
+$\tau$-offen. Diese Kugeln erzeugen aber gerade die Topologie von $d_k$, d.h.
+die Toplogie von $\tau$ ist größer oder gleich der Topologie von $d_k$.
+
+"`\ref{prop:5.3.6:4}$\Rightarrow$\ref{prop:5.3.6:3}"': $\Phi: (X,d_k)\to H$ ist
+stetig nach Konstruktion von $d_k$ und somit ist $\Phi: (X,\tau)\to H$ stetig
+nach Voraussetzung.
+
+"`\ref{prop:5.3.6:3}$\Rightarrow$\ref{prop:5.3.6:1}"': Seien $(x_n)$ und
+$(y_n)$ Folgen in $X$ mit $x,y\in X$, so dass $x_n\to x$ und $y_n\to y$, so gilt
+\begin{align*}
+\abs{k(x_n,y_n)-k(x,y)} &= \abs{\lin{\Phi(y_n),\Phi(x_n)-\Phi(x)}+
+\lin{\Phi(x),\Phi(y_n)-\Phi(y)}}\\
+&\le \norm{\Phi(y_n)}\norm{\Phi(x_n)-\Phi(x)} +
+\norm{\Phi(x)}\norm{\Phi(y_n)-\Phi(y)}\\
+&\le \norm{\Phi(y_n)}d_k(x_n,x) + \norm{\Phi(x)}d_k(y_n,y). 
+\end{align*}
+Nach Voraussetzung ist $\Phi$ stetig, d.h. $\norm{\Phi(y_n)}$ ist beschränkt.\qedhere 
+\end{proof}
+
+\begin{prop}
+\label{prop:5.3.7}
+Sei $X$ ein kompakter Hausdorffraum und $k$ ein stetiger Kern mit RKHS $H$. Dann
+ist die Abbildung
+\begin{align*}
+\id : H\to C(X)
+\end{align*}
+wohldefiniert und kompakt.\fishhere
+\end{prop}
+\begin{proof}
+Da $X$ kompakt und $k$ stetig, ist $k$ auch beschränkt. Foglich ist $\id :H\to
+C(X)$ wohldefiniert und stetig (Lemma \ref{prop:5.3.4}).
+
+Sei $C(X,d_k)$ der Raum der $d_k$-stetigen Funktionen $f: X\to \R$.
+Offensichtlich ist $C_b(X,d_k)\subset l_\infty(X)$. Außerdem ist
+$X$  kompakt und $\Phi$ stetig, d.h. $\Phi(X)\subset H$ ist kompakt. Da
+$\Phi$ Isometrie bezüglich $d_k$, ist $(X,d_k)$ kompakt und folglich
+\begin{align*}
+C(X,d_k) = C_b(X,d_k).
+\end{align*} 
+Für $f\in B_H$ und $x,y\in H$ gilt
+\begin{align*}
+\abs{f(x)-f(y)} = \abs{\lin{f,\Phi(x)-\Phi(y)}_H}
+\le \norm{f}\norm{\Phi(x)-\Phi(y)}
+\le d_k(x,y).
+\end{align*}
+Also sind alle Funktionen in $B_H$ lipschitz bezüglich $d_k$ mit
+lipschitz-Konstante $\le 1$. Der Satz von Arzelà-Ascoli besagt nun, dass
+\begin{align*}
+\bar{B_H} \text{ kompakt ist in } C(X,d_k).
+\end{align*}
+Somit ist $\id_{H\to C(X,d_k)}(B_H)$ relativkompakt und daher $\id: H\to
+C(X,d_k)$ kompakt. Da $C(X,d_k)\subset C(X)$ mit Normgleichheit und
+\begin{align*}
+H \overset{\id}{\longrightarrow} C(X,d_k)
+\overset{\text{stetig}}{\opento} C(X)
+\end{align*}
+ist $\id: H\to C(X)$ kompakt.\qedhere
+\end{proof}
+
+\begin{bem*}
+Ist $X$ \textit{nicht} kompakt aber $k$ stetig und beschränkt, so ist
+\begin{align*}
+\id: H\to C_b(X)
+\end{align*}
+wohldefiniert und stetig aber im Allgemeinen \textit{nicht} kompakt.
+
+Betrachte z.B. $X=\R$ und den Gauß-Kern $k_\sigma(x,y) =
+\exp(-\sigma^2\norm{x-y}_2^2)$. Seien $m,n\in\N$ mit $n\neq m$, so gilt
+\begin{align*}
+\norm{k_\sigma(m,\cdot)-k_\sigma(n,\cdot)}_\infty
+&\ge
+\abs{k_\sigma(m,m)-k_\sigma(n,m)}\\
+&= 1- \exp(-\sigma^2\abs{m-n}^2) \ge 1-e^{-\sigma^2},
+\end{align*}
+da $\abs{m-n} \ge 1$. Es ist aber
+\begin{align*}
+\norm{k_\sigma(n,\cdot)}_H = \sqrt{k_\sigma(n,n)} = 1
+\end{align*}
+und folglich $\id: H\to C_b(X)$ nicht kompakt.\maphere
+\end{bem*}
+
+\begin{lem}
+\label{prop:5.3.8}
+Sei $X$ ein separabler, metrischer Raum und $k$ ein stetiger Kern mit RKHS $H$.
+Dann ist $H$ separabel.\fishhere
+\end{lem}
+\begin{proof}
+$\Phi: X\to H$ ist stetig, da $k$ stetig und somit ist $\Phi(X)$ separabel.
+Folglich ist auch $H_\pre = \mathrm{span}\ \Phi(X)$ separabel, denn man kann
+$\mathrm{span}$ durch Linearkombinationen mit rationalen Koeffizienten
+approximieren, und damit ist auch $H=\bar{H_\pre}$ separabel.~\qedhere
+\end{proof}
+
+Wir wollen nun untersuchen, wie sich die Differenzierbarkeit des Kerns auf die
+Featuremap und den RKHS übertragen. Dazu betrachten wir einen Kern $k:
+\R^d\times \R^d\to \R$ und die Abbildung
+\begin{align*}
+\tilde{k}: \R^{2d}\to \R,\qquad (x,y)\mapsto \tilde{k}((x,y)) = k(x,y).
+\end{align*}
+Falls die partiellen Ableitungen von $i$ und $i+d$ von $\tilde{k}$ existieren,
+setzen wir
+\begin{align*}
+\partial_i \partial_{i+d} k\defl \partial_i \partial_{i+d}\tilde{k}.
+\end{align*}
+Analog lässt sich dies definieren, wenn $X\subset\R^d$ offen.
+
+\begin{lem}
+\label{prop:5.3.9}
+Sei $X\subset\R^d$ offen, $k$ ein Kern mit Featurespace $H$ und Featuremap
+$\Phi:~X\to H$, so dass $\partial_i\partial_{i+d} k$ für
+$1\le i\le d$ existiert und stetig ist. Dann existiert auch
+\begin{align*}
+\partial_i \Phi: X\to H
+\end{align*}
+und ist stetig und es gilt
+\begin{align*}
+\lin{\partial_i \Phi(x),\partial_i\Phi(y)}_H = 
+\partial_i\partial_{i+d}k(x,y) =
+\partial_{i+d}\partial_{i}k(x,y).\fishhere 
+\end{align*}
+\end{lem}
+\begin{proof}
+Wir beweisen nur den Fall $X=\R^d$. Sei $e_i$ der $i$-te Einheitsvektor, dann
+definiere für festes $h>0$,
+\begin{align*}
+\Delta_h \Phi(x) \defl \Phi(x+he_i) - \Phi(x).
+\end{align*}
+
+Wir zeigen nun, dass $(h_n^{-1}\Delta_{h_n}\Phi(x))_n$ für alle Folgen $h_n\to 0$
+mit $h_n\neq 0$ konvergiert. Dann ist $\lim\limits_{n\to\infty} h_n^{-1}
+\Delta_{h_n} \Phi(x) \defr \partial_i \Phi(x)$ unabhängig von der Folge $(h_n)$. Da
+$H$ vollständig ist, genügt es zu zeigen, dass $(h_n^{-1}\Delta_{h_n}\Phi(x))$
+eine Cauchyfolge ist. Es ist
+\begin{align*}
+&\norm{h_n^{-1}\Delta_{h_n}\Phi(x)-h_m^{-1}\Delta_{h_m} \Phi(x)}^2_H\\
+&\quad= \norm{h_n^{-1}\Delta_{h_n}\Phi(x)}_H^2
++ \norm{h_m^{-1}\Delta_{h_m}\Phi(x)}_H^2\\
+&\quad- 2 \lin{h_n^{-1}\Delta_{h_n} \Phi(x),h_m^{-1}\Delta h_m \Phi(x)}\\
+&\quad\le
+2\left(\ep + \partial_i\partial_{i+d}k(x,x)
+-\lin{h_n^{-1}\Delta_{h_n} \Phi(x),h_m^{-1}\Delta_{h_m} \Phi(x)}\right)\tag{*}
+\end{align*}
+Wir definieren für festes $n$ und $x$,
+\begin{align*}
+K_{x,n}(y) = k(x+h_ne_i,y) - k(x,y),
+\end{align*}
+dann ist
+\begin{align*}
+\lin{\Delta_{h_n} \Phi(x),\Delta_{h_m} \Phi(y)}_H
+&=
+\lin{\Phi(x+h_ne_i)-\Phi(x),\Phi(y+h_me_i)-\Phi(y)}_H\\
+&= k(x+h_ne_i,y+h_me_i) - k(x,y+h_me_i) \\ &
+- k(x+h_ne_i,y) + k(x,y)\\ 
+&= K_{x,n}(y+h_m e_i)-K_{x,n}(y).
+\end{align*}
+Wenden wir den Mittelwertsatz auf $K_{x,n}$ an, erhalten wir ein $\xi_{m,n}\in
+[-\abs{h_m},\abs{h_m}]$ mit
+\begin{align*}
+h_m^{-1}\lin{\Delta_{h_n}\Phi(x),\Delta_{h_m} \Phi(y)}
+&= h_m^{-1}\left(K_{x,n}(y+h_m e_i)-K_{x,n}(y) \right)\\
+&= \partial_i K_{x,n}(y+\xi_{m,n}e_i) \\
+&= \partial_{i+d}\left(k(x+h_n
+e_i,y+\xi_{m,n}e_i) - k(x,y+\xi_{m,n}e_i)\right)
+\end{align*} 
+Wir wenden nun den Mittelwertsatz auf die erste Variable an und erhalten ein
+$\eta_{n,m}\in [-\abs{h_n},\abs{h_n}]$, so dass
+\begin{align*}
+\lin{h_n^{-1}\Delta_{h_n}\Phi(x),h_m^{-1}\Delta_{h_m} \Phi(y)}_H
+= \partial_i \partial_{i+d} k(x+\eta_{n,m}e_i,y+\xi_{m,n}e_i)
+\end{align*}
+Somit ist nach (*),
+\begin{align*}
+&\norm{h_n^{-1}\Delta_{h_n}\Phi(x)-h_m^{-1}\Delta_{h_m} \Phi(x)}^2_H\\
+&\quad\le
+2\left(\ep + \partial_i\partial_{i+d}k(x,x)
+-\partial_i \partial_{i+d} k(x+\eta_{n,m}e_i,x+\xi_{m,n}e_i)\right)\\
+&\quad < 4\ep,\qquad n,m\ge n_0,
+\end{align*}
+denn $\partial_i \partial_{i+d}k$ ist stetig. Also ist
+$(h_n^{-1}\Delta_{h_n}\Phi(x))$ Cauchyfolge und daher existiert $\partial_i
+\Phi(x)$ und ist stetig.
+
+Weiterhin gilt
+\begin{align*}
+\lin{h_n^{-1}\Delta_{h_n}\Phi(x),h_m^{-1}\Delta_{h_m} \Phi(y)}_H\to \partial_i
+\partial_{i+d} k(x,y)
+\end{align*} 
+und da $h_n^{-1}\Delta_{h_n}\Phi(x) \to \partial_i \Phi(x)$, folgt die
+Formel.\qedhere
+\end{proof}
+
+\begin{defn}
+\label{defn:5.3.10}
+\index{Kern!stetig differenzierbar}
+Ein Kern $k$ auf $X\subset\R^d$ offen heißt \emph{$m$-fach stetig
+differenzierbar}, wenn
+\begin{align*}
+\partial^{\alpha,\alpha} k : X\times X\to \R
+\end{align*}
+existiert und stetig ist für alle $\alpha\in\N_0^d$ mit $\abs{\alpha}\le
+m$.\fishhere
+\end{defn}
+
+\begin{cor}
+\label{prop:5.3.11}
+Sei $k$ ein $m$-fach stetig differenzierbarer Kern mit RKHS $H$. Dann sind alle
+$f\in H$ $m$-fach stetig differenzierbar und es gilt
+\begin{align*}
+\abs{\partial^\alpha f(x)} \le \norm{f}\sqrt{\partial^{\alpha,\alpha}k(x,x)},
+\end{align*}
+für alle $x\in X$ und $\alpha\in \N_0^d$ mit $\abs{\alpha}\le m$.\fishhere
+\end{cor}
+\begin{proof}
+Iteration von Lemma \ref{prop:5.3.9} impliziert, dass $\partial^\alpha \Phi: X
+\to H$ Featuremap von $\partial^{\alpha,\alpha} k$. Da $\lin{f,\cdot}$ stetig,
+folgt
+\begin{align*}
+\lin{f,\partial^\alpha \Phi(x)}_H = \partial^\alpha \lin{f,\Phi(x)} =
+\partial^\alpha f(x)
+\end{align*}
+und nach Cauchy-Schwarz
+\begin{align*}
+\abs{\partial^\alpha f(x)} = \abs{\lin{f,\partial^\alpha \Phi(x)}} \le
+\norm{f}_H \norm{\partial^\alpha \Phi(x)}_H
+= \norm{f}_H \sqrt{\partial^{\alpha,\alpha}k(x,x)}.\qedhere
+\end{align*}
+\end{proof}
+
+\section{Große RKHS}
+
+Wann kann ein RKHS "`viele"' Funktionen approximieren?
+
+\begin{defn}
+\label{defn:5.4.1}
+Sei $(X,d)$ ein kompakter metrischer Raum, dann heißt ein stetiger Kern $k$ auf
+$X$ \emph{universell}\index{Kern!universell}, wenn der RKHS $H$ von $k$ dicht in
+$C(X)$ ist, d.h.
+\begin{align*}
+\forall g\in C(X), \ep > 0 \exists f\in H : \norm{f-g}_\infty \le \ep.\fishhere
+\end{align*}
+\end{defn}
+
+\begin{lem}
+\label{prop:5.4.2}
+Sei $(X,d)$ ein kompakter metrischer Raum und $k$ ein universeller Kern auf $X$.
+Dann gelten
+\begin{propenum}
+\item Jede Featuremap von $k$ ist injektiv.
+\item $k(x,x) > 0$ für alle $x\in X$.
+\item Der Kern $k^* : X\times X \to \R$ gegeben durch
+\begin{align*}
+k^*(x,y) = \frac{k(x,y)}{\sqrt{k(x,x)k(y,y)}}
+\end{align*}
+ist universell.
+\item Ist $M\subset X$ abgeschlossen, dann ist $k\big|_{M\times M}$
+universell.\fishhere
+\end{propenum}
+\end{lem}
+\begin{proof}
+\begin{proofenum}
+\item Seien $x_1\neq x_2\in X$ und $g: X\to \R$ mit $x\in X$,
+\begin{align*}
+g(x) \defl \frac{d(x_1,x)}{d(x_1,x)+d(x_2,x)} - \frac{d(x_2,x)}{d(x_1,x)+d(x_2,x)},
+\end{align*}
+$g(x_1)=-1$ und $g(x_2)=1$ und $g$ stetig auf $X$, also $g\in C(X)$. Sei nun
+$H_0$ ein Featurespace von $k$ und $\Phi_0 : X\to H_0$ eine Featuremap und
+ferner $H$ der RKHS von $k$. Da $k$ universell, existiert ein $f\in H$ mit
+\begin{align*}
+\norm{f-g}_\infty \le \frac{1}{2} \Rightarrow f(x_1) \le -\frac{1}{2}\text{ und
+} f(x_2)\ge \frac{1}{2}.
+\end{align*}
+Nach Satz \ref{prop:5.2.4} existiert ein $\omega\in H_0$ mit
+$f=\lin{\omega,\Phi_0(\cdot)}$ und daher
+\begin{align*}
+\begin{rcases}
+\lin{\omega,\Phi_0(x_1)}_H \le -\frac{1}{2},\\
+\lin{\omega,\Phi_0(x_2)}_H \ge \frac{1}{2},
+\end{rcases}
+\Rightarrow
+\Phi_0(x_1)\neq \Phi_0(x_2).
+\end{align*}
+\item Zeige $k(x,x)>0$ für alle $x\in X$. In 1) haben wir gesehen, dass es für
+$x\in X$ ein $g\in C(X)$ mit $g(x)=1$ gibt. Dazu gibt es ein $f\in H$ mit
+$\norm{f-g}_\infty \le \frac{1}{2}$ und folglich
+\begin{align*}
+\frac{1}{2} \le f(x) = \lin{f,\Phi(x)}_H \Rightarrow \Phi(x)\neq 0.
+\end{align*}
+Somit ist $k(x,x) = \lin{\Phi(x),\Phi(x)}_H > 0$.
+\item Zeige, dass der normalisierte Kern universell ist. Schreibe dazu
+\begin{align*}
+\alpha(x) \defl \left(k(x,x) \right)^{-1/2},
+\end{align*}
+dann ist $\alpha\Phi : X\to H$ eine Featuremap von $k^*$. Sei nun $g\in C(X)$
+und $\ep > 0$. Sei weiterhin
+\begin{align*}
+c \defl \norm{\alpha}_\infty < \infty.
+\end{align*}
+Dann existiert ein $f\in H$ mit $\norm{f-\frac{g}{\alpha}}_\infty \le
+\frac{\ep}{c}$ und damit
+\begin{align*}
+\norm{\lin{f,\alpha \Phi(\cdot)}_H-g}_\infty \le
+\underbrace{\norm{\alpha}_\infty}_{\le c} \norm{f-\frac{g}{\alpha}}_\infty \le
+\ep.
+\end{align*}
+\item Sei $M\subset X$ abgeschlossen, also kompakt, so ist
+$k\big|_{M\times M}$ universell. Tietzes Fortsetzungssatz besagt
+\begin{align*}
+\forall g\in C(M) \exists \hat{g}\in C(X) : \hat{g}\big|_M = g.
+\end{align*}
+Zu jedem $g\in C(X)$ und $\ep >0$ existiert eine Fortsetzung $\hat{g}\in C(X)$
+und ein $f\in H$ mit $\norm{\hat{g}-f}_\infty \le\ep$. Dann ist auch
+\begin{align*}
+\norm{\hat{g}\big|_M - f\big|_M}_\infty \le \ep,
+\end{align*}
+wobei $f\big|_M$ im RKHS von $k\big|_{M\times M}$.\qedhere
+\end{proofenum} 
+\end{proof}
+
+\begin{prop}
+\label{prop:5.4.3}
+Sei $(X,d)$ ein kompakter metrischer Raum, $k$ stetiger Kern mit $k(x,x) >
+0$ für alle $x\in X$. Ferner sei $\Phi: X\to l_2$ eine injektive Featuremap von
+$k$. Schreibe $\Phi_n : X\to \R$ für die $n$-te Komponente von $\Phi$, d.h.
+$\Phi(x) = (\Phi_n(x))_{n\ge 1}$ für alle $x\in X$.
+
+Schreibe $\AA\defl\mathrm{span}\setdef{\Phi_n}{n\ge 1}$. Ist $\AA$ eine Algebra,
+dann ist $k$ universell.~\fishhere
+\end{prop}
+
+Zum Beweis des Satzes benötigen wir den
+\begin{prop*}[Satz von Stone-Weierstraß]
+\index{Satz!von Stone-Weierstraß}
+Sei $(X,d)$ ein kompakter metrischer Raum, $\AA\subset C(X)$ Algebra mit
+\begin{propenum}
+\item Zu jedem $x\in X$ existiert ein $f\in \AA$ mit $f(x)\neq 0$. "`$\AA$
+verschwindet nicht"'
+\item Zu $x\neq y\in X$ existiert ein $f\in \AA$ mit $f(x)\neq f(y)$. "`$\AA$
+separiert"'.
+\end{propenum}
+Dann gilt $\AA\subset C(X)$ ist dicht.\fishhere
+\end{prop*}
+
+\begin{proof}
+\begin{proofenum}
+\item $\norm{(\Phi_n(x))_{n\ge 1}}_{l^2}^2 = \lin{\Phi(x),\Phi(x)}_{l^2} =
+k(x,x) > 0$ und daher existiert ein $n\in\N$, so dass $\Phi_n(x) > 0$.
+\item Sei nun $x\neq y$, dann ist $\Phi(x)\neq \Phi(y)$ nach Voraussetzung, d.h. es
+gibt ein $n\in\N$, so dass $\Phi_n(x)\neq \Phi_n(y)$.
+\item Zu zeigen ist noch, dass $\AA\subset C(X)$. Da $k$ stetig, ist $\Phi: X\to
+l^2$ stetig und daher ist auch $\Phi_n$ stetig für alle $n\ge 1$, d.h.
+$\AA\subset C(X)$. Damit zeigt Stone-Weierstraß, dass
+$\bar{A}^{\norm{\cdot}_\infty} = C(X)$. Für $g\in C(X)$ und $\ep > 0$ existiert
+somit ein $f\in\AA$ mit $\norm{f-g}_\infty \le \ep$ und
+\begin{align*}
+f = \sum_{j=1}^m \alpha_j \Phi_{n_j}.
+\end{align*}
+Setze
+\begin{align*}
+\omega_n \defl 
+\begin{cases}
+\alpha_j, & \text{falls } n_j = n,\\
+0, & \text{sonst},
+\end{cases}
+\end{align*}
+und $\omega\defl (\omega_n)_{n\ge 1}$. Somit ist $\omega\in l^2$ und
+$f=\lin{\omega,\Phi(\cdot)}_{l^2}$ nach Konstruktion.\qedhere
+\end{proofenum}
+\end{proof}
+
+\begin{cor}
+\label{prop:5.4.4}
+Für $r\in (0,\infty]$ sei $h: (-r,r)\to \R$ mit
+\begin{align*}
+h(t) = \sum_{n\ge 0} a_n t^n,\qquad t\in (-r,r).
+\end{align*}
+Falls $a_n >0$ für alle $n\ge 0$, ist der Taylorkern universell auf allen
+kompakten Teilmengen $X\subset \sqrt{r}\ocirc{B}_{\R^d}$.\fishhere
+\end{cor}
+\begin{proof}
+Wir haben schon gesehen, dass $\Phi: X\to l^2(\N_0^d)$,
+\begin{align*}
+\Phi(x) = \left(\underbrace{\sqrt{a_{j_1}\ldots a_{j_d}
+c_{j_1,\ldots,j_d}}}_{>0}
+\prod\limits_{i=1}^d x_i^{j_i}  \right)_{j_1,\ldots,j_d\ge 0}
+\end{align*}
+eine Featuremap von $k$ ist.
+\begin{proofenum}
+\item $k$ ist stetig, da $h$ und $\lin{\cdot,\cdot}_{\R^d}$ stetig.
+\item $a_0 > 0$ und daher ist $k(x,x) = \sum_{n\ge 0} a_n(\lin{x,x})^n \ge a_0
+> 0$.
+\item $\Phi$ ist injektiv. Sei $x\neq y$ dann existiert ein
+$i\in\setd{1,\ldots,d}$ mit $x_i\neq y_i$. Nimm $j_i = 1$, alle anderen $j_l =
+0$. Folglich ist $\Phi_{j_1,\ldots,j_d}(x) \neq \Phi_{j_1,\ldots,j_d}(y)$ und
+daher $\Phi(x)\neq\Phi(y)$.
+
+Zu zeigen ist, dass
+$\AA=\mathrm{span}\setdef{\Phi_{j_1,\ldots,j_d}}{j_1,\ldots,j_d \ge 0}$ ist
+Algebra. Da $a_n \ge 0$ ist $\AA$ Algebra, denn $\AA$ enhält alle Monome und
+Linearkombinationen davon. Also ist Satz \ref{prop:5.4.3} anwendbar.\qedhere
+\end{proofenum}
+\end{proof}
+
+\begin{bsp*}
+Der \textit{Exponentialkern}
+\begin{align*}
+h(x,x') \defl \exp\left( \lin{x,x'}_{\R^d}\right)
+\end{align*}
+ist universell auf allen Kompakta, da $a_n = \frac{1}{n!} >0$.\bsphere
+\end{bsp*}
+
+\begin{bsp*}
+Für $\sigma > 0$ ist der \textit{Gaußkern}
+\begin{align*}
+k_\sigma(x,x') = \exp(-\sigma^2\abs{x-x'}^2)
+\end{align*}
+universell auf allen Kompakta. Da
+\begin{align*}
+h_\sigma(x,x') =
+\frac{\exp(2\sigma^2\lin{x,x})}{\exp(\sigma^2\abs{x}^2)\exp(\sigma^2\abs{x'}^2)},
+\end{align*}
+$\exp(2\sigma^2\lin{x,x})$ universell und $h_\sigma$ eine normalisierte Fassung
+davon.\bsphere
+\end{bsp*}
+
+\begin{bem*}[Bemerkungen.]
+\begin{bemenum}
+\item
+Dahmen und Michelli zeigten 1987, dass ein Kern $k$ genau dann universell ist,
+wenn
+\begin{align*}
+a_0 > 0 \text{ und } \sum_{a_{2n}>0} \frac{1}{2n} = \sum_{a_{2n+1}>0}
+\frac{1}{2n+1} = \infty.
+\end{align*}
+\item Eine leichte Übung zeigt, dass jeder universelle Kern strikt positiv
+ist.
+\item Pirkus zeigte 2004, dass Taylorkerne genau dann strikt positiv sind, wenn
+\begin{align*}
+a_0 > 0\text{ und } \abs{\setdef{n}{a_{2n} >0}} = \abs{\setdef{n}{a_{2n+1}>0}} =
+\infty.
+\end{align*}
+\item
+Man kann auch untersuchen, wann $H\subset L_p(\mu)$ dicht ist.
+
+Für Gaußkerne ist $H_\sigma\subset L_p(\mu)$ dicht für alle
+$p\in[1,\infty)$ und alle W-Maße $\mu$ auf $\R^d$ und $\mu=\lambda^d$ auf
+$\R^d$.
+\item Sei $(X,d)$ kompakter metrischer Raum, dann existiert ein universeller
+Kern auf $X$.
+\item Sei $(X,\tau)$ kompakter Hausdorffraum, dann existiert genau dann ein
+universeller Kern auf $X$, wenn $(X,\tau)$ metrisierbar ist.
+\item In der Regel gilt für universelle RKHS $H$, dass $\dim H = \infty$,
+insbesondere gilt dies für $X\subset \R^d$ mit $\ocirc{X}\neq
+\varnothing$.\maphere
+\end{bemenum}
+\end{bem*}
